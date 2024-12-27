@@ -16,8 +16,8 @@
 var canvas = document.getElementById('canvas'),
 ctx = canvas.getContext("2d", { willReadFrequently: true });
 
-canvas.width = Math.max(window.innerWidth-16, 1096);    
-canvas.height = Math.max(window.innerHeight-21, 550);    
+canvas.width = window.innerWidth;    
+canvas.height = window.innerHeight;    
     
 const w = canvas.width;
 const h = canvas.height;    
