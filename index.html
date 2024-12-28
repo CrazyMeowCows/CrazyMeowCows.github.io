@@ -32,20 +32,13 @@ canvas.height = window.innerHeight
 const w = canvas.width;
 const h = canvas.height;
 const pi = Math.PI;
-
-//canvas.ontouchmove = (function (event) {
-////        mouseX = event.pageX;
-////        mouseY = event.pageY;
-//    circle(event.pageX, event.pageY, 10, "black")
-//});
-
-    
+ 
     
 document.addEventListener("touchmove", e => {
-    circle(e.touches[0].pageX, e.touches[0].pageY, 10, "black")
+    circle(e.touches[0].pageX, e.touches[0].pageY, 10, "red")
 })
 document.addEventListener("touchstart", e => {
-    circle(e.touches[0].pageX, e.touches[0].pageY, 10, "black")
+    circle(e.touches[0].pageX, e.touches[0].pageY, 10, "red")
 })
     
 //Easy Circle Drawing
