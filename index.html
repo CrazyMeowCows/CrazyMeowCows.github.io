@@ -7,7 +7,17 @@
 
 
 <body>
-<canvas id="canvas" width="0" height="0"></canvas>    
+<canvas id="canvas" width="0" height="0"></canvas>
+<style>
+body {
+width: 100%;
+height: 100%;
+margin: 0px;
+padding: 0px;
+overflow: hidden;
+display: block;
+}
+</style>
 </body>
 <script src="https://code.jquery.com/jquery-2.1.0.js"></script>
     
@@ -464,7 +474,7 @@ function drawCenterPlay () {
     ctx.fillStyle = "white";
     ctx.textAlign = "center";
     ctx.textBaseline = "middle";
-    ctx.fillText("GAY", w/2-50, h/2-95);
+    ctx.fillText("GAY2", w/2-50, h/2-95);
     
     //drawing play triangle
     ctx.fillStyle = "white";
