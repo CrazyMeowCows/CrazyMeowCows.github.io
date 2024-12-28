@@ -41,9 +41,14 @@ canvas.onmousemove = (function (event) {
 //        mouseY = event.pageY;
     circle(event.pageX, event.pageY, 10, "black")
 });
-//End of Initial File--------------------------------------------------------------------------------------------------    
     
-//Utilities------------------------------------------------------------------------------------------------------------
+    
+document.addEventListener("click", e => {
+    ctx.fillStyle = "red"
+    ctx.fillRect(0, 0, w, h)
+    console.log(e)
+})
+    
 //Easy Circle Drawing
 function circle(x, y, r, color) {
     ctx.fillStyle = color;
