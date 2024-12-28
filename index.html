@@ -35,10 +35,16 @@ const pi = Math.PI;
  
     
 document.addEventListener("touchmove", e => {
-    circle(e.touches[0].pageX, e.touches[0].pageY, 10, "red")
+    touches = e.touches
+    if (touches.length <= 1) {
+        circle(touches[0].pageX, touches[0].pageY, 10, "yellow")
+    }
 })
 document.addEventListener("touchstart", e => {
-    circle(e.touches[0].pageX, e.touches[0].pageY, 10, "red")
+    touches = e.touches
+    if (touches.length <= 1) {
+        circle(touches[0].pageX, touches[0].pageY, 10, "yellow")
+    }
 })
     
 //Easy Circle Drawing
