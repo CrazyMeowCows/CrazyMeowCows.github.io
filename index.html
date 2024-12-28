@@ -36,7 +36,7 @@ const pi = Math.PI;
 //Mouse input for artillery
 var mouseX = w/2;
 var mouseY = h/2;
-canvas.onmousemove = (function (event) {
+canvas.ontouchmove = (function (event) {
 //        mouseX = event.pageX;
 //        mouseY = event.pageY;
     circle(event.pageX, event.pageY, 10, "black")
