@@ -33,12 +33,10 @@ const w = canvas.width;
 const h = canvas.height;
 const pi = Math.PI;
  
-ctx.fillText("v1.1", 10, 20)
 
 var oX = w/2;
 var oY = h/2;
 var oR = 10;
-circle(oX, oY, oR, "blue");
 
 var panX = 0;
 var panY = 0;
@@ -48,7 +46,6 @@ document.addEventListener("touchmove", e => {
     touches = e.touches;
     if (touches[0].touchType == "stylus") { //Stylus --------------------------
         circle(touches[0].pageX, touches[0].pageY, 10, "red");
-
     } else if (touches.length <= 1) { //Single Finger Pan ---------------------
         touch = touches[0];
         newX = touch.pageX;
@@ -57,13 +54,12 @@ document.addEventListener("touchmove", e => {
         oY += (newY - panY);
         panX = newX;
         panY = newY;
-        ctx.clearRect(0, 0,w, h);
-        circle(oX, oY, oR, "blue");
-
+        redraw()
     } else { //Multi finger zoom ----------------------------------------------
         newZoomD = Math.hypot(touches[0].pageX - touches[1].pageX, touches[0].pageY - touches[1].pageY)
         oR += newZoomD - zoomD
         zoomD = newZoomD
+        redraw()
     }
 })
 document.addEventListener("touchstart", e => {
@@ -80,6 +76,13 @@ document.addEventListener("touchstart", e => {
         zoomD = Math.hypot(touches[0].pageX - touches[1].pageX, touches[0].pageY - touches[1].pageY)
     }
 })
+
+function redraw() {
+    ctx.fillText("v1.1", 10, 20)
+    ctx.clearRect(0, 0,w, h);
+    circle(oX, oY, oR, "blue");
+}
+redraw()
     
 //Easy Circle Drawing
 function circle(x, y, r, color) {
