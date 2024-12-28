@@ -33,20 +33,19 @@ const w = canvas.width;
 const h = canvas.height;
 const pi = Math.PI;
 
-//Mouse input for artillery
-var mouseX = w/2;
-var mouseY = h/2;
-canvas.ontouchmove = (function (event) {
-//        mouseX = event.pageX;
-//        mouseY = event.pageY;
-    circle(event.pageX, event.pageY, 10, "black")
-});
+//canvas.ontouchmove = (function (event) {
+////        mouseX = event.pageX;
+////        mouseY = event.pageY;
+//    circle(event.pageX, event.pageY, 10, "black")
+//});
+
     
     
-document.addEventListener("touchstart", e => {
-    ctx.fillStyle = "red"
-    ctx.fillRect(0, 0, w, h)
-    console.log(e)
+document.addEventListener("touchmove", e => {
+//    ctx.fillStyle = "red"
+//    ctx.fillRect(0, 0, w, h)
+//    console.log(e.touches[0].pageX)
+    circle(e.touches[0].pageX, e.touches[0].pageY, 10, "black")
 })
     
 //Easy Circle Drawing
