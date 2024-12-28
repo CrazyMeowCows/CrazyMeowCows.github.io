@@ -43,7 +43,7 @@ canvas.onmousemove = (function (event) {
 });
     
     
-document.addEventListener("click", e => {
+document.addEventListener("touchstart", e => {
     ctx.fillStyle = "red"
     ctx.fillRect(0, 0, w, h)
     console.log(e)
