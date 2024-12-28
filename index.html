@@ -35,7 +35,7 @@ canvas.height = window.innerHeight;
 const w = canvas.width;
 const h = canvas.height;
 const pi = Math.PI;
-const VER = "1.4.3";
+const VER = "1.4.5";
 
 var offsetX = 0;
 var offsetY = 0;
@@ -66,7 +66,7 @@ document.addEventListener("touchmove", e => {
         redraw()
     } else { //Multi finger zoom ----------------------------------------------
         newZoomD = Math.hypot(touches[0].pageX - touches[1].pageX, touches[0].pageY - touches[1].pageY)
-        zoom += newZoomD - zoomD
+        zoom += (newZoomD - zoomD)/100
         zoomD = newZoomD
         lastZoomed = true;
         ctx.scale(zoom, zoom);
@@ -91,7 +91,7 @@ document.addEventListener("touchstart", e => {
 function redraw() {
     ctx.clearRect(0, 0,w, h);
     ctx.fillText(VER, 10, 20)
-    circle(offsetX, offsetY, 10, "blue");
+    circle(offsetX+w/2, offsetY+h/2, 10, "blue");
 }
 redraw()
     
