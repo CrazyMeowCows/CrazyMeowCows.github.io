@@ -32,7 +32,7 @@ canvas.height = window.innerHeight;
 const w = canvas.width;
 const h = canvas.height;
 const pi = Math.PI;
- 
+const VER = "1.3";
 
 var oX = w/2;
 var oY = h/2;
@@ -41,6 +41,7 @@ var oR = 10;
 var panX = 0;
 var panY = 0;
 var zoomD = 0;
+var lastZoomed = false;
     
 document.addEventListener("touchmove", e => {
     touches = e.touches;
@@ -48,6 +49,11 @@ document.addEventListener("touchmove", e => {
         circle(touches[0].pageX, touches[0].pageY, 10, "red");
     } else if (touches.length <= 1) { //Single Finger Pan ---------------------
         touch = touches[0];
+        if (lastZoomed) {
+            panX = touch.pageX;
+            panY = touch.pageY;
+            lastZoomed = false
+        }
         newX = touch.pageX;
         newY = touch.pageY;
         oX += (newX - panX);
@@ -59,6 +65,7 @@ document.addEventListener("touchmove", e => {
         newZoomD = Math.hypot(touches[0].pageX - touches[1].pageX, touches[0].pageY - touches[1].pageY)
         oR += newZoomD - zoomD
         zoomD = newZoomD
+        lastZoomed = true;
         redraw()
     }
 })
@@ -79,7 +86,7 @@ document.addEventListener("touchstart", e => {
 
 function redraw() {
     ctx.clearRect(0, 0,w, h);
-    ctx.fillText("v1.2", 10, 20)
+    ctx.fillText(VER, 10, 20)
     circle(oX, oY, oR, "blue");
 }
 redraw()
