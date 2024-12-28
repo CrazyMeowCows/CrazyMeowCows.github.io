@@ -16,6 +16,9 @@
     padding: 0px;
     overflow: hidden;
     display: block;
+    user-select: none;
+    -webkit-user-select: none;
+    -webkit-touch-callout: none;
     }
 </style>
 </body>
@@ -32,7 +35,7 @@ canvas.height = window.innerHeight;
 const w = canvas.width;
 const h = canvas.height;
 const pi = Math.PI;
-const VER = "1.3";
+const VER = "1.4";
 
 var oX = w/2;
 var oY = h/2;
