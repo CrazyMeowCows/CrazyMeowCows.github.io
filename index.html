@@ -42,9 +42,9 @@ const pi = Math.PI;
     
     
 document.addEventListener("touchmove", e => {
-//    ctx.fillStyle = "red"
-//    ctx.fillRect(0, 0, w, h)
-//    console.log(e.touches[0].pageX)
+    circle(e.touches[0].pageX, e.touches[0].pageY, 10, "black")
+})
+document.addEventListener("touchstart", e => {
     circle(e.touches[0].pageX, e.touches[0].pageY, 10, "black")
 })
     
