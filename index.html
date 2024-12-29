@@ -33,10 +33,10 @@ canvas.height = window.innerHeight;
 const W = canvas.width;
 const H = canvas.height;
 const GRID_SIZE = W/10;
-// const ZOOM_SENS = 0.0012
-const ZOOM_SENS = 0.0005
+const ZOOM_SENS = 0.0012
+// const ZOOM_SENS = 0.0005
 const PI = Math.PI;
-const VER = "1.7";
+const VER = "1.8";
 
 var offsetX = 0;
 var offsetY = 0;
@@ -107,38 +107,34 @@ document.addEventListener("touchstart", e => {
 
     } else { //Multi finger zoom ----------------------------------------------
         zoomD = Math.hypot(touches[0].pageX - touches[1].pageX, touches[0].pageY - touches[1].pageY)
-        zoom_TEST = delta
     }
 })
 document.addEventListener("wheel", e => {
-    zoom -= e.deltaY*ZOOM_SENS;
+    zoom = Math.max(zoom-e.deltaY*ZOOM_SENS/2, 1)
     zoomX = e.pageX;
     zoomY = e.pageY;
     redraw();
 })
 
-var zoom_TEST = GRID_SIZE
 var oldDelta = GRID_SIZE;
 var delta = null;
 function redraw() {
     ctx.clearRect(0, 0, W, H);
     ctx.fillText(VER, 10, 20)
 
-    // delta = GRID_SIZE*(1+zoom%1);
-    delta = GRID_SIZE*(zoom);
-    let delta_delta = delta - oldDelta;
-    offsetX -= delta_delta*(zoomX/zoom_TEST);
+    delta = GRID_SIZE*zoom;
+    delta_delta = delta - oldDelta
+    offsetX -= delta_delta*(zoomX-offsetX)/delta;
+    offsetY -= delta_delta*(zoomY-offsetY)/delta;
     oldDelta = delta;
-
-    ctx.fillText(delta_delta, 10, 40);
 
     ctx.lineWidth = 1;
     ctx.beginPath();
-    for (var x = 0; x <= W+1000; x += delta) {
+    for (var x = Math.floor(-offsetX/delta)*delta; x < W+Math.ceil(-offsetX/delta)*delta; x += delta) {
         ctx.moveTo(x+offsetX, 0);
         ctx.lineTo(x+offsetX, H);
     }
-    for (var y = 0; y <= H; y += delta) {
+    for (var y = Math.floor(-offsetY/delta)*delta; y < H+Math.ceil(-offsetY/delta)*delta; y += delta) {
         ctx.moveTo(0, y+offsetY);
         ctx.lineTo(W, y+offsetY);
     }
@@ -146,16 +142,18 @@ function redraw() {
 
     ctx.lineWidth = 0.5;
     ctx.beginPath();
-    for (var x = 0; x <= W+1000; x += delta/5) {
+    for (var x = Math.floor(-offsetX/delta)*delta; x < W+Math.ceil(-offsetX/delta)*delta; x += delta/5) {
         ctx.moveTo(x+offsetX, 0);
         ctx.lineTo(x+offsetX, H);
     }
-    for (var y = 0; y <= H; y += delta/5) {
+    for (var y = Math.floor(-offsetY/delta)*delta; y < H+Math.ceil(-offsetY/delta)*delta; y += delta/5) {
         ctx.moveTo(0, y+offsetY);
         ctx.lineTo(W, y+offsetY);
     }
     ctx.stroke();
-    circle(offsetX+delta*4, offsetY+delta*0, 10, "blue");
+
+    circle(offsetX+400*zoom, offsetY+400*zoom, 10, "blue");
+    circle(offsetX+0*zoom, offsetY+0*zoom, 10, "blue");
 }
 redraw()
     
