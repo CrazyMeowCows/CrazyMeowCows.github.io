@@ -36,7 +36,7 @@ const H = canvas.height;
 const GRID_SIZE = Math.round(W/50)
 const ZOOM_SENS = 0.0005
 const PI = Math.PI;
-const VER = "1.6.1";
+const VER = "1.6.2";
 
 var offsetX = 0;
 var offsetY = 0;
@@ -47,11 +47,11 @@ var panY = 0;
 var zoomD = 0;
 var lastZoomed = false;
 
-function inc () {
-    zoom += 0.01
-    redraw()
-}
-setInterval(inc, 20)
+// function inc () {
+//     zoom += 0.01
+//     redraw()
+// }
+// setInterval(inc, 20)
     
 document.addEventListener("touchmove", e => {
     touches = e.touches;
