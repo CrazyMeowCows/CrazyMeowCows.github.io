@@ -35,7 +35,7 @@ const H = canvas.height;
 const GRID_SIZE = W/10;
 const ZOOM_SENS = 0.002
 const PI = Math.PI;
-const VER = "1.8";
+const VER = "1.8.1";
 
 var offsetX = W/2;
 var offsetY = H/2;
@@ -75,7 +75,7 @@ document.addEventListener("touchmove", e => {
     } else { //Multi finger zoom ----------------------------------------------
         newZoomD = Math.hypot(touches[0].pageX-touches[1].pageX, touches[0].pageY-touches[1].pageY)
 
-        zoom = Math.max(zoom+(zoomD - newZoomD)*ZOOM_SENS, 1)
+        zoom = Math.max(zoom-(zoomD - newZoomD)*ZOOM_SENS*Math.abs(zoom), 1)
         zoomX = (touches[0].pageX + touches[1].pageX)/2
         zoomY = (touches[0].pageY + touches[1].pageY)/2
 
