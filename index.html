@@ -34,9 +34,9 @@ canvas.height = window.innerHeight;
 const W = canvas.width;
 const H = canvas.height;
 const GRID_SIZE = Math.round(W/50)
-const ZOOM_SENS = 0.0005
+const ZOOM_SENS = 0.005
 const PI = Math.PI;
-const VER = "1.6.4";
+const VER = "1.6.5";
 
 var offsetX = 0;
 var offsetY = 0;
@@ -55,7 +55,7 @@ var lastZoomed = false;
     
 document.addEventListener("touchmove", e => {
     touches = e.touches;
-    if (touches[0].touchType != "adasd") { //Stylus --------------------------
+    if (touches[0].touchType == "stylus") { //Stylus --------------------------
         circle(touches[0].pageX, touches[0].pageY, 10, "red");
     } else if (touches.length <= 1) { //Single Finger Pan ---------------------
         touch = touches[0];
@@ -74,14 +74,17 @@ document.addEventListener("touchmove", e => {
         redraw()
     } else { //Multi finger zoom ----------------------------------------------
         newZoomD = Math.hypot(touches[0].pageX - touches[1].pageX, touches[0].pageY - touches[1].pageY)
-        zoom += (newZoomD - zoomD)*ZOOM_SENS
-        zoomD = newZoomD
-        lastZoomed = true;
+        // zoom += (newZoomD - zoomD)*ZOOM_SENS
+
         midX = (touches[0].pageX + touches[1].pageX)/2
         midY = (touches[0].pageY + touches[1].pageY)/2
         ctx.translate(midX, midY)
         ctx.scale((newZoomD - zoomD)*ZOOM_SENS, (newZoomD - zoomD)*ZOOM_SENS)
         ctx.translate(-midX, -midY)
+
+        zoomD = newZoomD
+        lastZoomed = true;
+
         redraw()
     }
 })
