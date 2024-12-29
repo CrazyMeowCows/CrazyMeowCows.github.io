@@ -27,16 +27,16 @@
 <script>   
 //Canvas Setup and sizing
 var canvas = document.getElementById('canvas'),
-ctx = canvas.getContext("2d", { willReadFrequently: true });
+ctx = canvas.getContext("2d", { willReadFrequently: true, aplha: false });
 canvas.width = window.innerWidth;
 canvas.height = window.innerHeight;
     
 const W = canvas.width;
 const H = canvas.height;
-const GRID_SIZE = W/10
-const ZOOM_SENS = 0.0001
+const GRID_SIZE = Math.round(W/50)
+const ZOOM_SENS = 0.001
 const PI = Math.PI;
-const VER = "1.5.1";
+const VER = "1.6";
 
 var offsetX = 0;
 var offsetY = 0;
@@ -47,11 +47,11 @@ var panY = 0;
 var zoomD = 0;
 var lastZoomed = false;
 
-// function inc () {
-//     zoom += 0.01
-//     redraw()
-// }
-// setInterval(inc, 20)
+function inc () {
+    zoom += 0.01
+    redraw()
+}
+setInterval(inc, 20)
     
 document.addEventListener("touchmove", e => {
     touches = e.touches;
@@ -68,6 +68,7 @@ document.addEventListener("touchmove", e => {
         newY = touch.pageY;
         offsetX += (newX - panX);
         offsetY += (newY - panY);
+        ctx.translate(newX - panX, newY - panY)
         panX = newX;
         panY = newY;
         redraw()
@@ -76,6 +77,10 @@ document.addEventListener("touchmove", e => {
         zoom += (newZoomD - zoomD)*ZOOM_SENS
         zoomD = newZoomD
         lastZoomed = true;
+        midX = (touches[0].pageX + touches[1].pageX)/2
+        midY = (touches[0].pageY + touches[1].pageY)/2
+        ctx.translate(midX, midY)
+        ctx.scale(zoom, zoom)
         redraw()
     }
 })
@@ -95,18 +100,19 @@ document.addEventListener("touchstart", e => {
 })
 
 function redraw() {
-    ctx.clearRect(0, 0,W, H);
+    ctx.clearRect(0, 0, W, H);
     ctx.fillText(VER, 10, 20)
 
-    let delta = GRID_SIZE + GRID_SIZE*(zoom%1);
+    // let delta = GRID_SIZE*(1+zoom%1);
+    let delta = GRID_SIZE;
 
     ctx.lineWidth = 1;
     ctx.beginPath();
-    for (var x = 0; x < W; x += delta) {
+    for (var x = 0; x < W; x += delta*5) {
         ctx.moveTo(x, 0);
         ctx.lineTo(x, H);
     }
-    for (var y = 0; y < H; y += delta) {
+    for (var y = 0; y < H; y += delta*5) {
         ctx.moveTo(0, y);
         ctx.lineTo(W, y);
     }
@@ -114,11 +120,11 @@ function redraw() {
 
     ctx.lineWidth = 0.5;
     ctx.beginPath();
-    for (var x = 0; x < W; x += delta/5) {
+    for (var x = 0; x < W; x += delta) {
         ctx.moveTo(x, 0);
         ctx.lineTo(x, H);
     }
-    for (var y = 0; y < H; y += delta/5) {
+    for (var y = 0; y < H; y += delta) {
         ctx.moveTo(0, y);
         ctx.lineTo(W, y);
     }
