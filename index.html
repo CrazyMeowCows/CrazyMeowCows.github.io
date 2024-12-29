@@ -36,7 +36,7 @@ const H = canvas.height;
 const GRID_SIZE = Math.round(W/50)
 const ZOOM_SENS = 0.0005
 const PI = Math.PI;
-const VER = "1.6.2";
+const VER = "1.6.3";
 
 var offsetX = 0;
 var offsetY = 0;
@@ -80,7 +80,7 @@ document.addEventListener("touchmove", e => {
         midX = (touches[0].pageX + touches[1].pageX)/2
         midY = (touches[0].pageY + touches[1].pageY)/2
         ctx.translate(midX, midY)
-        ctx.scale(zoom, zoom)
+        ctx.scale((newZoomD - zoomD)*ZOOM_SENS, (newZoomD - zoomD)*ZOOM_SENS)
         ctx.translate(-midX, -midY)
         redraw()
     }
