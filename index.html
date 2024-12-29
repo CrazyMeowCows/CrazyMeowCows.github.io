@@ -34,9 +34,9 @@ canvas.height = window.innerHeight;
 const W = canvas.width;
 const H = canvas.height;
 const GRID_SIZE = Math.round(W/50)
-const ZOOM_SENS = 0.0005
+const ZOOM_SENS = 0.0012
 const PI = Math.PI;
-const VER = "1.6.6";
+const VER = "1.6.8";
 
 var offsetX = 0;
 var offsetY = 0;
@@ -46,40 +46,42 @@ var panX = 0;
 var panY = 0;
 var zoomD = 0;
 var lastZoomed = false;
-
-// function inc () {
-//     zoom += 0.01
-//     redraw()
-// }
-// setInterval(inc, 20)
     
 document.addEventListener("touchmove", e => {
     touches = e.touches;
     if (touches[0].touchType == "stylus") { //Stylus --------------------------
         circle(touches[0].pageX, touches[0].pageY, 10, "red");
+
     } else if (touches.length <= 1) { //Single Finger Pan ---------------------
         touch = touches[0];
+
         if (lastZoomed) {
             panX = touch.pageX;
             panY = touch.pageY;
             lastZoomed = false
         }
+
         newX = touch.pageX;
         newY = touch.pageY;
+
         offsetX += (newX - panX);
         offsetY += (newY - panY);
-        // ctx.translate(newX - panX, newY - panY)
+
         panX = newX;
         panY = newY;
+
         redraw()
     } else { //Multi finger zoom ----------------------------------------------
         newZoomD = Math.hypot(touches[0].pageX - touches[1].pageX, touches[0].pageY - touches[1].pageY)
-        // zoom += (newZoomD - zoomD)*ZOOM_SENS
+
+        zoomDelta = (newZoomD - zoomD)*ZOOM_SENS
+        zoom += zoomDelta
+        if (zoom <= 1) {zoomDelta = Math.max(0, zoomDelta);}
 
         midX = (touches[0].pageX + touches[1].pageX)/2
         midY = (touches[0].pageY + touches[1].pageY)/2
         ctx.translate(midX, midY)
-        ctx.scale(1+(newZoomD - zoomD)*ZOOM_SENS, 1+(newZoomD - zoomD)*ZOOM_SENS)
+        ctx.scale(1+zoomDelta, 1+zoomDelta)
         ctx.translate(-midX, -midY)
 
         zoomD = newZoomD
