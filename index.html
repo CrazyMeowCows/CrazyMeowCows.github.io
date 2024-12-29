@@ -28,15 +28,15 @@
 //Canvas Setup and sizing
 var canvas = document.getElementById('canvas'),
 ctx = canvas.getContext("2d", { willReadFrequently: true });
-
 canvas.width = window.innerWidth;
 canvas.height = window.innerHeight;
     
-const w = canvas.width;
-const h = canvas.height;
-const gridSize = w/10
-const pi = Math.PI;
-const VER = "1.5";
+const W = canvas.width;
+const H = canvas.height;
+const GRID_SIZE = W/10
+const ZOOM_SENS = 0.0001
+const PI = Math.PI;
+const VER = "1.5.1";
 
 var offsetX = 0;
 var offsetY = 0;
@@ -73,7 +73,7 @@ document.addEventListener("touchmove", e => {
         redraw()
     } else { //Multi finger zoom ----------------------------------------------
         newZoomD = Math.hypot(touches[0].pageX - touches[1].pageX, touches[0].pageY - touches[1].pageY)
-        zoom += (newZoomD - zoomD)*0.1
+        zoom += (newZoomD - zoomD)*ZOOM_SENS
         zoomD = newZoomD
         lastZoomed = true;
         redraw()
@@ -95,32 +95,32 @@ document.addEventListener("touchstart", e => {
 })
 
 function redraw() {
-    ctx.clearRect(0, 0,w, h);
+    ctx.clearRect(0, 0,W, H);
     ctx.fillText(VER, 10, 20)
 
-    let delta = gridSize + gridSize*(zoom%1);
+    let delta = GRID_SIZE + GRID_SIZE*(zoom%1);
 
     ctx.lineWidth = 1;
     ctx.beginPath();
-    for (var x = 0; x < w; x += delta) {
+    for (var x = 0; x < W; x += delta) {
         ctx.moveTo(x, 0);
-        ctx.lineTo(x, h);
+        ctx.lineTo(x, H);
     }
-    for (var y = 0; y < h; y += delta) {
+    for (var y = 0; y < H; y += delta) {
         ctx.moveTo(0, y);
-        ctx.lineTo(w, y);
+        ctx.lineTo(W, y);
     }
     ctx.stroke();
 
     ctx.lineWidth = 0.5;
     ctx.beginPath();
-    for (var x = 0; x < w; x += delta/5) {
+    for (var x = 0; x < W; x += delta/5) {
         ctx.moveTo(x, 0);
-        ctx.lineTo(x, h);
+        ctx.lineTo(x, H);
     }
-    for (var y = 0; y < h; y += delta/5) {
+    for (var y = 0; y < H; y += delta/5) {
         ctx.moveTo(0, y);
-        ctx.lineTo(w, y);
+        ctx.lineTo(W, y);
     }
     ctx.stroke();
     // circle(offsetX+w/2, offsetY+h/2, 10, "blue");
@@ -131,7 +131,7 @@ redraw()
 function circle(x, y, r, color) {
     ctx.fillStyle = color;
     ctx.beginPath();
-    ctx.arc(x, y, r, 0, pi*2, false);
+    ctx.arc(x, y, r, 0, PI*2, false);
     ctx.fill();
 }
 
