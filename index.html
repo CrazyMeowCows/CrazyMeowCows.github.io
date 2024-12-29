@@ -5,7 +5,6 @@
 <link rel="shortcut icon" href="https://raw.githubusercontent.com/CrazyMeowCows/TankSimulator/main/favicon.ico">
 </head>
 
-
 <body>
 <canvas id="canvas" width="0" height="0"></canvas>    
 <style>
@@ -36,16 +35,24 @@ const H = canvas.height;
 const GRID_SIZE = Math.round(W/50)
 const ZOOM_SENS = 0.0012
 const PI = Math.PI;
-const VER = "1.6.8";
+const VER = "1.7";
 
 var offsetX = 0;
 var offsetY = 0;
 var zoom = 1;
+var zoomX = w/2;
+var zoomY = h/2;
 
 var panX = 0;
 var panY = 0;
 var zoomD = 0;
 var lastZoomed = false;
+
+function inc () {
+    zoom += 0.01
+    redraw()
+}
+setInterval(inc, 20)
     
 document.addEventListener("touchmove", e => {
     touches = e.touches;
@@ -72,17 +79,12 @@ document.addEventListener("touchmove", e => {
 
         redraw()
     } else { //Multi finger zoom ----------------------------------------------
-        newZoomD = Math.hypot(touches[0].pageX - touches[1].pageX, touches[0].pageY - touches[1].pageY)
-
+        newZoomD = Math.hypot(touches[0].pageX-touches[1].pageX, touches[0].pageY-touches[1].pageY)
         zoomDelta = (newZoomD - zoomD)*ZOOM_SENS
-        if (zoom <= 1) {zoomDelta = Math.max(0, zoomDelta);}
-        zoom += zoomDelta
 
-        midX = (touches[0].pageX + touches[1].pageX)/2
-        midY = (touches[0].pageY + touches[1].pageY)/2
-        ctx.translate(midX, midY)
-        ctx.scale(1+zoomDelta, 1+zoomDelta)
-        ctx.translate(-midX, -midY)
+        zoom += zoomDelta
+        zoomX = (touches[0].pageX + touches[1].pageX)/2
+        zoomY = (touches[0].pageY + touches[1].pageY)/2
 
         zoomD = newZoomD
         lastZoomed = true;
@@ -104,29 +106,13 @@ document.addEventListener("touchstart", e => {
         zoomD = Math.hypot(touches[0].pageX - touches[1].pageX, touches[0].pageY - touches[1].pageY)
     }
 })
-document.addEventListener("wheel", e=> {
-
-    zoomDelta = e.deltaY*ZOOM_SENS
-    if (zoom <= 1) {zoomDelta = Math.max(0, zoomDelta);}
-    zoom += zoomDelta
-
-    midX = (e.pageX + e.pageX)/2
-    midY = (e.pageY + e.pageY)/2
-    ctx.translate(midX, midY)
-    ctx.scale(1+zoomDelta, 1+zoomDelta)
-    ctx.translate(-midX, -midY)
-
-    lastZoomed = true;
-
-    redraw()
-})
 
 function redraw() {
     ctx.clearRect(0, 0, W, H);
     ctx.fillText(VER, 10, 20)
+    ctx.fillText(zoom, 10, 40)
 
-    // let delta = GRID_SIZE*(1+zoom%1);
-    let delta = GRID_SIZE;
+    let delta = GRID_SIZE*(1+zoom%1);
 
     ctx.lineWidth = 1;
     ctx.beginPath();
