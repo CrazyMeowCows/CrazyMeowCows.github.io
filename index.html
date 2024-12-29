@@ -75,8 +75,8 @@ document.addEventListener("touchmove", e => {
         newZoomD = Math.hypot(touches[0].pageX - touches[1].pageX, touches[0].pageY - touches[1].pageY)
 
         zoomDelta = (newZoomD - zoomD)*ZOOM_SENS
-        zoom += zoomDelta
         if (zoom <= 1) {zoomDelta = Math.max(0, zoomDelta);}
+        zoom += zoomDelta
 
         midX = (touches[0].pageX + touches[1].pageX)/2
         midY = (touches[0].pageY + touches[1].pageY)/2
@@ -103,6 +103,22 @@ document.addEventListener("touchstart", e => {
     } else { //Multi finger zoom ----------------------------------------------
         zoomD = Math.hypot(touches[0].pageX - touches[1].pageX, touches[0].pageY - touches[1].pageY)
     }
+})
+document.addEventListener("wheel", e=> {
+
+    zoomDelta = e.deltaY*ZOOM_SENS
+    if (zoom <= 1) {zoomDelta = Math.max(0, zoomDelta);}
+    zoom += zoomDelta
+
+    midX = (e.pageX + e.pageX)/2
+    midY = (e.pageY + e.pageY)/2
+    ctx.translate(midX, midY)
+    ctx.scale(1+zoomDelta, 1+zoomDelta)
+    ctx.translate(-midX, -midY)
+
+    lastZoomed = true;
+
+    redraw()
 })
 
 function redraw() {
