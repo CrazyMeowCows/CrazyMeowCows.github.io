@@ -34,9 +34,9 @@ canvas.height = window.innerHeight;
 const W = canvas.width;
 const H = canvas.height;
 const GRID_SIZE = Math.round(W/50)
-const ZOOM_SENS = 0.001
+const ZOOM_SENS = 0.0005
 const PI = Math.PI;
-const VER = "1.6";
+const VER = "1.6.1";
 
 var offsetX = 0;
 var offsetY = 0;
@@ -68,7 +68,7 @@ document.addEventListener("touchmove", e => {
         newY = touch.pageY;
         offsetX += (newX - panX);
         offsetY += (newY - panY);
-        ctx.translate(newX - panX, newY - panY)
+        // ctx.translate(newX - panX, newY - panY)
         panX = newX;
         panY = newY;
         redraw()
@@ -81,6 +81,7 @@ document.addEventListener("touchmove", e => {
         midY = (touches[0].pageY + touches[1].pageY)/2
         ctx.translate(midX, midY)
         ctx.scale(zoom, zoom)
+        ctx.translate(-midX, -midY)
         redraw()
     }
 })
