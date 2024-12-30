@@ -30,12 +30,18 @@ ctx = canvas.getContext("2d", { willReadFrequently: true, aplha: false });
 canvas.width = window.innerWidth;
 canvas.height = window.innerHeight;
     
+const VER = "1.8.2";
+
+const PI = Math.PI;
+const TAU = 2*Math.PI;
+const ROOT_PI = Math.sqrt(Math.PI);
+
 const W = canvas.width;
 const H = canvas.height;
-const GRID_SIZE = W/10;
+const GRID_SIZE = W/6;
 const ZOOM_SENS = 0.002
-const PI = Math.PI;
-const VER = "1.8.1";
+const THETA_RESOLUTION = TAU/81
+
 
 var offsetX = W/2;
 var offsetY = H/2;
@@ -100,7 +106,7 @@ document.addEventListener("touchstart", e => {
     }
 })
 document.addEventListener("wheel", e => { //TESTING --------------------------- //TODO: REMOVE
-    zoom = Math.max(zoom-e.deltaY*ZOOM_SENS/2, 1)
+    zoom = Math.max(zoom-e.deltaY*ZOOM_SENS*Math.abs(zoom)/2, 1)
     zoomX = e.pageX;
     zoomY = e.pageY;
     redraw();
@@ -118,13 +124,16 @@ function redraw() {
     offsetY -= delta_delta*(zoomY-offsetY)/delta;
     oldDelta = delta;
 
+    xStart = Math.round(-offsetX/delta)*delta
+    yStart = Math.round(-offsetY/delta)*delta
+
     ctx.lineWidth = 1;
     ctx.beginPath();
-    for (var x = Math.floor(-offsetX/delta)*delta; x < W+Math.ceil(-offsetX/delta)*delta; x += delta) {
+    for (var x = xStart-delta; x < W+xStart+delta; x += delta) {
         ctx.moveTo(x+offsetX, 0);
         ctx.lineTo(x+offsetX, H);
     }
-    for (var y = Math.floor(-offsetY/delta)*delta; y < H+Math.ceil(-offsetY/delta)*delta; y += delta) {
+    for (var y = yStart-delta; y < H+yStart+delta; y += delta) {
         ctx.moveTo(0, y+offsetY);
         ctx.lineTo(W, y+offsetY);
     }
@@ -132,11 +141,11 @@ function redraw() {
 
     ctx.lineWidth = 0.5;
     ctx.beginPath();
-    for (var x = Math.floor(-offsetX/delta)*delta; x < W+Math.ceil(-offsetX/delta)*delta; x += delta/5) {
+    for (var x = xStart-delta; x < W+xStart+delta; x += delta/5) {
         ctx.moveTo(x+offsetX, 0);
         ctx.lineTo(x+offsetX, H);
     }
-    for (var y = Math.floor(-offsetY/delta)*delta; y < H+Math.ceil(-offsetY/delta)*delta; y += delta/5) {
+    for (var y = yStart-delta; y < H+yStart+delta; y += delta/5) {
         ctx.moveTo(0, y+offsetY);
         ctx.lineTo(W, y+offsetY);
     }
@@ -147,17 +156,17 @@ function redraw() {
 
     ctx.lineWidth = 1
     ctx.beginPath();
-    ctx.moveTo(100*zoom+offsetX, offsetY);
-    for (let theta = 0; theta < PI*2; theta += PI/20) { //SHould this be handled by the zoom canvas?
-        let r = 100;
-        ctx.lineTo(r*Math.cos(theta)*zoom+offsetX, r*Math.sin(theta)*zoom+offsetY);
+    ctx.moveTo(offsetX+calcRad(0)*zoom, offsetY);
+    for (let theta = THETA_RESOLUTION; theta <= TAU; theta += THETA_RESOLUTION) {
+        let r = calcRad(theta);
+        ctx.lineTo(offsetX+r*Math.cos(theta)*zoom, offsetY-r*Math.sin(theta)*zoom);
     }
     ctx.stroke();
 }
 redraw()
     
-function calcRad(theta) {
-    return 100;
+function calcRad(t) {
+    return (1-1/6*(Math.sin(4*t+PI/2))-1/200*Math.pow(Math.cos(30*t), 2)*Math.sin(t)*Math.tan(t/2))/ROOT_PI*(W/2);
 }
 
 //Easy Circle Drawing
