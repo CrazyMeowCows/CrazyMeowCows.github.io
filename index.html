@@ -64,7 +64,7 @@ function PenStroke (xStart, yStart, xOffset, yOffset, zoom, brushSize) {
 
 document.addEventListener("touchstart", e => {
     touches = e.touches;
-    if (touches[0].touchType != "stylus") { //Stylus --------------------------
+    if (touches[0].touchType == "stylus") { //Stylus --------------------------
         circle(touches[0].pageX, touches[0].pageY, brushSize, "black");
         currentStroke = new PenStroke(touches[0].pageX, touches[0].pageY, offsetX, offsetY, zoom, brushSize);
         strokes.push(currentStroke);
@@ -83,7 +83,7 @@ document.addEventListener("touchstart", e => {
 
 document.addEventListener("touchmove", e => {
     touches = e.touches;
-    if (touches[0].touchType != "stylus") { //Stylus --------------------------
+    if (touches[0].touchType == "stylus") { //Stylus --------------------------
         line(currentStroke.rawX[currentStroke.rawX.length-1], currentStroke.rawY[currentStroke.rawY.length-1], touches[0].pageX, touches[0].pageY, "black", brushSize*2);
         circle(touches[0].pageX, touches[0].pageY, brushSize, "black");
         currentStroke.rawX.push(touches[0].pageX);
@@ -199,6 +199,18 @@ function redraw() {
             circle2(stroke.x[i]*zoom+offsetX, stroke.y[i]*zoom+offsetY, stroke.brushSize*zoom);
         }
     })
+    // ctx.lineCap = "round";
+    // strokes.forEach(stroke => {
+    //     ctx.lineWidth = stroke.brushSize*zoom*2;
+    //     // ctx.lineWidth = 3;
+    //     ctx.beginPath();
+    //     ctx.moveTo(stroke.x[0]*zoom+offsetX, stroke.y[0]*zoom+offsetY)
+    //     for (let i = 1; i < stroke.x.length; i++) {
+    //         ctx.lineTo(stroke.x[i]*zoom+offsetX, stroke.y[i]*zoom+offsetY);
+    //     }
+    //     ctx.stroke();
+    // })
+    // ctx.lineCap = "butt";
 }    
 redraw();
 
