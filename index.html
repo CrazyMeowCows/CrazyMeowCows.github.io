@@ -1,12 +1,11 @@
 <!DOCTYPE html>
 <html>
 <head>
-<title>TinyTanks.us</title>
-<link rel="shortcut icon" href="https://raw.githubusercontent.com/CrazyMeowCows/TankSimulator/main/favicon.ico">
+<title>DPAA Testing Software</title>
 </head>
 
-<body>
-<canvas id="canvas" width="0" height="0"></canvas>    
+<canvas id="baseCanvas" width="0" height="0"></canvas>    
+<canvas id="topCanvas" width="0" height="0"></canvas>
 <style>
     body {
     width: 100%;
@@ -19,16 +18,28 @@
     -webkit-user-select: none;
     -webkit-touch-callout: none;
     }
+    canvas {
+        position: absolute;
+    }
+    #baseCanvas {
+        z-index: 1;
+    }
+    #topCanvas {
+        z-index: 2;
+    }
 </style>
-</body>
-<script src="https://code.jquery.com/jquery-2.1.0.js"></script>
     
 <script>   
 //Canvas Setup and sizing
-var canvas = document.getElementById('canvas'),
-ctx = canvas.getContext("2d", { willReadFrequently: true, aplha: false });
-canvas.width = window.innerWidth;
-canvas.height = window.innerHeight;
+var baseCanvas = document.getElementById('baseCanvas'),
+ctxBase = baseCanvas.getContext("2d", { willReadFrequently: false, aplha: false });
+baseCanvas.width = window.innerWidth;
+baseCanvas.height = window.innerHeight;
+
+var topCanvas = document.getElementById('topCanvas'),
+ctxTop = topCanvas.getContext("2d", { willReadFrequently: true, aplha: true });
+topCanvas.width = window.innerWidth;
+topCanvas.height = window.innerHeight;
     
 const VER = "1.8.3";
 
@@ -36,28 +47,27 @@ const PI = Math.PI;
 const TAU = 2*Math.PI;
 const ROOT_PI = Math.sqrt(Math.PI);
 
-const W = canvas.width;
-const H = canvas.height;
+const W = baseCanvas.width;
+const H = baseCanvas.height;
 const GRID_SIZE = W/6;
 const ZOOM_SENS = 0.002
 const THETA_RESOLUTION = 0.01
 
-
 var offsetX = W/2;
 var offsetY = H/2;
-var zoom = 1;
 var zoomX = 0;
 var zoomY = 0;
+var zoom = 1;
+var zoomD = 0;
+var lastZoomed = false;
 
 var panX = 0;
 var panY = 0;
-var zoomD = 0;
-var lastZoomed = false;
 
 document.addEventListener("touchmove", e => {
     touches = e.touches;
     if (touches[0].touchType == "stylus") { //Stylus --------------------------
-        circle(touches[0].pageX, touches[0].pageY, 10, "red");
+        circle(touches[0].pageX, touches[0].pageY, 10, "red", ctxTop);
 
     } else if (touches.length <= 1) { //Single Finger Pan ---------------------
         touch = touches[0];
@@ -68,12 +78,12 @@ document.addEventListener("touchmove", e => {
             lastZoomed = false
         }
 
-        newX = touch.pageX;
-        newY = touch.pageY;
+        let newX = touch.pageX;
+        let newY = touch.pageY;
 
         panXdelta = newX-panX;
         panYdelta = newY-panY;
-        // offsetX = clamp(offsetX+panXdelta, -W/1.5*zoom+W, W/1.5*zoom);
+
         offsetX += panXdelta;
         offsetY += panYdelta;
 
@@ -82,7 +92,7 @@ document.addEventListener("touchmove", e => {
 
         redraw()
     } else { //Multi finger zoom ----------------------------------------------
-        newZoomD = Math.hypot(touches[0].pageX-touches[1].pageX, touches[0].pageY-touches[1].pageY)
+        let newZoomD = Math.hypot(touches[0].pageX-touches[1].pageX, touches[0].pageY-touches[1].pageY)
 
         zoom = Math.max(zoom - (zoomD-newZoomD)*ZOOM_SENS*Math.abs(zoom), 1)
 
@@ -95,7 +105,7 @@ document.addEventListener("touchmove", e => {
 document.addEventListener("touchstart", e => {
     touches = e.touches;
     if (touches[0].touchType == "stylus") { //Stylus --------------------------
-        circle(touches[0].pageX, touches[0].pageY, 10, "red");
+        circle(touches[0].pageX, touches[0].pageY, 10, "red", ctxTop);
 
     } else if (touches.length <= 1) { //Single Finger Pan ---------------------
         touch = touches[0];
@@ -110,6 +120,7 @@ document.addEventListener("touchstart", e => {
 })
 document.addEventListener("wheel", e => { //TESTING --------------------------- //TODO: REMOVE
     zoom = Math.max(zoom-e.deltaY*ZOOM_SENS*Math.abs(zoom)/2, 1)
+    zoom = Math.max(zoom-e.deltaY*ZOOM_SENS/2, 1)
     zoomX = e.pageX;
     zoomY = e.pageY;
     redraw();
@@ -118,8 +129,10 @@ document.addEventListener("wheel", e => { //TESTING --------------------------- 
 var oldDelta = GRID_SIZE;
 var delta = null;
 function redraw() {
-    ctx.clearRect(0, 0, W, H);
-    ctx.fillText(VER, 10, 20)
+    circle(W/2, H/2, 10, "red", ctxTop);
+
+    ctxBase.clearRect(0, 0, W, H);
+    ctxBase.fillText(VER, 10, 20)
 
     delta = GRID_SIZE*zoom;
     delta_delta = delta - oldDelta
@@ -133,39 +146,44 @@ function redraw() {
     xStart = Math.round(-offsetX/delta)*delta
     yStart = Math.round(-offsetY/delta)*delta
 
-    ctx.lineWidth = 1;
-    ctx.beginPath();
-    for (var x = xStart-delta; x < W+xStart+delta; x += delta) {
-        ctx.moveTo(x+offsetX, 0);
-        ctx.lineTo(x+offsetX, H);
-    }
-    for (var y = yStart-delta; y < H+yStart+delta; y += delta) {
-        ctx.moveTo(0, y+offsetY);
-        ctx.lineTo(W, y+offsetY);
-    }
-    ctx.stroke();
+    lineResolution = delta/4;
 
-    ctx.lineWidth = 0.5;
-    ctx.beginPath();
-    for (var x = xStart-delta; x < W+xStart+delta; x += delta/4) {
-        ctx.moveTo(x+offsetX, 0);
-        ctx.lineTo(x+offsetX, H);
+    let i = 0; //TODO: Optimize grid drawing
+    for (var x = xStart-delta; x < W+xStart+delta; x += lineResolution) {
+        if (i%4 == 0) {
+            ctxBase.lineWidth = 1;
+        } else {
+            ctxBase.lineWidth = 0.5;
+        }
+        ctxBase.beginPath();
+        ctxBase.moveTo(x+offsetX, 0);
+        ctxBase.lineTo(x+offsetX, H);
+        ctxBase.stroke();
+        i++;
     }
-    for (var y = yStart-delta; y < H+yStart+delta; y += delta/4) {
-        ctx.moveTo(0, y+offsetY);
-        ctx.lineTo(W, y+offsetY);
+    i = 0;
+    for (var y = yStart-delta; y < H+yStart+delta; y += lineResolution) {
+        if (i%4 == 0) {
+            ctxBase.lineWidth = 1;
+        } else {
+            ctxBase.lineWidth = 0.5;
+        }
+        ctxBase.beginPath();
+        ctxBase.moveTo(0, y+offsetY);
+        ctxBase.lineTo(W, y+offsetY);
+        ctxBase.stroke();
+        i++;
     }
-    ctx.stroke();
 
-    ctx.lineWidth = 1
-    ctx.beginPath();
-    ctx.moveTo(offsetX+calcRad(0)*zoom, offsetY);
+    ctxBase.lineWidth = 2
+    ctxBase.beginPath();
+    ctxBase.moveTo(offsetX+calcRad(0)*zoom, offsetY);
     for (let theta = THETA_RESOLUTION; theta < TAU; theta += THETA_RESOLUTION) {
         let r = calcRad(theta);
-        ctx.lineTo(offsetX+r*Math.cos(theta)*zoom, offsetY-r*Math.sin(theta)*zoom);
+        ctxBase.lineTo(offsetX+r*Math.cos(theta)*zoom, offsetY-r*Math.sin(theta)*zoom);
     }
-    ctx.lineTo(offsetX+calcRad(0)*zoom, offsetY);
-    ctx.stroke();
+    ctxBase.lineTo(offsetX+calcRad(0)*zoom, offsetY);
+    ctxBase.stroke();
 }
 redraw()
     
@@ -178,7 +196,7 @@ function clamp(x, min, max) {
 }
 
 //Easy Circle Drawing
-function circle(x, y, r, color) {
+function circle(x, y, r, color, ctx) {
     ctx.fillStyle = color;
     ctx.beginPath();
     ctx.arc(x, y, r, 0, PI*2, false);
@@ -186,7 +204,7 @@ function circle(x, y, r, color) {
 }
 
 //Easy Line Drawing
-function line(x, y, x2, y2, color, width) {
+function line(x, y, x2, y2, color, width, ctx) {
     ctx.strokeStyle = color;
     ctx.lineWidth = width;
     ctx.beginPath();
