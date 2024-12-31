@@ -30,7 +30,7 @@ ctx = canvas.getContext("2d", { willReadFrequently: true, aplha: false });
 canvas.width = window.innerWidth;
 canvas.height = window.innerHeight;
     
-const VER = "1.8.2";
+const VER = "1.8.3";
 
 const PI = Math.PI;
 const TAU = 2*Math.PI;
@@ -71,8 +71,11 @@ document.addEventListener("touchmove", e => {
         newX = touch.pageX;
         newY = touch.pageY;
 
-        offsetX += (newX - panX);
-        offsetY += (newY - panY);
+        panXdelta = newX-panX;
+        panYdelta = newY-panY;
+        // offsetX = clamp(offsetX+panXdelta, -W/1.5*zoom+W, W/1.5*zoom);
+        offsetX += panXdelta;
+        offsetY += panYdelta;
 
         panX = newX;
         panY = newY;
@@ -81,9 +84,7 @@ document.addEventListener("touchmove", e => {
     } else { //Multi finger zoom ----------------------------------------------
         newZoomD = Math.hypot(touches[0].pageX-touches[1].pageX, touches[0].pageY-touches[1].pageY)
 
-        zoom = Math.max(zoom-(zoomD - newZoomD)*ZOOM_SENS*Math.abs(zoom), 1)
-        zoomX = (touches[0].pageX + touches[1].pageX)/2
-        zoomY = (touches[0].pageY + touches[1].pageY)/2
+        zoom = Math.max(zoom - (zoomD-newZoomD)*ZOOM_SENS*Math.abs(zoom), 1)
 
         zoomD = newZoomD
         lastZoomed = true;
@@ -103,6 +104,8 @@ document.addEventListener("touchstart", e => {
 
     } else { //Multi finger zoom ----------------------------------------------
         zoomD = Math.hypot(touches[0].pageX - touches[1].pageX, touches[0].pageY - touches[1].pageY)
+        zoomX = (touches[0].pageX + touches[1].pageX)/2
+        zoomY = (touches[0].pageY + touches[1].pageY)/2
     }
 })
 document.addEventListener("wheel", e => { //TESTING --------------------------- //TODO: REMOVE
@@ -120,9 +123,12 @@ function redraw() {
 
     delta = GRID_SIZE*zoom;
     delta_delta = delta - oldDelta
-    offsetX -= delta_delta*(zoomX-offsetX)/delta;
-    offsetY -= delta_delta*(zoomY-offsetY)/delta;
+    offsetX -= delta_delta*(zoomX-offsetX)/oldDelta;
+    offsetY -= delta_delta*(zoomY-offsetY)/oldDelta;
     oldDelta = delta;
+
+    offsetX = clamp(offsetX, -W/1.5*zoom+W, W/1.5*zoom);
+    offsetY = clamp(offsetY, -H/1.5*zoom+H, H/1.5*zoom);
 
     xStart = Math.round(-offsetX/delta)*delta
     yStart = Math.round(-offsetY/delta)*delta
@@ -141,32 +147,34 @@ function redraw() {
 
     ctx.lineWidth = 0.5;
     ctx.beginPath();
-    for (var x = xStart-delta; x < W+xStart+delta; x += delta/5) {
+    for (var x = xStart-delta; x < W+xStart+delta; x += delta/4) {
         ctx.moveTo(x+offsetX, 0);
         ctx.lineTo(x+offsetX, H);
     }
-    for (var y = yStart-delta; y < H+yStart+delta; y += delta/5) {
+    for (var y = yStart-delta; y < H+yStart+delta; y += delta/4) {
         ctx.moveTo(0, y+offsetY);
         ctx.lineTo(W, y+offsetY);
     }
     ctx.stroke();
 
-    circle(offsetX+400*zoom, offsetY+400*zoom, 10, "blue");
-    circle(offsetX+0*zoom, offsetY+0*zoom, 10, "blue");
-
     ctx.lineWidth = 1
     ctx.beginPath();
     ctx.moveTo(offsetX+calcRad(0)*zoom, offsetY);
-    for (let theta = THETA_RESOLUTION; theta <= TAU; theta += THETA_RESOLUTION) {
+    for (let theta = THETA_RESOLUTION; theta < TAU; theta += THETA_RESOLUTION) {
         let r = calcRad(theta);
         ctx.lineTo(offsetX+r*Math.cos(theta)*zoom, offsetY-r*Math.sin(theta)*zoom);
     }
+    ctx.lineTo(offsetX+calcRad(0)*zoom, offsetY);
     ctx.stroke();
 }
 redraw()
     
 function calcRad(t) {
     return (1-1/6*(Math.sin(4*t+PI/2))-1/200*Math.pow(Math.cos(30*t), 2)*Math.sin(t)*Math.tan(t/2))/ROOT_PI*(W/2);
+}
+
+function clamp(x, min, max) {
+    return Math.max(Math.min(x, max), min);
 }
 
 //Easy Circle Drawing
