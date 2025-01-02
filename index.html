@@ -4,46 +4,61 @@
 <title>DPAA Testing Software</title>
 </head>
 
-<canvas id="canvas" width="0" height="0"></canvas>    
+<canvas id="mainCanvas" width="0" height="0"></canvas>    
+<canvas id="uiCanvas" width="0" height="0"></canvas>
 <style>
     body {
-    width: 100%;
-    height: 100%;
-    margin: 0px;
-    padding: 0px;
-    overflow: hidden;
-    display: block;
-    user-select: none;
-    -webkit-user-select: none;
-    -webkit-touch-callout: none;
+        width: 100%;
+        height: 100%;
+        margin: 0px;
+        padding: 0px;
+        overflow: hidden;
+        display: block;
+        user-select: none;
+        -webkit-user-select: none;
+        -webkit-touch-callout: none;
+    }
+    canvas {
+        position: absolute;
     }
 </style>
-    
-<script>   
-//Canvas Setup and sizing
-var canvas = document.getElementById('canvas')
-var ctx = canvas.getContext("2d", { willReadFrequently: false, aplha: false });
-canvas.width = window.innerWidth;
-canvas.height = window.innerHeight;
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css">   
+<script>
+//Constant Declarations----------------------------------------------------------------------------
+const VER = "2.1.1";
+const UI_WIDTH = 100;
+
+const PI = Math.PI;
+const TAU = 2*Math.PI;
+const ROOT_PI = Math.sqrt(Math.PI);
+
+const W = window.innerWidth-UI_WIDTH;
+const H = window.innerHeight;
+const GRID_SIZE = W/6;
+const ZOOM_SENS = 0.002;
+const THETA_RESOLUTION = 0.01;
+
+//Canvas Setup and Styling-------------------------------------------------------------------------
+var mainCanvas = document.getElementById('mainCanvas')
+var ctx = mainCanvas.getContext("2d", { willReadFrequently: true, aplha: false });
+
+var uiCanvas = document.getElementById('uiCanvas')
+var uiCtx = uiCanvas.getContext("2d", { willReadFrequently: false, aplha: false });
+
+mainCanvas.width = W;
+mainCanvas.height = H;
+
+uiCanvas.width = UI_WIDTH;
+uiCanvas.height = H;
+uiCanvas.style.left = W+"px";
 
 ctx.lineCap = "round";
 ctx.lineJoin = "round";
 
 ctx.fillStyle = "black";
 ctx.strokeStyle = "black";
-    
-const VER = "2.1.1";
 
-const PI = Math.PI;
-const TAU = 2*Math.PI;
-const ROOT_PI = Math.sqrt(Math.PI);
-
-const W = canvas.width;
-const H = canvas.height;
-const GRID_SIZE = W/6;
-const ZOOM_SENS = 0.002;
-const THETA_RESOLUTION = 0.01;
-
+//Variable Declarations----------------------------------------------------------------------------
 var oldGridSize = GRID_SIZE;
 
 var offsetX = W/2;
@@ -77,26 +92,30 @@ function extendCurrentStroke (rawX, rawY) {
     lastStrokeY = rawY;
 }
 
-
+//TouchStart Listener------------------------------------------------------------------------------
 document.addEventListener("touchstart", e => {
     touches = e.touches;
     touch = touches[0];
-    if (touch.touchType == "stylus") { //Stylus --------------------------
-        circle(touch.pageX, touch.pageY, brushSize);
-        currentStroke = new PenStroke(touch.pageX, touch.pageY);
-        strokes.push(currentStroke);
+    if (touch.pageX < W) {
+        if (touch.touchType == "stylus") { //Stylus ---------------------------
+            circle(touch.pageX, touch.pageY, brushSize);
+            currentStroke = new PenStroke(touch.pageX, touch.pageY);
+            strokes.push(currentStroke);
 
-    } else if (touches.length <= 1) { //Single Finger Pan ---------------------
-        panX = touch.pageX;
-        panY = touch.pageY;
+        } else if (touches.length <= 1) { //Single Finger Pan -----------------
+            panX = touch.pageX;
+            panY = touch.pageY;
 
-    } else { //Multi finger zoom ----------------------------------------------
-        zoomGestureDist = Math.hypot(touches[0].pageX - touches[1].pageX, touches[0].pageY - touches[1].pageY);
-        zoomX = (touches[0].pageX + touches[1].pageX)/2;
-        zoomY = (touches[0].pageY + touches[1].pageY)/2;
+        } else { //Multi finger zoom ------------------------------------------
+            zoomGestureDist = Math.hypot(touches[0].pageX - touches[1].pageX, touches[0].pageY - touches[1].pageY);
+            zoomX = (touches[0].pageX + touches[1].pageX)/2;
+            zoomY = (touches[0].pageY + touches[1].pageY)/2;
+        }
+    } else {
+
     }
 })
-
+//TouchMove Listener-------------------------------------------------------------------------------
 document.addEventListener("touchmove", e => {
     touches = e.touches;
     touch = touches[0];
@@ -123,7 +142,7 @@ document.addEventListener("touchmove", e => {
         panX = newX;
         panY = newY;
 
-        redraw();
+        mainRedraw();
 
     } else { //Multi finger zoom ----------------------------------------------
         let newZoomDistance = Math.hypot(touches[0].pageX-touches[1].pageX, touches[0].pageY-touches[1].pageY);
@@ -133,7 +152,7 @@ document.addEventListener("touchmove", e => {
         zoomGestureDist = newZoomDistance;
         lastZoomed = true;
 
-        redraw();
+        mainRedraw();
     }
 })
 
@@ -142,15 +161,16 @@ document.addEventListener("wheel", e => { //TESTING --------------------------- 
 
     zoomX = e.pageX;
     zoomY = e.pageY;
-    redraw();
+    mainRedraw();
 })
 
-function redraw() {
-    //Clear the canvas every redraw----------------------------------------------------------------
+//Drawing the content of the main canvas-----------------------------------------------------------
+function mainRedraw() {
+    //Clear the canvas every redraw--------------------------------------------
     ctx.clearRect(0, 0, W, H);
     ctx.fillText(VER, 10, 20);
 
-    //Calculate screen offsets for zooming and panning---------------------------------------------
+    //Calculate screen offsets for zooming and panning-------------------------
     let dynamicGridSize = GRID_SIZE*zoom;
     let gridDelta = dynamicGridSize - oldGridSize;
     offsetX -= gridDelta*(zoomX-offsetX)/oldGridSize;
@@ -160,7 +180,7 @@ function redraw() {
     offsetX = clamp(offsetX, -W/1.5*zoom+W, W/1.5*zoom);
     offsetY = clamp(offsetY, -H/1.5*zoom+H, H/1.5*zoom);
 
-    //Drawing the gridlines that are visible on screen---------------------------------------------
+    //Drawing the gridlines that are visible on screen-------------------------
     xStart = Math.round(-offsetX/dynamicGridSize)*dynamicGridSize;
     yStart = Math.round(-offsetY/dynamicGridSize)*dynamicGridSize;
 
@@ -193,7 +213,7 @@ function redraw() {
         i++;
     }
 
-    //Drawing figure outline-----------------------------------------------------------------------
+    //Drawing figure outline---------------------------------------------------
     ctx.lineWidth = 2;
     ctx.beginPath();
     ctx.moveTo(offsetX+calcRad(0)*zoom, offsetY);
@@ -204,7 +224,7 @@ function redraw() {
     ctx.lineTo(offsetX+calcRad(0)*zoom, offsetY);
     ctx.stroke();
 
-    //Drawing strokes using one continuous line----------------------------------------------------
+    //Drawing strokes using one continuous line--------------------------------
     strokes.forEach(stroke => {
         ctx.lineWidth = stroke.brushSize*zoom*2;
         ctx.beginPath();
@@ -215,24 +235,43 @@ function redraw() {
         ctx.stroke();
     })
 }    
-redraw();
+mainRedraw();
 
+//Drawing the content of the ui canvas-------------------------------------------------------------
+function uiRedraw () {
+    //Clear the canvas every redraw--------------------------------------------
+    uiCtx.clearRect(0, 0, UI_WIDTH, H);
+
+    uiCtx.lineWidth = 5;
+    uiCtx.beginPath();
+    uiCtx.moveTo(0, 0);
+    uiCtx.lineTo(0, H);
+    uiCtx.stroke();
+
+    uiCtx.font = '20px FontAwesome';
+    uiCtx.fillText('\uF12d', 10, 50);
+}
+uiRedraw();
+
+//Helper Functions---------------------------------------------------------------------------------
+//Given a theta value, return the radius of the selected function--------------
 function calcRad(t) {
     return (1-1/6*(Math.sin(4*t+PI/2))-1/200*Math.pow(Math.cos(30*t), 2)*Math.sin(t)*Math.tan(t/2))/ROOT_PI*(W/2);
 }
 
+//Clamp number between minimum and maximum values------------------------------
 function clamp(x, min, max) {
     return Math.max(Math.min(x, max), min);
 }
 
-//Easy Circle Drawing
+//Easy Circle Drawing----------------------------------------------------------
 function circle(x, y, r) {
     ctx.beginPath();
     ctx.arc(x, y, r, 0, PI*2, false);
     ctx.fill();
 }
 
-//Easy Line Drawing
+//Easy Line Drawing------------------------------------------------------------
 function line(x, y, x2, y2, width) {
     ctx.lineWidth = width;
     ctx.beginPath();
@@ -240,6 +279,5 @@ function line(x, y, x2, y2, width) {
     ctx.lineTo(x2, y2);
     ctx.stroke();
 }
-    
 </script>
 </html>
