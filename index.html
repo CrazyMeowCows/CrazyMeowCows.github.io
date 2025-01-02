@@ -21,12 +21,18 @@
     
 <script>   
 //Canvas Setup and sizing
-var canvas = document.getElementById('canvas'),
-ctx = canvas.getContext("2d", { willReadFrequently: false, aplha: false });
+var canvas = document.getElementById('canvas')
+var ctx = canvas.getContext("2d", { willReadFrequently: false, aplha: false });
 canvas.width = window.innerWidth;
 canvas.height = window.innerHeight;
+
+ctx.lineCap = "round";
+ctx.lineJoin = "round";
+
+ctx.fillStyle = "black";
+ctx.strokeStyle = "black";
     
-const VER = "2.0.0";
+const VER = "2.1.0";
 
 const PI = Math.PI;
 const TAU = 2*Math.PI;
@@ -35,47 +41,57 @@ const ROOT_PI = Math.sqrt(Math.PI);
 const W = canvas.width;
 const H = canvas.height;
 const GRID_SIZE = W/6;
-const ZOOM_SENS = 0.002
-const THETA_RESOLUTION = 0.01
+const ZOOM_SENS = 0.002;
+const THETA_RESOLUTION = 0.01;
+
+var oldGridSize = GRID_SIZE;
 
 var offsetX = W/2;
 var offsetY = H/2;
 var zoomX = 0;
 var zoomY = 0;
 var zoom = 1;
-var zoomD = 0;
 var lastZoomed = false;
 
-var panX = 0;
-var panY = 0;
+var zoomGestureDist;
+var panX;
+var panY;
 
 var brushSize = 30;
-var currentStroke = null;
+var currentStroke;
+var lastStrokeX;
+var lastStrokeY;
 
 var strokes = [];
-function PenStroke (xStart, yStart, xOffset, yOffset, zoom, brushSize) {
-    this.rawX = [xStart];
-    this.rawY = [yStart];
-    this.x = [(xStart-xOffset)/zoom];
-    this.y = [(yStart-yOffset)/zoom];
+function PenStroke (xStart, yStart) {
+    this.x = [(xStart-offsetX)/zoom];
+    this.y = [(yStart-offsetY)/zoom];
     this.brushSize = brushSize/zoom;
+    lastStrokeX = xStart;
+    lastStrokeY = yStart;
+}
+function extendCurrentStroke (rawX, rawY) {
+    currentStroke.x.push((rawX-offsetX)/zoom);
+    currentStroke.y.push((rawY-offsetY)/zoom);
+    lastStrokeX = rawX;
+    lastStrokeY = rawY;
 }
 
 
 document.addEventListener("touchstart", e => {
     touches = e.touches;
-    if (touches[0].touchType == "stylus") { //Stylus --------------------------
-        circle(touches[0].pageX, touches[0].pageY, brushSize, "black");
-        currentStroke = new PenStroke(touches[0].pageX, touches[0].pageY, offsetX, offsetY, zoom, brushSize);
+    touch = touches[0];
+    if (touch.touchType != "stylus") { //Stylus --------------------------
+        circle(touch.pageX, touch.pageY, brushSize);
+        currentStroke = new PenStroke(touch.pageX, touch.pageY);
         strokes.push(currentStroke);
 
     } else if (touches.length <= 1) { //Single Finger Pan ---------------------
-        touch = touches[0];
         panX = touch.pageX;
         panY = touch.pageY;
 
     } else { //Multi finger zoom ----------------------------------------------
-        zoomD = Math.hypot(touches[0].pageX - touches[1].pageX, touches[0].pageY - touches[1].pageY);
+        zoomGestureDist = Math.hypot(touches[0].pageX - touches[1].pageX, touches[0].pageY - touches[1].pageY);
         zoomX = (touches[0].pageX + touches[1].pageX)/2;
         zoomY = (touches[0].pageY + touches[1].pageY)/2;
     }
@@ -83,17 +99,15 @@ document.addEventListener("touchstart", e => {
 
 document.addEventListener("touchmove", e => {
     touches = e.touches;
-    if (touches[0].touchType == "stylus") { //Stylus --------------------------
-        line(currentStroke.rawX[currentStroke.rawX.length-1], currentStroke.rawY[currentStroke.rawY.length-1], touches[0].pageX, touches[0].pageY, "black", brushSize*2);
-        circle(touches[0].pageX, touches[0].pageY, brushSize, "black");
-        currentStroke.rawX.push(touches[0].pageX);
-        currentStroke.rawY.push(touches[0].pageY);
-        currentStroke.x.push((touches[0].pageX-offsetX)/zoom);
-        currentStroke.y.push((touches[0].pageY-offsetY)/zoom);
+    touch = touches[0];
+    if (touches[0].touchType != "stylus") { //Stylus --------------------------
+        touchX = touch.pageX; 
+        touchY = touch.pageY;
+
+        line(lastStrokeX, lastStrokeY, touchX, touchY, brushSize*2);
+        extendCurrentStroke(touchX, touchY);
 
     } else if (touches.length <= 1) { //Single Finger Pan ---------------------
-        touch = touches[0];
-
         if (lastZoomed) {
             panX = touch.pageX;
             panY = touch.pageY;
@@ -103,11 +117,8 @@ document.addEventListener("touchmove", e => {
         let newX = touch.pageX;
         let newY = touch.pageY;
 
-        panXdelta = newX-panX;
-        panYdelta = newY-panY;
-
-        offsetX += panXdelta;
-        offsetY += panYdelta;
+        offsetX += newX-panX;
+        offsetY += newY-panY;
 
         panX = newX;
         panY = newY;
@@ -115,11 +126,11 @@ document.addEventListener("touchmove", e => {
         redraw();
 
     } else { //Multi finger zoom ----------------------------------------------
-        let newZoomD = Math.hypot(touches[0].pageX-touches[1].pageX, touches[0].pageY-touches[1].pageY);
+        let newZoomDistance = Math.hypot(touches[0].pageX-touches[1].pageX, touches[0].pageY-touches[1].pageY);
 
-        zoom = Math.max(zoom - (zoomD-newZoomD)*ZOOM_SENS*Math.abs(zoom), 1);
+        zoom = Math.max(zoom - (zoomGestureDist-newZoomDistance)*ZOOM_SENS*Math.abs(zoom), 1);
 
-        zoomD = newZoomD;
+        zoomGestureDist = newZoomDistance;
         lastZoomed = true;
 
         redraw();
@@ -134,28 +145,29 @@ document.addEventListener("wheel", e => { //TESTING --------------------------- 
     redraw();
 })
 
-var oldDelta = GRID_SIZE;
-var delta = null;
 function redraw() {
+    //Clear the canvas every redraw----------------------------------------------------------------
     ctx.clearRect(0, 0, W, H);
     ctx.fillText(VER, 10, 20);
 
-    delta = GRID_SIZE*zoom;
-    delta_delta = delta - oldDelta;
-    offsetX -= delta_delta*(zoomX-offsetX)/oldDelta;
-    offsetY -= delta_delta*(zoomY-offsetY)/oldDelta;
-    oldDelta = delta;
+    //Calculate screen offsets for zooming and panning---------------------------------------------
+    let dynamicGridSize = GRID_SIZE*zoom;
+    let gridDelta = dynamicGridSize - oldGridSize;
+    offsetX -= gridDelta*(zoomX-offsetX)/oldGridSize;
+    offsetY -= gridDelta*(zoomY-offsetY)/oldGridSize;
+    oldGridSize = dynamicGridSize;
 
     offsetX = clamp(offsetX, -W/1.5*zoom+W, W/1.5*zoom);
     offsetY = clamp(offsetY, -H/1.5*zoom+H, H/1.5*zoom);
 
-    xStart = Math.round(-offsetX/delta)*delta;
-    yStart = Math.round(-offsetY/delta)*delta;
+    //Drawing the gridlines that are visible on screen---------------------------------------------
+    xStart = Math.round(-offsetX/dynamicGridSize)*dynamicGridSize;
+    yStart = Math.round(-offsetY/dynamicGridSize)*dynamicGridSize;
 
-    lineResolution = delta/4;
+    lineResolution = dynamicGridSize/4;
 
     let i = 0; //TODO: Optimize grid drawing
-    for (var x = xStart-delta; x < W+xStart+delta; x += lineResolution) {
+    for (var x = xStart-dynamicGridSize; x < W+xStart+dynamicGridSize; x += lineResolution) {
         if (i%4 == 0) {
             ctx.lineWidth = 1;
         } else {
@@ -168,7 +180,7 @@ function redraw() {
         i++;
     }
     i = 0;
-    for (var y = yStart-delta; y < H+yStart+delta; y += lineResolution) {
+    for (var y = yStart-dynamicGridSize; y < H+yStart+dynamicGridSize; y += lineResolution) {
         if (i%4 == 0) {
             ctx.lineWidth = 1;
         } else {
@@ -181,6 +193,7 @@ function redraw() {
         i++;
     }
 
+    //Drawing figure outline-----------------------------------------------------------------------
     ctx.lineWidth = 2;
     ctx.beginPath();
     ctx.moveTo(offsetX+calcRad(0)*zoom, offsetY);
@@ -191,26 +204,16 @@ function redraw() {
     ctx.lineTo(offsetX+calcRad(0)*zoom, offsetY);
     ctx.stroke();
 
+    //Drawing strokes using one continuous line----------------------------------------------------
     strokes.forEach(stroke => {
         ctx.lineWidth = stroke.brushSize*zoom*2;
-        circle2(stroke.x[0]*zoom+offsetX, stroke.y[0]*zoom+offsetY, stroke.brushSize*zoom);
+        ctx.beginPath();
+        ctx.moveTo(stroke.x[0]*zoom+offsetX, stroke.y[0]*zoom+offsetY)
         for (let i = 1; i < stroke.x.length; i++) {
-            line2(stroke.x[i-1]*zoom+offsetX, stroke.y[i-1]*zoom+offsetY, stroke.x[i]*zoom+offsetX, stroke.y[i]*zoom+offsetY);
-            circle2(stroke.x[i]*zoom+offsetX, stroke.y[i]*zoom+offsetY, stroke.brushSize*zoom);
+            ctx.lineTo(stroke.x[i]*zoom+offsetX, stroke.y[i]*zoom+offsetY);
         }
+        ctx.stroke();
     })
-    // ctx.lineCap = "round";
-    // strokes.forEach(stroke => {
-    //     ctx.lineWidth = stroke.brushSize*zoom*2;
-    //     // ctx.lineWidth = 3;
-    //     ctx.beginPath();
-    //     ctx.moveTo(stroke.x[0]*zoom+offsetX, stroke.y[0]*zoom+offsetY)
-    //     for (let i = 1; i < stroke.x.length; i++) {
-    //         ctx.lineTo(stroke.x[i]*zoom+offsetX, stroke.y[i]*zoom+offsetY);
-    //     }
-    //     ctx.stroke();
-    // })
-    // ctx.lineCap = "butt";
 }    
 redraw();
 
@@ -223,30 +226,15 @@ function clamp(x, min, max) {
 }
 
 //Easy Circle Drawing
-function circle(x, y, r, color) {
-    ctx.fillStyle = color;
-    ctx.beginPath();
-    ctx.arc(x, y, r, 0, PI*2, false);
-    ctx.fill();
-}
-
-function circle2(x, y, r) {
+function circle(x, y, r) {
     ctx.beginPath();
     ctx.arc(x, y, r, 0, PI*2, false);
     ctx.fill();
 }
 
 //Easy Line Drawing
-function line(x, y, x2, y2, color, width) {
-    ctx.strokeStyle = color;
+function line(x, y, x2, y2, width) {
     ctx.lineWidth = width;
-    ctx.beginPath();
-    ctx.moveTo(x, y);
-    ctx.lineTo(x2, y2);
-    ctx.stroke();
-}
-
-function line2(x, y, x2, y2) {
     ctx.beginPath();
     ctx.moveTo(x, y);
     ctx.lineTo(x2, y2);
