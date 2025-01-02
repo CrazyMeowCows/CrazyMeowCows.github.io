@@ -32,7 +32,7 @@ ctx.lineJoin = "round";
 ctx.fillStyle = "black";
 ctx.strokeStyle = "black";
     
-const VER = "2.1.0";
+const VER = "2.1.1";
 
 const PI = Math.PI;
 const TAU = 2*Math.PI;
@@ -81,7 +81,7 @@ function extendCurrentStroke (rawX, rawY) {
 document.addEventListener("touchstart", e => {
     touches = e.touches;
     touch = touches[0];
-    if (touch.touchType != "stylus") { //Stylus --------------------------
+    if (touch.touchType == "stylus") { //Stylus --------------------------
         circle(touch.pageX, touch.pageY, brushSize);
         currentStroke = new PenStroke(touch.pageX, touch.pageY);
         strokes.push(currentStroke);
@@ -100,7 +100,7 @@ document.addEventListener("touchstart", e => {
 document.addEventListener("touchmove", e => {
     touches = e.touches;
     touch = touches[0];
-    if (touches[0].touchType != "stylus") { //Stylus --------------------------
+    if (touches[0].touchType == "stylus") { //Stylus --------------------------
         touchX = touch.pageX; 
         touchY = touch.pageY;
 
