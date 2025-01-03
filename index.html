@@ -49,7 +49,8 @@ const MIN_BRUSH_SIZE = 10;
 const UI_BRUSH_RAD = 43;
 const BRUSH_DELTA = (MAX_BRUSH_SIZE-MIN_BRUSH_SIZE)/6;
 
-const COMP_TESTING = true;
+const COMP_TESTING = window.innerWidth == 1024;
+console.log();
 
 //Canvas Setup and Styling-------------------------------------------------------------------------
 var mainCanvas = document.getElementById('mainCanvas')
