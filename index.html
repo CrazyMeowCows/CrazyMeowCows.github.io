@@ -8,8 +8,8 @@
 
 <canvas id="canvas"></canvas>    
 <div id="uiDiv" class="uiDiv">
-    <!-- <button class="rippleButton" onclick="brushSize = Math.min(brushSize+BRUSH_DELTA, MAX_BRUSH_SIZE)"><i class="fa fa-plus"></i></button>
-    <button class="rippleButton" onclick="brushSize = Math.max(brushSize-BRUSH_DELTA, MIN_BRUSH_SIZE)"><i class="fa fa-minus"></i></button> -->
+    <button class="rippleButton" onclick="brushSize = Math.min(brushSize+BRUSH_DELTA, MAX_BRUSH_SIZE)"><i class="fa fa-plus"></i></button>
+    <button class="rippleButton" onclick="brushSize = Math.max(brushSize-BRUSH_DELTA, MIN_BRUSH_SIZE)"><i class="fa fa-minus"></i></button>
 </div>
 <style>
     body {
@@ -27,9 +27,9 @@
         position: absolute;
     }
     .uiDiv {
-        /* border: 0px; */
-        /* margin: 0px;
-        padding: 0px; */
+        border: 0px;
+        margin: 0px;
+        padding: 0px;
         background-color: #FFFFFF;    
         text-align: center;
         position: absolute;
@@ -44,36 +44,14 @@
         margin-top: 10px;
         width: 70px;
         height: 70px;
-        transition-duration: 0.4s;
         border-radius: 8px;
-        overflow: hidden;
-        justify-content: center;
-        align-items: center;
-    }
-    .rippleButton:after {
-        content: "";
-        background: #f1f1f1;
-        display: block;
-        position: absolute;
-        padding-top: 300%;
-        padding-left: 350%;
-        margin-left: -20px !important;
-        margin-top: -120%;
-        opacity: 0;
-        transition: all 0.8s;
-    }
-    .rippleButton:active:after {
-        padding: 0;
-        margin: 0;
-        opacity: 1;
-        transition: 0s;
     }
 </style>
 <!-- Colors: FFFFFF, 4F3564, 000000 -->
 
 <script>
 //Constant Declarations----------------------------------------------------------------------------
-const VER = "2.1.1";
+const VER = "2.2.0";
 
 const PI = Math.PI;
 const TAU = 2*Math.PI;
@@ -149,7 +127,7 @@ function extendCurrentStroke (rawX, rawY) {
 }
 
 //TouchStart Listener------------------------------------------------------------------------------
-document.addEventListener("touchstart", e => {
+canvas.addEventListener("touchstart", e => {
     touches = e.touches;
     touch = touches[0];
     if (touch.pageX < W) {
@@ -167,16 +145,10 @@ document.addEventListener("touchstart", e => {
             zoomX = (touches[0].pageX + touches[1].pageX)/2;
             zoomY = (touches[0].pageY + touches[1].pageY)/2;
         }
-    } else if (touch.pageY < 90) {
-        brushSize = Math.min(brushSize+BRUSH_DELTA, MAX_BRUSH_SIZE);
-        uiRedraw();
-    } else if (touch.pageY > 225-40 && touch.pageY < 225+40) {
-        brushSize = Math.max(brushSize-BRUSH_DELTA, MIN_BRUSH_SIZE);
-        uiRedraw();
     }
 })
 //TouchMove Listener-------------------------------------------------------------------------------
-document.addEventListener("touchmove", e => {
+canvas.addEventListener("touchmove", e => {
     touches = e.touches;
     touch = touches[0];
     if (touch.pageX < W) {
@@ -215,12 +187,10 @@ document.addEventListener("touchmove", e => {
 
             mainRedraw();
         }
-    } else {
-
     }
 })
 
-document.addEventListener("wheel", e => { //TESTING --------------------------- //TODO: REMOVE
+canvas.addEventListener("wheel", e => { //TESTING --------------------------- //TODO: REMOVE
     zoom = Math.max(zoom-e.deltaY*ZOOM_SENS*Math.abs(zoom)/2, 1);
 
     zoomX = e.pageX;
