@@ -22,21 +22,34 @@
         position: absolute;
     }
 </style>
-<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css">   
+<!-- Font Awesome by Dave Gandy - http://fontawesome.io  -->
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css">
+<!-- Colors: FFFFFF, 4F3564, 000000 -->
+
 <script>
 //Constant Declarations----------------------------------------------------------------------------
 const VER = "2.1.1";
-const UI_WIDTH = 100;
 
 const PI = Math.PI;
 const TAU = 2*Math.PI;
 const ROOT_PI = Math.sqrt(Math.PI);
 
+const UI_WIDTH = 100;
+const UI_CENTER = UI_WIDTH/2+1;
+
 const W = window.innerWidth-UI_WIDTH;
 const H = window.innerHeight;
+
 const GRID_SIZE = W/6;
 const ZOOM_SENS = 0.002;
 const THETA_RESOLUTION = 0.01;
+
+const MAX_BRUSH_SIZE = 45;
+const MIN_BRUSH_SIZE = 10;
+const UI_BRUSH_RAD = 43;
+const BRUSH_DELTA = (MAX_BRUSH_SIZE-MIN_BRUSH_SIZE)/6;
+
+const COMP_TESTING = true;
 
 //Canvas Setup and Styling-------------------------------------------------------------------------
 var mainCanvas = document.getElementById('mainCanvas')
@@ -58,6 +71,10 @@ ctx.lineJoin = "round";
 ctx.fillStyle = "black";
 ctx.strokeStyle = "black";
 
+uiCtx.font = '60px FontAwesome';
+uiCtx.textAlign = "center";
+uiCtx.textBaseline = "middle";
+
 //Variable Declarations----------------------------------------------------------------------------
 var oldGridSize = GRID_SIZE;
 
@@ -72,7 +89,7 @@ var zoomGestureDist;
 var panX;
 var panY;
 
-var brushSize = 30;
+var brushSize = (MAX_BRUSH_SIZE-MIN_BRUSH_SIZE)/2+MIN_BRUSH_SIZE;
 var currentStroke;
 var lastStrokeX;
 var lastStrokeY;
@@ -97,7 +114,7 @@ document.addEventListener("touchstart", e => {
     touches = e.touches;
     touch = touches[0];
     if (touch.pageX < W) {
-        if (touch.touchType == "stylus") { //Stylus ---------------------------
+        if (touch.touchType == "stylus" || COMP_TESTING) { //Stylus ---------------------------
             circle(touch.pageX, touch.pageY, brushSize);
             currentStroke = new PenStroke(touch.pageX, touch.pageY);
             strokes.push(currentStroke);
@@ -111,48 +128,56 @@ document.addEventListener("touchstart", e => {
             zoomX = (touches[0].pageX + touches[1].pageX)/2;
             zoomY = (touches[0].pageY + touches[1].pageY)/2;
         }
-    } else {
-
+    } else if (touch.pageY < 90) {
+        brushSize = Math.min(brushSize+BRUSH_DELTA, MAX_BRUSH_SIZE);
+        uiRedraw();
+    } else if (touch.pageY > 225-40 && touch.pageY < 225+40) {
+        brushSize = Math.max(brushSize-BRUSH_DELTA, MIN_BRUSH_SIZE);
+        uiRedraw();
     }
 })
 //TouchMove Listener-------------------------------------------------------------------------------
 document.addEventListener("touchmove", e => {
     touches = e.touches;
     touch = touches[0];
-    if (touches[0].touchType == "stylus") { //Stylus --------------------------
-        touchX = touch.pageX; 
-        touchY = touch.pageY;
+    if (touch.pageX < W) {
+        if (touches[0].touchType == "stylus" || COMP_TESTING) { //Stylus --------------------------
+            touchX = touch.pageX; 
+            touchY = touch.pageY;
 
-        line(lastStrokeX, lastStrokeY, touchX, touchY, brushSize*2);
-        extendCurrentStroke(touchX, touchY);
+            line(lastStrokeX, lastStrokeY, touchX, touchY, brushSize*2);
+            extendCurrentStroke(touchX, touchY);
 
-    } else if (touches.length <= 1) { //Single Finger Pan ---------------------
-        if (lastZoomed) {
-            panX = touch.pageX;
-            panY = touch.pageY;
-            lastZoomed = false
+        } else if (touches.length <= 1) { //Single Finger Pan ---------------------
+            if (lastZoomed) {
+                panX = touch.pageX;
+                panY = touch.pageY;
+                lastZoomed = false
+            }
+
+            let newX = touch.pageX;
+            let newY = touch.pageY;
+
+            offsetX += newX-panX;
+            offsetY += newY-panY;
+
+            panX = newX;
+            panY = newY;
+
+            mainRedraw();
+
+        } else { //Multi finger zoom ----------------------------------------------
+            let newZoomDistance = Math.hypot(touches[0].pageX-touches[1].pageX, touches[0].pageY-touches[1].pageY);
+
+            zoom = Math.max(zoom - (zoomGestureDist-newZoomDistance)*ZOOM_SENS*Math.abs(zoom), 1);
+
+            zoomGestureDist = newZoomDistance;
+            lastZoomed = true;
+
+            mainRedraw();
         }
+    } else {
 
-        let newX = touch.pageX;
-        let newY = touch.pageY;
-
-        offsetX += newX-panX;
-        offsetY += newY-panY;
-
-        panX = newX;
-        panY = newY;
-
-        mainRedraw();
-
-    } else { //Multi finger zoom ----------------------------------------------
-        let newZoomDistance = Math.hypot(touches[0].pageX-touches[1].pageX, touches[0].pageY-touches[1].pageY);
-
-        zoom = Math.max(zoom - (zoomGestureDist-newZoomDistance)*ZOOM_SENS*Math.abs(zoom), 1);
-
-        zoomGestureDist = newZoomDistance;
-        lastZoomed = true;
-
-        mainRedraw();
     }
 })
 
@@ -179,6 +204,17 @@ function mainRedraw() {
 
     offsetX = clamp(offsetX, -W/1.5*zoom+W, W/1.5*zoom);
     offsetY = clamp(offsetY, -H/1.5*zoom+H, H/1.5*zoom);
+
+    //Drawing strokes using one continuous line--------------------------------
+    strokes.forEach(stroke => {
+        ctx.lineWidth = stroke.brushSize*zoom*2;
+        ctx.beginPath();
+        ctx.moveTo(stroke.x[0]*zoom+offsetX, stroke.y[0]*zoom+offsetY)
+        for (let i = 0; i < stroke.x.length; i++) {
+            ctx.lineTo(stroke.x[i]*zoom+offsetX, stroke.y[i]*zoom+offsetY);
+        }
+        ctx.stroke();
+    })
 
     //Drawing the gridlines that are visible on screen-------------------------
     xStart = Math.round(-offsetX/dynamicGridSize)*dynamicGridSize;
@@ -223,17 +259,6 @@ function mainRedraw() {
     }
     ctx.lineTo(offsetX+calcRad(0)*zoom, offsetY);
     ctx.stroke();
-
-    //Drawing strokes using one continuous line--------------------------------
-    strokes.forEach(stroke => {
-        ctx.lineWidth = stroke.brushSize*zoom*2;
-        ctx.beginPath();
-        ctx.moveTo(stroke.x[0]*zoom+offsetX, stroke.y[0]*zoom+offsetY)
-        for (let i = 1; i < stroke.x.length; i++) {
-            ctx.lineTo(stroke.x[i]*zoom+offsetX, stroke.y[i]*zoom+offsetY);
-        }
-        ctx.stroke();
-    })
 }    
 mainRedraw();
 
@@ -248,10 +273,31 @@ function uiRedraw () {
     uiCtx.lineTo(0, H);
     uiCtx.stroke();
 
-    uiCtx.font = '20px FontAwesome';
-    uiCtx.fillText('\uF12d', 10, 50);
+    // uiCtx.fillText('\uF12d', 10, 50); // Eraser Icon
+    // uiCtx.fillText('\uF040', 10, 110); //Pencil Icon
+    // uiCtx.fillText('\uF066', 10, 170); //Compress Icon
+
+    //Font Size 60
+    uiCtx.fillText('\uF067', UI_CENTER, 50); //Plus Icon
+    uiCtx.fillText('\uF068', UI_CENTER, 225); //Minus Icon
+
+    uiCtx.lineWidth = 1;
+    uiCtx.beginPath();
+    uiCtx.roundRect(UI_CENTER-UI_BRUSH_RAD, 50+185/2-UI_BRUSH_RAD, UI_BRUSH_RAD*2, UI_BRUSH_RAD*2, [10]);
+    uiCtx.stroke();
+    uiCtx.beginPath();
+    uiCtx.arc(UI_CENTER, 50+185/2, brushSize/MAX_BRUSH_SIZE*UI_BRUSH_RAD, 0, TAU, false);
+    uiCtx.fill();
 }
-uiRedraw();
+uiRedraw(); //Call uiRedraw to start loading the used fonts
+function load () { 
+    if (document.fonts.check('1px FontAwesome')) {
+        uiRedraw(); //Call uiRedraw once fonts are loaded to display everything correctly
+    } else {
+        setTimeout(load, 20); //Recursively check every 20ms until font loads
+    }
+}
+load(); //Begin loading loop
 
 //Helper Functions---------------------------------------------------------------------------------
 //Given a theta value, return the radius of the selected function--------------
@@ -267,7 +313,7 @@ function clamp(x, min, max) {
 //Easy Circle Drawing----------------------------------------------------------
 function circle(x, y, r) {
     ctx.beginPath();
-    ctx.arc(x, y, r, 0, PI*2, false);
+    ctx.arc(x, y, r, 0, TAU, false);
     ctx.fill();
 }
 
