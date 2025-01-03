@@ -28,7 +28,7 @@
 
 <script>
 //Constant Declarations----------------------------------------------------------------------------
-const VER = "2.1.1";
+const VER = "2.1.2";
 
 const PI = Math.PI;
 const TAU = 2*Math.PI;
@@ -46,11 +46,10 @@ const THETA_RESOLUTION = 0.01;
 
 const MAX_BRUSH_SIZE = 45;
 const MIN_BRUSH_SIZE = 10;
-const UI_BRUSH_RAD = 43;
+const UI_BRUSH_RAD = 38;
 const BRUSH_DELTA = (MAX_BRUSH_SIZE-MIN_BRUSH_SIZE)/6;
 
-const COMP_TESTING = window.innerWidth == 1024;
-console.log();
+const COMP_TESTING = false;
 
 //Canvas Setup and Styling-------------------------------------------------------------------------
 var mainCanvas = document.getElementById('mainCanvas')
@@ -75,6 +74,7 @@ ctx.strokeStyle = "black";
 uiCtx.font = '60px FontAwesome';
 uiCtx.textAlign = "center";
 uiCtx.textBaseline = "middle";
+
 
 //Variable Declarations----------------------------------------------------------------------------
 var oldGridSize = GRID_SIZE;
@@ -110,35 +110,41 @@ function extendCurrentStroke (rawX, rawY) {
     lastStrokeY = rawY;
 }
 
+var buttons = [];
+function Button (x, y, width, height, event, drawFunction) {
+    this.x = x;
+    this.y = y;
+    this.w = width;
+    this.h = height;
+    this.event = event;
+    this.drawFunction = drawFunction;
+    this.trans = 0;
+    buttons.push(this);
+}
+
 //TouchStart Listener------------------------------------------------------------------------------
-document.addEventListener("touchstart", e => {
+mainCanvas.addEventListener("touchstart", e => {
     touches = e.touches;
     touch = touches[0];
-    if (touch.pageX < W) {
-        if (touch.touchType == "stylus" || COMP_TESTING) { //Stylus ---------------------------
-            circle(touch.pageX, touch.pageY, brushSize);
-            currentStroke = new PenStroke(touch.pageX, touch.pageY);
-            strokes.push(currentStroke);
+    if (touch.touchType == "stylus" || COMP_TESTING) { //Stylus ---------------------------
+        circle(touch.pageX, touch.pageY, brushSize);
+        currentStroke = new PenStroke(touch.pageX, touch.pageY);
+        strokes.push(currentStroke);
 
-        } else if (touches.length <= 1) { //Single Finger Pan -----------------
-            panX = touch.pageX;
-            panY = touch.pageY;
+    } else if (touches.length <= 1) { //Single Finger Pan -----------------
+        panX = touch.pageX;
+        panY = touch.pageY;
 
-        } else { //Multi finger zoom ------------------------------------------
-            zoomGestureDist = Math.hypot(touches[0].pageX - touches[1].pageX, touches[0].pageY - touches[1].pageY);
-            zoomX = (touches[0].pageX + touches[1].pageX)/2;
-            zoomY = (touches[0].pageY + touches[1].pageY)/2;
-        }
-    } else if (touch.pageY < 90) {
-        brushSize = Math.min(brushSize+BRUSH_DELTA, MAX_BRUSH_SIZE);
-        uiRedraw();
-    } else if (touch.pageY > 225-40 && touch.pageY < 225+40) {
-        brushSize = Math.max(brushSize-BRUSH_DELTA, MIN_BRUSH_SIZE);
-        uiRedraw();
+    } else { //Multi finger zoom ------------------------------------------
+        zoomGestureDist = Math.hypot(touches[0].pageX - touches[1].pageX, touches[0].pageY - touches[1].pageY);
+        zoomX = (touches[0].pageX + touches[1].pageX)/2;
+        zoomY = (touches[0].pageY + touches[1].pageY)/2;
     }
 })
+
+
 //TouchMove Listener-------------------------------------------------------------------------------
-document.addEventListener("touchmove", e => {
+mainCanvas.addEventListener("touchmove", e => {
     touches = e.touches;
     touch = touches[0];
     if (touch.pageX < W) {
@@ -181,14 +187,27 @@ document.addEventListener("touchmove", e => {
 
     }
 })
-
-document.addEventListener("wheel", e => { //TESTING --------------------------- //TODO: REMOVE
+mainCanvas.addEventListener("wheel", e => { //TESTING --------------------------- //TODO: REMOVE
     zoom = Math.max(zoom-e.deltaY*ZOOM_SENS*Math.abs(zoom)/2, 1);
 
     zoomX = e.pageX;
     zoomY = e.pageY;
     mainRedraw();
 })
+
+uiCanvas.addEventListener("touchstart", e => {
+    touchX = e.touches[0].pageX-W;
+    touchY = e.touches[0].pageY;
+    buttons.forEach(button => {
+        // alert(button.height);
+        if (touchY > button.y && touchY < button.y+button.h) {
+            button.trans = 10;
+            console.log("Initializing Trans: "+button.trans);
+            button.event();
+        }
+    });
+})
+
 
 //Drawing the content of the main canvas-----------------------------------------------------------
 function mainRedraw() {
@@ -263,6 +282,47 @@ function mainRedraw() {
 }    
 mainRedraw();
 
+
+//Creating Buttons for uiCanvas--------------------------------------------------------------------
+var brushPlus = new Button(10, 10, 80, 80, brushPlusAction, drawBrushPlus);
+function drawBrushPlus() {
+    uiCtx.beginPath();
+    uiCtx.roundRect(15, 15, 70, 70, [10]);
+    uiCtx.stroke();
+
+    uiCtx.fillStyle = "#4F3564";
+    uiCtx.fillText('\uF067', UI_CENTER, 50);
+
+    uiCtx.fillStyle = 'rgba(0,0,0,'+brushPlus.trans/20+')';
+    uiCtx.beginPath();
+    uiCtx.roundRect(15, 15, 70, 70, [10]);
+    uiCtx.fill();
+}
+function brushPlusAction() {
+    brushSize = Math.min(brushSize+BRUSH_DELTA, MAX_BRUSH_SIZE);
+    uiRedraw();
+}
+
+var brushMinus = new Button(10, 200, 80, 80, brushMinusAction, drawBrushMinus);
+function drawBrushMinus() {
+    uiCtx.beginPath();
+    uiCtx.roundRect(15, 205, 70, 70, [10]);
+    uiCtx.stroke();
+
+    uiCtx.fillStyle = "#4F3564";
+    uiCtx.fillText('\uF068', UI_CENTER, 240);
+
+    uiCtx.fillStyle = 'rgba(0,0,0,'+brushMinus.trans/20+')';
+    uiCtx.beginPath();
+    uiCtx.roundRect(15, 205, 70, 70, [10]);
+    uiCtx.fill();
+}
+function brushMinusAction() {
+    brushSize = Math.max(brushSize-BRUSH_DELTA, MIN_BRUSH_SIZE);
+    uiRedraw();
+}
+
+
 //Drawing the content of the ui canvas-------------------------------------------------------------
 function uiRedraw () {
     //Clear the canvas every redraw--------------------------------------------
@@ -277,18 +337,33 @@ function uiRedraw () {
     // uiCtx.fillText('\uF12d', 10, 50); // Eraser Icon
     // uiCtx.fillText('\uF040', 10, 110); //Pencil Icon
     // uiCtx.fillText('\uF066', 10, 170); //Compress Icon
-
-    //Font Size 60
-    uiCtx.fillText('\uF067', UI_CENTER, 50); //Plus Icon
-    uiCtx.fillText('\uF068', UI_CENTER, 225); //Minus Icon
+    // uiCtx.fillText('\uF067', UI_CENTER, 50); //Plus Icon
+    // uiCtx.fillText('\uF068', UI_CENTER, 225); //Minus Icon
 
     uiCtx.lineWidth = 1;
-    uiCtx.beginPath();
-    uiCtx.roundRect(UI_CENTER-UI_BRUSH_RAD, 50+185/2-UI_BRUSH_RAD, UI_BRUSH_RAD*2, UI_BRUSH_RAD*2, [10]);
-    uiCtx.stroke();
+    uiCtx.fillStyle = "black";
     uiCtx.beginPath();
     uiCtx.arc(UI_CENTER, 50+185/2, brushSize/MAX_BRUSH_SIZE*UI_BRUSH_RAD, 0, TAU, false);
     uiCtx.fill();
+
+    uiCtx.setLineDash([5, 5]);
+    uiCtx.beginPath();
+    uiCtx.arc(UI_CENTER, 50+185/2, UI_BRUSH_RAD, 0, TAU, false);
+    uiCtx.stroke();
+    uiCtx.setLineDash([]);
+
+    let recurse = false;
+    buttons.forEach(button => {
+        button.drawFunction();
+        if (button.trans > 0) {
+            button.trans--;
+            recurse = true;
+        }
+    });
+    console.log("Recurse: "+recurse);
+    if (recurse) {
+        setTimeout(uiRedraw, 20);
+    }
 }
 uiRedraw(); //Call uiRedraw to start loading the used fonts
 function load () { 
@@ -299,6 +374,7 @@ function load () {
     }
 }
 load(); //Begin loading loop
+
 
 //Helper Functions---------------------------------------------------------------------------------
 //Given a theta value, return the radius of the selected function--------------
