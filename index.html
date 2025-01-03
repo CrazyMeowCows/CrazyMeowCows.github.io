@@ -2,10 +2,15 @@
 <html>
 <head>
 <title>DPAA Testing Software</title>
+<!-- Font Awesome by Dave Gandy - http://fontawesome.io  -->
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css">
 </head>
 
-<canvas id="mainCanvas" width="0" height="0"></canvas>    
-<canvas id="uiCanvas" width="0" height="0"></canvas>
+<canvas id="canvas"></canvas>    
+<div id="uiDiv" class="uiDiv">
+    <button class="rippleButton" onclick="brushSize = Math.min(brushSize+BRUSH_DELTA, MAX_BRUSH_SIZE)"><i class="fa fa-plus"></i></button>
+    <button class="rippleButton" onclick="brushSize = Math.max(brushSize-BRUSH_DELTA, MIN_BRUSH_SIZE)"><i class="fa fa-minus"></i></button>
+</div>
 <style>
     body {
         width: 100%;
@@ -21,9 +26,49 @@
     canvas {
         position: absolute;
     }
+    .uiDiv {
+        /* border: 0px; */
+        /* margin: 0px;
+        padding: 0px; */
+        background-color: #FFFFFF;    
+        text-align: center;
+        position: absolute;
+    }
+    .rippleButton {
+        position: relative;
+        background-color: #FFFFFF;
+        border: 2px solid #000000;
+        font-size: 60px;
+        color: #4F3564;
+        margin: 0px;
+        margin-top: 10px;
+        width: 70px;
+        height: 70px;
+        transition-duration: 0.4s;
+        border-radius: 8px;
+        overflow: hidden;
+        justify-content: center;
+        align-items: center;
+    }
+    .rippleButton:after {
+        content: "";
+        background: #f1f1f1;
+        display: block;
+        position: absolute;
+        padding-top: 300%;
+        padding-left: 350%;
+        margin-left: -20px !important;
+        margin-top: -120%;
+        opacity: 0;
+        transition: all 0.8s;
+    }
+    .rippleButton:active:after {
+        padding: 0;
+        margin: 0;
+        opacity: 1;
+        transition: 0s;
+    }
 </style>
-<!-- Font Awesome by Dave Gandy - http://fontawesome.io  -->
-<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css">
 <!-- Colors: FFFFFF, 4F3564, 000000 -->
 
 <script>
@@ -52,28 +97,22 @@ const BRUSH_DELTA = (MAX_BRUSH_SIZE-MIN_BRUSH_SIZE)/6;
 const COMP_TESTING = true;
 
 //Canvas Setup and Styling-------------------------------------------------------------------------
-var mainCanvas = document.getElementById('mainCanvas')
-var ctx = mainCanvas.getContext("2d", { willReadFrequently: true, aplha: false });
+var canvas = document.getElementById('canvas');
+var ctx = canvas.getContext("2d", { willReadFrequently: true, aplha: false });
 
-var uiCanvas = document.getElementById('uiCanvas')
-var uiCtx = uiCanvas.getContext("2d", { willReadFrequently: false, aplha: false });
+var div = document.getElementById("uiDiv");
+div.style.left = W+"px";
+div.style.width = UI_WIDTH+"px";
+div.style.height = H+"px";
 
-mainCanvas.width = W;
-mainCanvas.height = H;
-
-uiCanvas.width = UI_WIDTH;
-uiCanvas.height = H;
-uiCanvas.style.left = W+"px";
+canvas.width = W;
+canvas.height = H;
 
 ctx.lineCap = "round";
 ctx.lineJoin = "round";
 
 ctx.fillStyle = "black";
 ctx.strokeStyle = "black";
-
-uiCtx.font = '60px FontAwesome';
-uiCtx.textAlign = "center";
-uiCtx.textBaseline = "middle";
 
 //Variable Declarations----------------------------------------------------------------------------
 var oldGridSize = GRID_SIZE;
@@ -259,45 +298,33 @@ function mainRedraw() {
     }
     ctx.lineTo(offsetX+calcRad(0)*zoom, offsetY);
     ctx.stroke();
+
+    ctx.lineWidth = 4;
+    line(W, 0, W, H);
 }    
 mainRedraw();
 
 //Drawing the content of the ui canvas-------------------------------------------------------------
 function uiRedraw () {
     //Clear the canvas every redraw--------------------------------------------
-    uiCtx.clearRect(0, 0, UI_WIDTH, H);
-
-    uiCtx.lineWidth = 5;
-    uiCtx.beginPath();
-    uiCtx.moveTo(0, 0);
-    uiCtx.lineTo(0, H);
-    uiCtx.stroke();
 
     // uiCtx.fillText('\uF12d', 10, 50); // Eraser Icon
     // uiCtx.fillText('\uF040', 10, 110); //Pencil Icon
     // uiCtx.fillText('\uF066', 10, 170); //Compress Icon
 
     //Font Size 60
-    uiCtx.fillText('\uF067', UI_CENTER, 50); //Plus Icon
-    uiCtx.fillText('\uF068', UI_CENTER, 225); //Minus Icon
-
-    uiCtx.lineWidth = 1;
-    uiCtx.beginPath();
-    uiCtx.roundRect(UI_CENTER-UI_BRUSH_RAD, 50+185/2-UI_BRUSH_RAD, UI_BRUSH_RAD*2, UI_BRUSH_RAD*2, [10]);
-    uiCtx.stroke();
-    uiCtx.beginPath();
-    uiCtx.arc(UI_CENTER, 50+185/2, brushSize/MAX_BRUSH_SIZE*UI_BRUSH_RAD, 0, TAU, false);
-    uiCtx.fill();
+    // uiCtx.fillText('\uF067', UI_CENTER, 50); //Plus Icon
+    // uiCtx.fillText('\uF068', UI_CENTER, 225); //Minus Icon
 }
 uiRedraw(); //Call uiRedraw to start loading the used fonts
-function load () { 
-    if (document.fonts.check('1px FontAwesome')) {
-        uiRedraw(); //Call uiRedraw once fonts are loaded to display everything correctly
-    } else {
-        setTimeout(load, 20); //Recursively check every 20ms until font loads
-    }
-}
-load(); //Begin loading loop
+// function load () { 
+//     if (document.fonts.check('1px FontAwesome')) {
+//         uiRedraw(); //Call uiRedraw once fonts are loaded to display everything correctly
+//     } else {
+//         setTimeout(load, 20); //Recursively check every 20ms until font loads
+//     }
+// }
+// load(); //Begin loading loop
 
 //Helper Functions---------------------------------------------------------------------------------
 //Given a theta value, return the radius of the selected function--------------
