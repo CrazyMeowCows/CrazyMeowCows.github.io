@@ -31,13 +31,14 @@
     .uiDiv {
         width: 100%;
         height: 100%;
-        border: 0px;
         margin: 0px;
         padding: 0px;
         overflow: hidden;
-        display: block;
+        display: flex;
+        flex-direction: column;
         background-color: #FFFFFF;    
-        text-align: center;
+        justify-content: center;
+        align-items: center;
         position: absolute;
     }
     .rippleButton {
@@ -57,7 +58,7 @@
 
 <script>
 //Constant Declarations----------------------------------------------------------------------------
-const VER = "2.2.1";
+const VER = "2.2.2";
 
 const PI = Math.PI;
 const TAU = 2*Math.PI;
