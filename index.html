@@ -74,6 +74,8 @@ ctx.strokeStyle = "black";
 uiCtx.textAlign = "center";
 uiCtx.textBaseline = "middle";
 
+uiCtx.lineCap = "round";
+
 
 //Variable Declarations----------------------------------------------------------------------------
 var oldGridSize = GRID_SIZE;
@@ -112,13 +114,14 @@ function extendCurrentStroke (rawX, rawY) {
 }
 
 var buttons = [];
-function Button (x, y, width, height, event, icon, hideOutline) {
+function Button (x, y, width, height, event, icon, iconVoffset, hideOutline) {
     this.x = x;
     this.y = y;
     this.w = width;
     this.h = height;
     this.event = event;
     this.icon = icon;
+    this.iconVoffset = iconVoffset;
     this.hideOutline = hideOutline;
 
     this.trans = 0;
@@ -311,15 +314,15 @@ mainRedraw();
 
 
 //Creating Buttons for uiCanvas--------------------------------------------------------------------
-var brushPlus = new Button(15, 10, 70, 70, () => {brushSize = Math.min(brushSize+BRUSH_DELTA, MAX_BRUSH_SIZE)}, '\uF067', false);
-var brushMinus = new Button(15, 310, 70, 70, () => {brushSize = Math.max(brushSize-BRUSH_DELTA, MIN_BRUSH_SIZE)}, '\uF068', false);
-var pencil = new Button(15, H-250, 70, 70, () => {pencilColor = "black"}, '\uF040', true);
-var eraser = new Button(15, pencil.y+70, 70, 70, () => {pencilColor = "white"}, '\uF12d', true);
-var resetZoom = new Button(15, H-80, 70, 70, () => {offsetX = W/2; offsetY = H/2; zoom = 1; oldGridSize = GRID_SIZE; mainRedraw();}, '\uF066', false);
+var brushPlus = new Button(15, 10, 70, 70, () => {brushSize = Math.min(brushSize+BRUSH_DELTA, MAX_BRUSH_SIZE)}, '\uF067', 2, false);
+var brushMinus = new Button(15, 310, 70, 70, () => {brushSize = Math.max(brushSize-BRUSH_DELTA, MIN_BRUSH_SIZE)}, '\uF068', 3, false);
+var pencil = new Button(15, H-250, 70, 70, () => {pencilColor = "black"}, '\uF040', 0, true);
+var eraser = new Button(15, pencil.y+70, 70, 70, () => {pencilColor = "white"}, '\uF12d', 0, true);
+var resetZoom = new Button(15, H-80, 70, 70, () => {offsetX = W/2; offsetY = H/2; zoom = 1; oldGridSize = GRID_SIZE; mainRedraw();}, '\uF066', 0, false);
 function drawIconButton(button) {
     uiCtx.font = '60px FontAwesome';
     uiCtx.fillStyle = "#4F3564";
-    uiCtx.fillText(button.icon, UI_CENTER, button.y+button.h/2);
+    uiCtx.fillText(button.icon, UI_CENTER, button.y+button.h/2+button.iconVoffset);
 
     if (!button.hideOutline) {
         uiCtx.beginPath();
@@ -340,30 +343,25 @@ function uiRedraw () {
     uiCtx.clearRect(0, 0, UI_WIDTH, H);
 
     //Draw brush size slider
-    uiCtx.lineCap = "round";
     line(UI_CENTER, 110, UI_CENTER, 280, 10, uiCtx)
     uiCtx.strokeStyle = "#d6d6d6";
-    line(UI_CENTER, 110, UI_CENTER, 280, 6, uiCtx)
-    uiCtx.lineCap = "butt";
+    uiCtx.lineWidth = 6;
+    uiCtx.stroke();
 
     let sliderHeight = 280-(brushSize-MIN_BRUSH_SIZE)/(MAX_BRUSH_SIZE-MIN_BRUSH_SIZE)*170;
 
-    uiCtx.lineWidth = 3;
-    uiCtx.strokeStyle = "#b5b5b5";
-    uiCtx.beginPath();  
-    uiCtx.arc(UI_CENTER, sliderHeight, brushSize/MAX_BRUSH_SIZE*UI_BRUSH_RAD+4, 0, TAU, false);
-    uiCtx.stroke();
-
     //Draw current brush size
+    uiCtx.lineWidth = 2;
+    uiCtx.strokeStyle = "black";
     if (pencilColor == "white") {
         uiCtx.fillStyle = "#f2f2f2";
     } else {
         uiCtx.fillStyle = "black";
     }
     circle(UI_CENTER, sliderHeight, brushSize/MAX_BRUSH_SIZE*UI_BRUSH_RAD+4, uiCtx);
+    uiCtx.stroke();
 
     //Draw icon buttons
-    uiCtx.strokeStyle = "black";
     uiCtx.lineWidth = 1.5;
     let recurse = false;
     buttons.forEach(button => {
