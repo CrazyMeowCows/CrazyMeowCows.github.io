@@ -28,7 +28,7 @@
 
 <script>
 //Constant Declarations----------------------------------------------------------------------------
-const VER = "2.1.3";
+const VER = "2.1.4";
 
 const PI = Math.PI;
 const TAU = 2*Math.PI;
@@ -46,7 +46,7 @@ const THETA_RESOLUTION = 0.01;
 
 const MAX_BRUSH_SIZE = 45;
 const MIN_BRUSH_SIZE = 10;
-const UI_BRUSH_RAD = 38;
+const UI_BRUSH_RAD = 22;
 const BRUSH_DELTA = (MAX_BRUSH_SIZE-MIN_BRUSH_SIZE)/6;
 
 const COMP_TESTING = false;
@@ -326,57 +326,31 @@ function uiRedraw () {
     //Clear the canvas every redraw
     uiCtx.clearRect(0, 0, UI_WIDTH, H);
 
-    //Draw current brush size
-    uiCtx.lineWidth = 1;
-    uiCtx.fillStyle = "black";
-    uiCtx.beginPath();
-    uiCtx.arc(UI_CENTER, 430, brushSize/MAX_BRUSH_SIZE*UI_BRUSH_RAD, 0, TAU, false);
-    if (pencilColor == "black") {
-        uiCtx.fill();
-    } else {
-        for (let i = -UI_BRUSH_RAD*2+UI_BRUSH_RAD/2.5*2; i < 0; i += UI_BRUSH_RAD/2.5) {
-            uiCtx.moveTo(UI_CENTER-UI_BRUSH_RAD, 430-UI_BRUSH_RAD-i);
-            uiCtx.lineTo(UI_CENTER+UI_BRUSH_RAD+i, 430+UI_BRUSH_RAD);
-            uiCtx.moveTo(UI_CENTER-UI_BRUSH_RAD-i, 430-UI_BRUSH_RAD);
-            uiCtx.lineTo(UI_CENTER+UI_BRUSH_RAD, 430+UI_BRUSH_RAD+i);
-        }
-        uiCtx.stroke();
-    }
-    uiCtx.fillStyle = "white";
-    uiCtx.beginPath();
-    uiCtx.rect(UI_CENTER-UI_BRUSH_RAD, 430-UI_BRUSH_RAD, UI_BRUSH_RAD*2, UI_BRUSH_RAD*2);
-    uiCtx.arc(UI_CENTER, 430, brushSize/MAX_BRUSH_SIZE*UI_BRUSH_RAD, 0, TAU, true);
-    uiCtx.fill();
-
     //Draw brush size slider
     uiCtx.lineCap = "round";
-    line(UI_CENTER, 100, UI_CENTER, 290, 10, uiCtx)
+    line(UI_CENTER, 110, UI_CENTER, 280, 10, uiCtx)
     uiCtx.strokeStyle = "#d6d6d6";
-    line(UI_CENTER, 100, UI_CENTER, 290, 6, uiCtx)
-
+    line(UI_CENTER, 110, UI_CENTER, 280, 6, uiCtx)
     uiCtx.lineCap = "butt";
-    uiCtx.lineWidth = 4;
 
-    let sliderHeight = 290-(brushSize-MIN_BRUSH_SIZE)/(MAX_BRUSH_SIZE-MIN_BRUSH_SIZE)*190;
-    uiCtx.fillStyle = "black";
-    uiCtx.strokeStyle = "#d6d6d6";
+    let sliderHeight = 280-(brushSize-MIN_BRUSH_SIZE)/(MAX_BRUSH_SIZE-MIN_BRUSH_SIZE)*170;
+
+    uiCtx.lineWidth = 3;
+    uiCtx.strokeStyle = "#b5b5b5";
     uiCtx.beginPath();  
-    uiCtx.arc(UI_CENTER, sliderHeight, 8, 0, TAU, false);
+    uiCtx.arc(UI_CENTER, sliderHeight, brushSize/MAX_BRUSH_SIZE*UI_BRUSH_RAD+4, 0, TAU, false);
     uiCtx.stroke();
-    circle(UI_CENTER, sliderHeight, 8, uiCtx);
 
-    uiCtx.strokeStyle = "black";
-    uiCtx.lineWidth = 1;
-
-    //Draw max brush size dotted outline
-    uiCtx.fillStyle = "black";
-    uiCtx.setLineDash([5, 5]);
-    uiCtx.beginPath();  
-    uiCtx.arc(UI_CENTER, 430, UI_BRUSH_RAD, 0, TAU, false);
-    uiCtx.stroke();
-    uiCtx.setLineDash([]);
+    //Draw current brush size
+    if (pencilColor == "white") {
+        uiCtx.fillStyle = "#f2f2f2";
+    } else {
+        uiCtx.fillStyle = "black";
+    }
+    circle(UI_CENTER, sliderHeight, brushSize/MAX_BRUSH_SIZE*UI_BRUSH_RAD+4, uiCtx);
 
     //Draw icon buttons
+    uiCtx.strokeStyle = "black";
     uiCtx.lineWidth = 1.5;
     let recurse = false;
     buttons.forEach(button => {
