@@ -28,7 +28,7 @@
 
 <script>
 //Constant Declarations----------------------------------------------------------------------------
-const VER = "2.1.8";
+const VER = "2.1.9";
 
 const PI = Math.PI;
 const TAU = 2*Math.PI;
@@ -320,11 +320,8 @@ var pencil = new Button(15, H-250, 70, 70, () => {pencilColor = "black"}, '\uF04
 var eraser = new Button(15, pencil.y+70, 70, 70, () => {pencilColor = "white"}, '\uF12d', 0, true);
 var resetZoom = new Button(15, H-80, 70, 70, zoomOut, '\uF066', 0, false);
 function drawIconButton(button) {
-    uiCtx.font = '60px FontAwesome';
-    uiCtx.fillStyle = "#4F3564";
-    uiCtx.fillText(button.icon, UI_CENTER, button.y+button.h/2+button.iconVoffset);
-
     if (!button.hideOutline) {
+        uiCtx.fillStyle = "white";
         uiCtx.beginPath();
         uiCtx.roundRect(button.x, button.y, button.w, button.h, [10]);
         uiCtx.stroke();
@@ -334,6 +331,10 @@ function drawIconButton(button) {
         uiCtx.roundRect(button.x, button.y, button.w, button.h, [10]);
         uiCtx.fill();
     }
+
+    uiCtx.font = '60px FontAwesome';
+    uiCtx.fillStyle = "#4F3564";
+    uiCtx.fillText(button.icon, button.x+button.w/2, button.y+button.h/2+button.iconVoffset);
 }
 
 
@@ -342,6 +343,7 @@ function uiRedraw () {
     //Clear the canvas every redraw
     uiCtx.clearRect(0, 0, W+UI_WIDTH, H);
 
+    // Draw Timer
     uiCtx.fillStyle = "white";
     uiCtx.lineWidth = 2;
     uiCtx.strokeStyle = "black";
@@ -357,10 +359,10 @@ function uiRedraw () {
     }
     let secs = "" + timerSeconds%60;
     if (secs.length <= 1) {
-        secs += "0";
+        secs = "0"+secs;
     }
-    uiCtx.font = "60px Times New Roman"; //Same font as Times New Roman without having to load it
-    uiCtx.fillText(mins+":"+secs, W/2, 31);
+    uiCtx.font = "60px Times New Roman";
+    uiCtx.fillText(mins+":"+secs, W/2, 29);
 
     //Draw brush size slider
     let sliderHeight = 280-(brushSize-MIN_BRUSH_SIZE)/(MAX_BRUSH_SIZE-MIN_BRUSH_SIZE)*170;
@@ -393,6 +395,17 @@ function uiRedraw () {
         }
     });
     if (recurse) { setTimeout(uiRedraw, 20); }
+
+    uiCtx.fillStyle = "white";
+    uiCtx.beginPath();
+    uiCtx.roundRect(10, H-80, 70, 70, [10]);
+    uiCtx.stroke();
+    uiCtx.fill();
+
+    uiCtx.font = '500 30px Times New Roman';
+    uiCtx.fillStyle = "#4F3564";
+    uiCtx.fillText("End", 45, H-57.5);
+    uiCtx.fillText("Test", 45, H-27.5);
 
     //Draw Eraser/Pencil Toggle
     uiCtx.lineWidth = 1.5 + 1.5*(pencilColor == "black");
@@ -449,7 +462,7 @@ function zoomOutAnimation() {
 }
 
 function decrementTimer() {
-    timerSeconds--;
+    timerSeconds = Math.max(timerSeconds-1, 0);
     uiRedraw();
 }
 setInterval(decrementTimer, 1000);
