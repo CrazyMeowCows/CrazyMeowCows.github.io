@@ -28,7 +28,7 @@
 
 <script>
 //Constant Declarations----------------------------------------------------------------------------
-const VER = "2.1.5";
+const VER = "2.1.6";
 
 const PI = Math.PI;
 const TAU = 2*Math.PI;
@@ -343,22 +343,24 @@ function uiRedraw () {
     uiCtx.clearRect(0, 0, UI_WIDTH, H);
 
     //Draw brush size slider
-    line(UI_CENTER, 110, UI_CENTER, 280, 10, uiCtx)
-    uiCtx.strokeStyle = "#d6d6d6";
-    uiCtx.lineWidth = 6;
-    uiCtx.stroke();
-
     let sliderHeight = 280-(brushSize-MIN_BRUSH_SIZE)/(MAX_BRUSH_SIZE-MIN_BRUSH_SIZE)*170;
 
+    line(UI_CENTER, 110, UI_CENTER, 280, 10, uiCtx)
+    uiCtx.strokeStyle = "#d6d6d6";
+    line(UI_CENTER, 110, UI_CENTER, 280, 6, uiCtx)
+    uiCtx.strokeStyle = "#a1a1a1";
+    line(UI_CENTER, sliderHeight, UI_CENTER, 280, 6, uiCtx)
+
     //Draw current brush size
-    uiCtx.lineWidth = 2;
-    uiCtx.strokeStyle = "black";
     if (pencilColor == "white") {
         uiCtx.fillStyle = "#f2f2f2";
     } else {
         uiCtx.fillStyle = "black";
     }
     circle(UI_CENTER, sliderHeight, brushSize/MAX_BRUSH_SIZE*UI_BRUSH_RAD+4, uiCtx);
+
+    uiCtx.lineWidth = 2;
+    uiCtx.strokeStyle = "black";
     uiCtx.stroke();
 
     //Draw icon buttons
