@@ -361,7 +361,7 @@ function uiRedraw () {
     if (secs.length <= 1) {
         secs = "0"+secs;
     }
-    uiCtx.font = "60px Times New Roman";
+    uiCtx.font = "normal 500 60px Times New Roman";
     uiCtx.fillText(mins+":"+secs, W/2, 29);
 
     //Draw brush size slider
@@ -396,13 +396,15 @@ function uiRedraw () {
     });
     if (recurse) { setTimeout(uiRedraw, 20); }
 
-    uiCtx.fillStyle = "white";
+    //Draw end test button
+    uiCtx.fillStyle = "#f2f2f2";
+    uiCtx.lineWidth = 4;
     uiCtx.beginPath();
     uiCtx.roundRect(10, H-80, 70, 70, [10]);
     uiCtx.stroke();
     uiCtx.fill();
 
-    uiCtx.font = '500 30px Times New Roman';
+    uiCtx.font = 'normal 500 30px Times New Roman';
     uiCtx.fillStyle = "#4F3564";
     uiCtx.fillText("End", 45, H-57.5);
     uiCtx.fillText("Test", 45, H-27.5);
