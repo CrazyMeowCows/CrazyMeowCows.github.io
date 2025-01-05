@@ -46,7 +46,7 @@ const THETA_RESOLUTION = 0.01;
 
 const MAX_BRUSH_SIZE = 45;
 const MIN_BRUSH_SIZE = 10;
-const UI_BRUSH_RAD = 22;
+const UI_BRUSH_RAD = 21;
 const BRUSH_DELTA = (MAX_BRUSH_SIZE-MIN_BRUSH_SIZE)/6;
 
 const COMP_TESTING = false;
@@ -208,7 +208,7 @@ mainCanvas.addEventListener("wheel", e => { //TESTING --------------------------
 uiCanvas.addEventListener("touchstart", e => {
     touchX = e.touches[0].pageX-W;
     touchY = e.touches[0].pageY;
-    if (touchY >= 110-20 && touchY <= 280+20) {
+    if (touchY >= 110-10 && touchY <= 280+10) {
         brushSize = lerp(MIN_BRUSH_SIZE, MAX_BRUSH_SIZE, (280-touchY)/(280-110));
         uiRedraw();
     } else {
@@ -224,7 +224,7 @@ uiCanvas.addEventListener("touchstart", e => {
 uiCanvas.addEventListener("touchmove", e => {
     touchX = e.touches[0].pageX-W;
     touchY = e.touches[0].pageY;
-    if (touchY >= 110-20 && touchY <= 280+20) {
+    if (touchY >= 110-10 && touchY <= 280+10) {
         brushSize = lerp(MIN_BRUSH_SIZE, MAX_BRUSH_SIZE, (280-touchY)/(280-110));
         uiRedraw();
     }
