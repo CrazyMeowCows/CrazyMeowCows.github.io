@@ -50,7 +50,7 @@ const MIN_BRUSH_SIZE = 10;
 const UI_BRUSH_RAD = 21;
 const BRUSH_DELTA = (MAX_BRUSH_SIZE-MIN_BRUSH_SIZE)/6;
 
-const COMP_TESTING = false;
+const COMP_TESTING = true;
 
 //Canvas Setup and Styling-------------------------------------------------------------------------
 var mainCanvas = document.getElementById('mainCanvas')
@@ -99,6 +99,7 @@ var pencilColor = "black";
 
 var maxTimeSeconds = 5*60;
 var timerSeconds = maxTimeSeconds;
+var endTestPrompted = false;
 
 var strokes = [];
 function PenStroke (xStart, yStart, strokeColor) {
@@ -138,47 +139,49 @@ document.addEventListener("touchstart", e => {
     let touchX = touch.pageX; 
     let touchY = touch.pageY;
 
-    if (touchX <= W) {
-        if (touchX <= 80 && touchY >= H-80) {
-            confirm("End the Test Early?");
-        } else if (touch.touchType == "stylus" || COMP_TESTING) { //Stylus ---------------
-            ctx.fillStyle = pencilColor;
-            circle(touch.pageX, touch.pageY, brushSize, ctx);
+    if (!endTestPrompted) {
+        if (touchX <= W) {
+            if (touchX <= 80 && touchY >= H-80) {
+                endTestPrompt();
+            } else if (touch.touchType == "stylus" || COMP_TESTING) { //Stylus ---------------
+                ctx.fillStyle = pencilColor;
+                circle(touch.pageX, touch.pageY, brushSize, ctx);
 
-            currentStroke = new PenStroke(touch.pageX, touch.pageY, pencilColor);
-            strokes.push(currentStroke);
+                currentStroke = new PenStroke(touch.pageX, touch.pageY, pencilColor);
+                strokes.push(currentStroke);
 
-            if (pencilColor == "white") {
-                mainRedraw();
+                if (pencilColor == "white") {
+                    mainRedraw();
 
-                ctx.lineWidth = 2;
-                ctx.strokeStyle = "black";
-                ctx.beginPath();
-                ctx.arc(touch.pageX, touch.pageY, brushSize, 0, TAU, false);
-                ctx.stroke();
-            }
-
-        } else if (touches.length <= 1) { //Single Finger Pan ---------------------
-            panX = touch.pageX;
-            panY = touch.pageY;
-
-        } else { //Multi finger zoom ----------------------------------------------
-            zoomGestureDist = Math.hypot(touches[0].pageX - touches[1].pageX, touches[0].pageY - touches[1].pageY);
-            zoomX = (touches[0].pageX + touches[1].pageX)/2;
-            zoomY = (touches[0].pageY + touches[1].pageY)/2;
-        }
-    } else {
-        if (touchY >= 110-10 && touchY <= 280+10) {
-            brushSize = lerp(MIN_BRUSH_SIZE, MAX_BRUSH_SIZE, (280-touchY)/(280-110));
-            uiRedraw();
-        } else {
-            buttons.forEach(button => {
-                if (touchY > button.y && touchY < button.y+button.h) {
-                    button.trans = 10;
-                    button.event();
-                    uiRedraw();
+                    ctx.lineWidth = 2;
+                    ctx.strokeStyle = "black";
+                    ctx.beginPath();
+                    ctx.arc(touch.pageX, touch.pageY, brushSize, 0, TAU, false);
+                    ctx.stroke();
                 }
-            });
+
+            } else if (touches.length <= 1) { //Single Finger Pan ---------------------
+                panX = touch.pageX;
+                panY = touch.pageY;
+
+            } else { //Multi finger zoom ----------------------------------------------
+                zoomGestureDist = Math.hypot(touches[0].pageX - touches[1].pageX, touches[0].pageY - touches[1].pageY);
+                zoomX = (touches[0].pageX + touches[1].pageX)/2;
+                zoomY = (touches[0].pageY + touches[1].pageY)/2;
+            }
+        } else {
+            if (touchY >= 110-10 && touchY <= 280+10) {
+                brushSize = lerp(MIN_BRUSH_SIZE, MAX_BRUSH_SIZE, (280-touchY)/(280-110));
+                uiRedraw();
+            } else {
+                buttons.forEach(button => {
+                    if (touchY > button.y && touchY < button.y+button.h) {
+                        button.trans = 10;
+                        button.event();
+                        uiRedraw();
+                    }
+                });
+            }
         }
     }
 })
@@ -193,53 +196,55 @@ document.addEventListener("touchmove", e => {
     if (COMP_TESTING) {
         touch.touchType = "stylus";
     }
+    if (!endTestPrompted) {
+        if (touch.pageX <= W) {
+            if (touch.touchType == "stylus" && currentStroke != undefined) { //Stylus ----------
+                ctx.strokeStyle = pencilColor;
+                line(lastStrokeX, lastStrokeY, touchX, touchY, brushSize*2, ctx);
+                extendCurrentStroke(touchX, touchY);
 
-    if (touch.pageX <= W) {
-        if (touch.touchType == "stylus" && currentStroke != undefined) { //Stylus ----------
-            ctx.strokeStyle = pencilColor;
-            line(lastStrokeX, lastStrokeY, touchX, touchY, brushSize*2, ctx);
-            extendCurrentStroke(touchX, touchY);
+                if (pencilColor == "white") {
+                    mainRedraw();
 
-            if (pencilColor == "white") {
-                mainRedraw();
+                    ctx.lineWidth = 1.5;
+                    ctx.strokeStyle = "black";
+                    ctx.beginPath();
+                    ctx.arc(touch.pageX, touch.pageY, brushSize, 0, TAU, false);
+                    ctx.stroke();
+                }
 
-                ctx.lineWidth = 1.5;
-                ctx.strokeStyle = "black";
-                ctx.beginPath();
-                ctx.arc(touch.pageX, touch.pageY, brushSize, 0, TAU, false);
-                ctx.stroke();
-            }
+            } else if (touches.length <= 1 && touch.touchType != "stylus") { //Single Finger Pan ---------------------
+                if (lastZoomed) {
+                    panX = touchX;
+                    panY = touchY;
+                    lastZoomed = false
+                }
 
-        } else if (touches.length <= 1 && touch.touchType != "stylus") { //Single Finger Pan ---------------------
-            if (lastZoomed) {
+                offsetX += touchX-panX;
+                offsetY += touchY-panY;
+
                 panX = touchX;
                 panY = touchY;
-                lastZoomed = false
+
+                mainRedraw();
+
+            } else if (touches.length > 1 && touch.touchType != "stylus") { //Multi finger zoom ----------------------------------------------
+                let newZoomDistance = Math.hypot(touches[0].pageX-touches[1].pageX, touches[0].pageY-touches[1].pageY);
+
+                zoom = Math.max(zoom - (zoomGestureDist-newZoomDistance)*ZOOM_SENS*Math.abs(zoom), 1);
+
+                zoomGestureDist = newZoomDistance;
+                lastZoomed = true;
+
+                mainRedraw();
             }
-
-            offsetX += touchX-panX;
-            offsetY += touchY-panY;
-
-            panX = touchX;
-            panY = touchY;
-
+        } else {
             mainRedraw();
-
-        } else if (touches.length > 1 && touch.touchType != "stylus") { //Multi finger zoom ----------------------------------------------
-            let newZoomDistance = Math.hypot(touches[0].pageX-touches[1].pageX, touches[0].pageY-touches[1].pageY);
-
-            zoom = Math.max(zoom - (zoomGestureDist-newZoomDistance)*ZOOM_SENS*Math.abs(zoom), 1);
-
-            zoomGestureDist = newZoomDistance;
-            lastZoomed = true;
-
-            mainRedraw();
-        }
-    } else {
-        currentStroke = undefined;
-        if (touchY >= 110-10 && touchY <= 280+10) {
-            brushSize = lerp(MIN_BRUSH_SIZE, MAX_BRUSH_SIZE, (280-touchY)/(280-110));
-            uiRedraw();
+            currentStroke = undefined;
+            if (touchY >= 110-10 && touchY <= 280+10) {
+                brushSize = lerp(MIN_BRUSH_SIZE, MAX_BRUSH_SIZE, (280-touchY)/(280-110));
+                uiRedraw();
+            }
         }
     }
 })
@@ -461,6 +466,22 @@ function load () {
 }
 load(); //Begin loading loop
 
+function endTestPrompt() {
+    endTestPrompted = true;
+
+    clearInterval(timerInterval);
+
+    uiCtx.fillStyle = 'rgba(0,0,0,0.3)';
+    uiCtx.fillRect(0, 0, W+UI_WIDTH, H);
+
+    uiCtx.fillStyle = 'white';
+    uiCtx.strokeStyle = 'black';
+    uiCtx.lineWidth = 3;
+    uiCtx.beginPath();
+    uiCtx.roundRect((W+UI_WIDTH)/2-200, H/2-200, 400, 200, [10]);
+    uiCtx.fill();
+    uiCtx.stroke();
+}
 
 //Helper Functions---------------------------------------------------------------------------------
 function zoomOut() {
@@ -490,7 +511,7 @@ function decrementTimer() {
     timerSeconds = Math.max(timerSeconds-1, 0);
     uiRedraw();
 }
-setInterval(decrementTimer, 1000);
+var timerInterval = setInterval(decrementTimer, 1000);
 
 //Given a theta value, return the radius of the selected function--------------
 function calcRad(t) {
