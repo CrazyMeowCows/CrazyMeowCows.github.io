@@ -98,7 +98,7 @@ var lastStrokeY;
 var pencilColor = "black";
 
 var maxTimeSeconds = 5*60;
-var timer = maxTimeSeconds;
+var timerSeconds = maxTimeSeconds;
 
 var strokes = [];
 function PenStroke (xStart, yStart, strokeColor) {
@@ -351,16 +351,16 @@ function uiRedraw () {
     uiCtx.stroke();
 
     uiCtx.fillStyle = "black";
-    let mins = "" + Math.floor(timer/60);
+    let mins = "" + Math.floor(timerSeconds/60);
     if (mins.length <= 1) {
         mins = "0"+mins;
     }
-    let secs = "" + timer%60;
+    let secs = "" + timerSeconds%60;
     if (secs.length <= 1) {
         secs += "0";
     }
-    uiCtx.font = "60px FontAwesome"; //Same font as Times New Roman without having to load it
-    uiCtx.fillText(mins+":"+secs, W/2, 25);
+    uiCtx.font = "60px Times New Roman"; //Same font as Times New Roman without having to load it
+    uiCtx.fillText(mins+":"+secs, W/2, 31);
 
     //Draw brush size slider
     let sliderHeight = 280-(brushSize-MIN_BRUSH_SIZE)/(MAX_BRUSH_SIZE-MIN_BRUSH_SIZE)*170;
@@ -449,7 +449,7 @@ function zoomOutAnimation() {
 }
 
 function decrementTimer() {
-    timer--;
+    timerSeconds--;
     uiRedraw();
 }
 setInterval(decrementTimer, 1000);
