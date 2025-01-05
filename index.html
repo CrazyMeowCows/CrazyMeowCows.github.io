@@ -140,7 +140,7 @@ document.addEventListener("touchstart", e => {
 
     if (touchX <= W) {
         if (touchX <= 80 && touchY >= H-80) {
-            confirm("End the Test Early?")
+            confirm("End the Test Early?");
         } else if (touch.touchType == "stylus" || COMP_TESTING) { //Stylus ---------------
             ctx.fillStyle = pencilColor;
             circle(touch.pageX, touch.pageY, brushSize, ctx);
@@ -364,7 +364,7 @@ function uiRedraw () {
         secs = "0"+secs;
     }
     uiCtx.font = "normal 500 60px Times New Roman";
-    uiCtx.fillText(mins+":"+secs, W/2, 29);
+    uiCtx.fillText(mins+":"+secs, W/2, 27);
 
     //Draw brush size slider
     let sliderHeight = 280-(brushSize-MIN_BRUSH_SIZE)/(MAX_BRUSH_SIZE-MIN_BRUSH_SIZE)*170;
@@ -408,8 +408,8 @@ function uiRedraw () {
 
     uiCtx.font = 'normal 500 30px Times New Roman';
     uiCtx.fillStyle = "#4F3564";
-    uiCtx.fillText("End", 45, H-57.5);
-    uiCtx.fillText("Test", 45, H-27.5);
+    uiCtx.fillText("End", 45, H-59.5);
+    uiCtx.fillText("Test", 45, H-29.5);
 
     //Draw Eraser/Pencil Toggle
     uiCtx.lineWidth = 1.5 + 1.5*(pencilColor == "black");
