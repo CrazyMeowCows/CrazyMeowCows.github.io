@@ -131,7 +131,7 @@ mainCanvas.addEventListener("touchstart", e => {
     touch = touches[0];
     if (touch.touchType == "stylus" || COMP_TESTING) { //Stylus ---------------
         ctx.fillStyle = pencilColor;
-        circle(touch.pageX, touch.pageY, brushSize);
+        circle(touch.pageX, touch.pageY, brushSize, ctx);
 
         currentStroke = new PenStroke(touch.pageX, touch.pageY, pencilColor);
         strokes.push(currentStroke);
@@ -161,7 +161,7 @@ mainCanvas.addEventListener("touchmove", e => {
         touchY = touch.pageY;
 
         ctx.strokeStyle = pencilColor;
-        line(lastStrokeX, lastStrokeY, touchX, touchY, brushSize*2);
+        line(lastStrokeX, lastStrokeY, touchX, touchY, brushSize*2, ctx);
         extendCurrentStroke(touchX, touchY);
 
         if (pencilColor == "white") {
@@ -292,8 +292,7 @@ function mainRedraw() {
     ctx.stroke();
 
     //Line at right side of canvas to seperate UI
-    uiCtx.lineWidth = 5;
-    line(W, 0, W, H);
+    line(W, 0, W, H, 5, ctx);
 }    
 mainRedraw();
 
@@ -348,6 +347,26 @@ function uiRedraw () {
     uiCtx.rect(UI_CENTER-UI_BRUSH_RAD, 430-UI_BRUSH_RAD, UI_BRUSH_RAD*2, UI_BRUSH_RAD*2);
     uiCtx.arc(UI_CENTER, 430, brushSize/MAX_BRUSH_SIZE*UI_BRUSH_RAD, 0, TAU, true);
     uiCtx.fill();
+
+    //Draw brush size slider
+    uiCtx.lineCap = "round";
+    line(UI_CENTER, 100, UI_CENTER, 290, 10, uiCtx)
+    uiCtx.strokeStyle = "#d6d6d6";
+    line(UI_CENTER, 100, UI_CENTER, 290, 6, uiCtx)
+
+    uiCtx.lineCap = "butt";
+    uiCtx.lineWidth = 4;
+
+    let sliderHeight = 290-(brushSize-MIN_BRUSH_SIZE)/(MAX_BRUSH_SIZE-MIN_BRUSH_SIZE)*190;
+    uiCtx.fillStyle = "black";
+    uiCtx.strokeStyle = "#d6d6d6";
+    uiCtx.beginPath();  
+    uiCtx.arc(UI_CENTER, sliderHeight, 8, 0, TAU, false);
+    uiCtx.stroke();
+    circle(UI_CENTER, sliderHeight, 8, uiCtx);
+
+    uiCtx.strokeStyle = "black";
+    uiCtx.lineWidth = 1;
 
     //Draw max brush size dotted outline
     uiCtx.fillStyle = "black";
@@ -418,14 +437,14 @@ function clamp(x, min, max) {
 }
 
 //Easy Circle Drawing----------------------------------------------------------
-function circle(x, y, r) {
+function circle(x, y, r, ctx) {
     ctx.beginPath();
     ctx.arc(x, y, r, 0, TAU, false);
     ctx.fill();
 }
 
 //Easy Line Drawing------------------------------------------------------------
-function line(x, y, x2, y2, width) {
+function line(x, y, x2, y2, width, ctx) {
     ctx.lineWidth = width;
     ctx.beginPath();
     ctx.moveTo(x, y);
