@@ -28,7 +28,7 @@
 
 <script>
 //Constant Declarations----------------------------------------------------------------------------
-const VER = "2.1.9";
+const VER = "2.2.0";
 
 const PI = Math.PI;
 const TAU = 2*Math.PI;
@@ -138,8 +138,10 @@ document.addEventListener("touchstart", e => {
     let touchX = touch.pageX; 
     let touchY = touch.pageY;
 
-    if (touch.pageX <= W) {
-        if (touch.touchType == "stylus" || COMP_TESTING) { //Stylus ---------------
+    if (touchX <= W) {
+        if (touchX <= 80 && touchY >= H-80) {
+            confirm("End the Test Early?")
+        } else if (touch.touchType == "stylus" || COMP_TESTING) { //Stylus ---------------
             ctx.fillStyle = pencilColor;
             circle(touch.pageX, touch.pageY, brushSize, ctx);
 
