@@ -318,7 +318,7 @@ var brushPlus = new Button(15, 10, 70, 70, () => {brushSize = Math.min(brushSize
 var brushMinus = new Button(15, 310, 70, 70, () => {brushSize = Math.max(brushSize-BRUSH_DELTA, MIN_BRUSH_SIZE)}, '\uF068', 3, false);
 var pencil = new Button(15, H-250, 70, 70, () => {pencilColor = "black"}, '\uF040', 0, true);
 var eraser = new Button(15, pencil.y+70, 70, 70, () => {pencilColor = "white"}, '\uF12d', 0, true);
-var resetZoom = new Button(15, H-80, 70, 70, () => {offsetX = W/2; offsetY = H/2; zoom = 1; oldGridSize = GRID_SIZE; mainRedraw();}, '\uF066', 0, false);
+var resetZoom = new Button(15, H-80, 70, 70, zoomOut, '\uF066', 0, false);
 function drawIconButton(button) {
     uiCtx.font = '60px FontAwesome';
     uiCtx.fillStyle = "#4F3564";
@@ -413,6 +413,30 @@ load(); //Begin loading loop
 
 
 //Helper Functions---------------------------------------------------------------------------------
+function zoomOut() {
+    offsetX = W/2;
+    offsetY = H/2;
+    zoomX = W/2;
+    zoomY = H/2;
+    zoom = 1;
+    oldGridSize = GRID_SIZE;
+    mainRedraw();
+
+    animInc = 0;
+    zoomOutAnimation();
+}
+var animInc = 0
+function zoomOutAnimation() {
+    zoom -= 0.01*Math.sign(10-animInc);
+    console.log(animInc);
+    mainRedraw();
+
+    if (animInc < 20) {
+        animInc++;    
+        setTimeout(zoomOutAnimation, 10);
+    }
+}
+
 //Given a theta value, return the radius of the selected function--------------
 function calcRad(t) {
     return (1-1/6*(Math.sin(4*t+PI/2))-1/200*Math.pow(Math.cos(30*t), 2)*Math.sin(t)*Math.tan(t/2))/ROOT_PI*(W/2);
