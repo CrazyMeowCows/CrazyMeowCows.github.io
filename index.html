@@ -28,7 +28,7 @@
 
 <script>
 //Constant Declarations----------------------------------------------------------------------------
-const VER = "2.2.0";
+const VER = "2.2.1";
 
 const PI = Math.PI;
 const TAU = 2*Math.PI;
@@ -50,7 +50,7 @@ const MIN_BRUSH_SIZE = 10;
 const UI_BRUSH_RAD = 21;
 const BRUSH_DELTA = (MAX_BRUSH_SIZE-MIN_BRUSH_SIZE)/6;
 
-const COMP_TESTING = true;
+const COMP_TESTING = false;
 
 //Canvas Setup and Styling-------------------------------------------------------------------------
 var mainCanvas = document.getElementById('mainCanvas')
@@ -190,9 +190,12 @@ document.addEventListener("touchmove", e => {
     let touch = touches[0];
     let touchX = touch.pageX; 
     let touchY = touch.pageY;
+    if (COMP_TESTING) {
+        touch.touchType = "stylus";
+    }
 
     if (touch.pageX <= W) {
-        if (touches[0].touchType == "stylus" || COMP_TESTING) { //Stylus ----------
+        if (touch.touchType == "stylus" && currentStroke != undefined) { //Stylus ----------
             ctx.strokeStyle = pencilColor;
             line(lastStrokeX, lastStrokeY, touchX, touchY, brushSize*2, ctx);
             extendCurrentStroke(touchX, touchY);
@@ -207,7 +210,7 @@ document.addEventListener("touchmove", e => {
                 ctx.stroke();
             }
 
-        } else if (touches.length <= 1) { //Single Finger Pan ---------------------
+        } else if (touches.length <= 1 && touch.touchType != "stylus") { //Single Finger Pan ---------------------
             if (lastZoomed) {
                 panX = touchX;
                 panY = touchY;
@@ -222,7 +225,7 @@ document.addEventListener("touchmove", e => {
 
             mainRedraw();
 
-        } else { //Multi finger zoom ----------------------------------------------
+        } else if (touches.length > 1 && touch.touchType != "stylus") { //Multi finger zoom ----------------------------------------------
             let newZoomDistance = Math.hypot(touches[0].pageX-touches[1].pageX, touches[0].pageY-touches[1].pageY);
 
             zoom = Math.max(zoom - (zoomGestureDist-newZoomDistance)*ZOOM_SENS*Math.abs(zoom), 1);
@@ -233,6 +236,7 @@ document.addEventListener("touchmove", e => {
             mainRedraw();
         }
     } else {
+        currentStroke = undefined;
         if (touchY >= 110-10 && touchY <= 280+10) {
             brushSize = lerp(MIN_BRUSH_SIZE, MAX_BRUSH_SIZE, (280-touchY)/(280-110));
             uiRedraw();
