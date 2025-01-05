@@ -50,7 +50,7 @@ const MIN_BRUSH_SIZE = 10;
 const UI_BRUSH_RAD = 21;
 const BRUSH_DELTA = (MAX_BRUSH_SIZE-MIN_BRUSH_SIZE)/6;
 
-const COMP_TESTING = false;
+const COMP_TESTING = true;
 
 //Canvas Setup and Styling-------------------------------------------------------------------------
 var mainCanvas = document.getElementById('mainCanvas')
@@ -150,6 +150,12 @@ document.addEventListener("touchstart", e => {
 
             if (pencilColor == "white") {
                 mainRedraw();
+
+                ctx.lineWidth = 2;
+                ctx.strokeStyle = "black";
+                ctx.beginPath();
+                ctx.arc(touch.pageX, touch.pageY, brushSize, 0, TAU, false);
+                ctx.stroke();
             }
 
         } else if (touches.length <= 1) { //Single Finger Pan ---------------------
@@ -193,6 +199,12 @@ document.addEventListener("touchmove", e => {
 
             if (pencilColor == "white") {
                 mainRedraw();
+
+                ctx.lineWidth = 1.5;
+                ctx.strokeStyle = "black";
+                ctx.beginPath();
+                ctx.arc(touch.pageX, touch.pageY, brushSize, 0, TAU, false);
+                ctx.stroke();
             }
 
         } else if (touches.length <= 1) { //Single Finger Pan ---------------------
@@ -227,13 +239,18 @@ document.addEventListener("touchmove", e => {
         }
     }
 })
+document.addEventListener("touchend", e => {
+    mainRedraw();
+});
+
+
 document.addEventListener("wheel", e => { //TESTING --------------------------- //TODO: REMOVE
     zoom = Math.max(zoom-e.deltaY*ZOOM_SENS*Math.abs(zoom)/2, 1);
 
     zoomX = e.pageX;
     zoomY = e.pageY;
     mainRedraw();
-})
+});
 
 
 //Drawing the content of the main canvas-----------------------------------------------------------
