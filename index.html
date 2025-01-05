@@ -28,7 +28,7 @@
 
 <script>
 //Constant Declarations----------------------------------------------------------------------------
-const VER = "2.1.4";
+const VER = "2.1.5";
 
 const PI = Math.PI;
 const TAU = 2*Math.PI;
@@ -208,13 +208,26 @@ mainCanvas.addEventListener("wheel", e => { //TESTING --------------------------
 uiCanvas.addEventListener("touchstart", e => {
     touchX = e.touches[0].pageX-W;
     touchY = e.touches[0].pageY;
-    buttons.forEach(button => {
+    if (touchY >= 110-20 && touchY <= 280+20) {
+        brushSize = lerp(MIN_BRUSH_SIZE, MAX_BRUSH_SIZE, (280-touchY)/(280-110));
+        uiRedraw();
+    } else {
+        buttons.forEach(button => {
         if (touchY > button.y && touchY < button.y+button.h) {
             button.trans = 10;
             button.event();
             uiRedraw();
         }
     });
+    }
+})
+uiCanvas.addEventListener("touchmove", e => {
+    touchX = e.touches[0].pageX-W;
+    touchY = e.touches[0].pageY;
+    if (touchY >= 110-20 && touchY <= 280+20) {
+        brushSize = lerp(MIN_BRUSH_SIZE, MAX_BRUSH_SIZE, (280-touchY)/(280-110));
+        uiRedraw();
+    }
 })
 
 
@@ -408,6 +421,11 @@ function calcRad(t) {
 //Clamp number between minimum and maximum values------------------------------
 function clamp(x, min, max) {
     return Math.max(Math.min(x, max), min);
+}
+
+//Given value from 0-1 (alpha) interpolate between a and b
+function lerp(a, b, alpha) {
+    return a + clamp(alpha, 0, 1)*(b-a);
 }
 
 //Easy Circle Drawing----------------------------------------------------------
