@@ -356,7 +356,7 @@ var pencil = new Button(15+W, H-250, 70, 70, () => {brushColor = "black"}, '\uF0
 var eraser = new Button(15+W, pencil.y+70, 70, 70, () => {brushColor = "white"}, '\uF12d', 0, true, false);
 var resetZoom = new Button(15+W, H-80, 70, 70, zoomOut, '\uF066', 0, false, false);
 var yesEndTest = new Button((W+UI_WIDTH)/2-105, H/2-115, 70, 70, endTest, '\uF00C', 0, false, true);
-var noEndTest = new Button((W+UI_WIDTH)/2+35, H/2-115, 70, 70, () => {endTestPrompted = false; uiRedraw();}, '\uF00D', 0, false, true);
+var noEndTest = new Button((W+UI_WIDTH)/2+35, H/2-115, 70, 70, () => {endTestPrompted = false; uiRedraw(); lastZoomed = true;}, '\uF00D', 0, false, true);
 function drawIconButton(button) {
     uiCtx.font = '60px FontAwesome';
     uiCtx.fillText(button.icon, button.x+button.w/2, button.y+button.h/2+button.iconVoffset);
