@@ -4,10 +4,11 @@
 <title>DPAA Testing Software</title>
 </head>
 
-<canvas id="gridCanvas" width="0" height="0"></canvas>    
+<canvas class="canvas" id="gridCanvas" width="0" height="0"></canvas>    
 <canvas id="drawCanvas" width="0" height="0"></canvas>    
 <canvas id="figureCanvas" width="0" height="0"></canvas>    
 <canvas id="uiCanvas" width="0" height="0"></canvas>
+<canvas id="scoreCanvas" width="1000" height="1000"></canvas>
 <style>
     body {
         width: 100%;
@@ -62,7 +63,7 @@ const ERASE_COLOR = "#FFFFFF";
 const SLIDER_Y1 = 110;
 const SLIDER_Y2 = 280;
 
-const COMP_TESTING = false;
+var COMP_TESTING = true;
 
 
 //Canvas Setup and Styling-------------------------------------------------------------------------
@@ -70,20 +71,22 @@ var gridCanvas = document.getElementById('gridCanvas')
 var gridCtx = gridCanvas.getContext("2d", { willReadFrequently: false, aplha: false });
 
 var drawCanvas = document.getElementById('drawCanvas')
-var drawCtx = drawCanvas.getContext("2d", { willReadFrequently: true, aplha: false });
+var drawCtx = drawCanvas.getContext("2d", { willReadFrequently: false, aplha: false });
 
 var figureCanvas = document.getElementById('figureCanvas')
-var figureCtx = figureCanvas.getContext("2d", { willReadFrequently: true, aplha: false });
+var figureCtx = figureCanvas.getContext("2d", { willReadFrequently: false, aplha: false });
 
 var uiCanvas = document.getElementById('uiCanvas')
 var uiCtx = uiCanvas.getContext("2d", { willReadFrequently: false, aplha: false });
+
+var scoreCanvas = document.getElementById('scoreCanvas')
+var scoreCtx = scoreCanvas.getContext("2d", { willReadFrequently: true, aplha: false });
 
 gridCanvas.width = W; gridCanvas.height = H;
 drawCanvas.width = W; drawCanvas.height = H;
 figureCanvas.width = W; figureCanvas.height = H;
 
-uiCanvas.width = W+UI_WIDTH;
-uiCanvas.height = H;
+uiCanvas.width = W+UI_WIDTH; uiCanvas.height = H;
 
 gridCtx.strokeStyle = "black";
 
@@ -121,6 +124,7 @@ var brushColor = DRAW_COLOR;
 var maxTimeSeconds = 5*60;
 var timerSeconds = maxTimeSeconds;
 var endTestPrompted = false;
+var isScoring = false;
 
 var strokes = [];
 function PenStroke (xStart, yStart, strokeColor) {
@@ -143,7 +147,7 @@ var brushPlus = new Button(15+W, 10, 70, 70, () => {brushSize = Math.min(brushSi
 var brushMinus = new Button(15+W, 310, 70, 70, () => {brushSize = Math.max(brushSize-BRUSH_DELTA, MIN_BRUSH_SIZE)}, '\uF068', 3, false, false);
 var pencil = new Button(15+W, H-250, 70, 70, () => {brushColor = DRAW_COLOR}, '\uF040', 0, true, false);
 var eraser = new Button(15+W, pencil.y+70, 70, 70, () => {brushColor = ERASE_COLOR}, '\uF12d', 0, true, false);
-var resetZoom = new Button(15+W, H-80, 70, 70, zoomOut, '\uF066', 0, false, false);
+var resetZoom = new Button(15+W, H-80, 70, 70, () => {zoomOut(true)}, '\uF066', 0, false, false);
 var yesEndTest = new Button((W+UI_WIDTH)/2-105, H/2-115, 70, 70, endTest, '\uF00C', 0, false, true);
 var noEndTest = new Button((W+UI_WIDTH)/2+35, H/2-115, 70, 70, () => {endTestPrompted = false; uiRedraw(); lastZoomed = true;}, '\uF00D', 0, false, true);
 
@@ -156,9 +160,10 @@ document.addEventListener("touchstart", e => {
     if (COMP_TESTING) {touch.touchType = "stylus";}
 
     if (endTestPrompted) { //End Test Promt is Active
-        handleButtonTouch(yesEndTest, touch);
-        handleButtonTouch(noEndTest, touch);
-        uiRedraw();
+        if (!isScoring) {
+            handleButtonTouch(yesEndTest, touch);
+            handleButtonTouch(noEndTest, touch);
+        }
         return;
     }
     if (touchX <= 80 && touchY >= H-80) { //Check for EndTest Button
@@ -259,11 +264,13 @@ document.addEventListener("touchend", e => { //Clear the Eraser Outline
 
 //Wheel Listener-----------------------------------------------------------------------------------
 document.addEventListener("wheel", e => { //TODO: REMOVE
-    zoom = clamp(zoom-e.deltaY*ZOOM_SENS*Math.abs(zoom)/2, 1, MAX_ZOOM);
+    if (!endTestPrompted) {
+        zoom = clamp(zoom-e.deltaY*ZOOM_SENS*Math.abs(zoom)/2, 1, MAX_ZOOM);
 
-    zoomX = e.pageX;
-    zoomY = e.pageY;
-    mainRedraw();
+        zoomX = e.pageX;
+        zoomY = e.pageY;
+        mainRedraw();
+    }
 });
 
 
@@ -497,12 +504,42 @@ function endTestPrompt() {
 
 function endTest() {
     clearInterval(timerInterval);
+    isScoring = true;
+    console.log("s");
 
-    location.href = "index.html";
+    zoomOut(false)
+
+    scoreCtx.clearRect(0, 0, W, H);
+
+    //Drawing strokes using one continuous line
+    scoreCtx.strokeStyle = "black";
+    strokes.forEach(stroke => {
+        if (stroke.strokeColor == DRAW_COLOR) {
+            scoreCtx.globalCompositeOperation = "source-over";
+        } else {
+            scoreCtx.globalCompositeOperation = "destination-out";
+        }
+        scoreCtx.lineWidth = stroke.brushSize*2;
+        scoreCtx.beginPath();
+        scoreCtx.moveTo(stroke.x[0]+500, stroke.y[0]+500)
+        for (let i = 0; i < stroke.x.length; i++) {
+            scoreCtx.lineTo(stroke.x[i]+500, stroke.y[i]+500);
+        }
+        scoreCtx.stroke();
+    });
+
+    drawData = drawCtx.getImageData(0, 0, W, H);
+    for (let i = 0; i < imgData.data.length; i += 4) {
+        imgData.data[i+0] = 255;
+        imgData.data[i+1] = 0;
+        imgData.data[i+2] = 0;
+        imgData.data[i+3] = 255;
+    }
+    // location.href = "index.html";
 }
 
 //Helper Functions---------------------------------------------------------------------------------
-function zoomOut() {
+function zoomOut(animate) {
     offsetX = W/2;
     offsetY = H/2;
     zoomX = W/2;
@@ -511,8 +548,10 @@ function zoomOut() {
     oldGridSize = GRID_SIZE;
     mainRedraw();
 
-    animInc = 0;
-    zoomOutAnimation();
+    if (animate) {
+        animInc = 0;
+        zoomOutAnimation();
+    }
 }
 
 function decrementTimer() {
