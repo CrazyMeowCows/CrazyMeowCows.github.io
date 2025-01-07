@@ -4,6 +4,7 @@
 <title>DPAA Testing Software</title>
 </head>
 
+<canvas id="canvas" width="0" height="0"></canvas>    
 <style>
     body {
         width: 100%;
@@ -16,31 +17,72 @@
         -webkit-user-select: none;
         -webkit-touch-callout: none;
     }
-    .button {
-        background-color: white;
-        border: 2px solid black;
-        color: #4F3564;
-        text-align: center;
-        font-size: 60px;
-        /* margin: 0px; */
-        padding: 0px 8px;
-        /* width: 70px;
-        height: 70px; */
-        border-radius: 10px;
+    canvas {
         position: absolute;
-        bottom: 9px;
-        right: 9px;
-        appearance: none;
-        -webkit-appearance: none; 
-        /* -webkit-border-radius: 0; */
     }
 </style>
 <!-- Colors: FFFFFF, 4F3564, 000000 -->
 <!-- Font Awesome by Dave Gandy - http://fontawesome.io  -->
 <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css">
 
-<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec aliquam nisl eget nunc tristique luctus eget sit amet eros. Aliquam mollis massa ut varius auctor. Morbi ultricies et quam sed vehicula. In et tincidunt nisi. Mauris lacus massa, ultrices ut auctor scelerisque, mattis non sapien. Proin sodales imperdiet tincidunt. Donec porttitor diam non suscipit faucibus. Suspendisse lobortis nisl non diam euismod, nec eleifend justo suscipit. Vestibulum commodo urna quis lacus molestie iaculis. Nulla at nibh sodales, volutpat ante quis, interdum nisi.</p>
-<!-- <button class="button" onclick="location.href = 'index.html'"></button> -->
-<button class="button" onclick="location.href = 'index.html'"><i class="fa fa-home"></i></button>
+<script src="buttons.js"></script>
 
+
+<script>
+//Constant Declarations----------------------------------------------------------------------------
+const W = window.innerWidth;
+const H = window.innerHeight;
+
+
+//Canvas Setup and Styling-------------------------------------------------------------------------
+var canvas = document.getElementById('canvas')
+var ctx = canvas.getContext("2d", { willReadFrequently: false, aplha: false });
+
+canvas.width = W;
+canvas.height = H;
+
+ctx.textBaseline = "middle";
+
+
+//Variable Declarations----------------------------------------------------------------------------
+var buttons = [];
+var home = new Button(W-80, H-80, 70, 70, () => {location.href = "index.html";}, '\uF015', 0, false, false);
+
+
+//TouchStart Listener------------------------------------------------------------------------------
+document.addEventListener("touchstart", e => {
+    buttons.forEach(button => {
+        handleButtonTouch(button, e.touches[0]);
+    });
+})
+
+
+//Drawing the content of the main canvas-----------------------------------------------------------
+function redraw() {
+    //Clear the canvas every redraw
+    ctx.clearRect(0, 0, W, H);
+
+    ctx.font = 'normal 500 20px Times New Roman';
+    ctx.fillStyle = "black";
+    ctx.textAlign = "left";
+    ctx.fillText('Lorem Ipsum', 35, 35);
+
+    //Draw icon buttons
+    ctx.lineWidth = 1.5;
+    ctx.fillStyle = "#4F3564";
+    ctx.textAlign = "center";
+    buttons.forEach(button => {
+        drawIconButton(button, ctx);
+    });
+}    
+redraw(); //Call redraw to start loading the used fonts
+function load () { 
+    if (document.fonts.check('1px FontAwesome')) {
+        redraw(); //Call redraw once fonts are loaded to display everything correctly
+    } else {
+        setTimeout(load, 20); //Recursively check every 20ms until font loads
+    }
+}
+load(); //Begin loading loop
+</script>
 </html>
