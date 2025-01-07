@@ -49,8 +49,10 @@ const MAX_BRUSH_SIZE = 45;
 const MIN_BRUSH_SIZE = 10;
 const UI_BRUSH_RAD = 21;
 const BRUSH_DELTA = (MAX_BRUSH_SIZE-MIN_BRUSH_SIZE)/6;
+const DRAW_COLOR = "#4F3564";
+const ERASE_COLOR = "#FFFFFF";
 
-const COMP_TESTING = false;
+const COMP_TESTING = true;
 
 //Canvas Setup and Styling-------------------------------------------------------------------------
 var mainCanvas = document.getElementById('mainCanvas')
@@ -95,7 +97,7 @@ var brushSize = (MAX_BRUSH_SIZE-MIN_BRUSH_SIZE)/2+MIN_BRUSH_SIZE;
 var currentStroke;
 var lastStrokeX;
 var lastStrokeY;
-var brushColor = "black";
+var brushColor = DRAW_COLOR;
 
 var maxTimeSeconds = 5*60;
 var timerSeconds = maxTimeSeconds;
@@ -152,7 +154,7 @@ document.addEventListener("touchstart", e => {
                 currentStroke = new PenStroke(touch.pageX, touch.pageY, brushColor);
                 strokes.push(currentStroke);
 
-                if (brushColor == "white") {
+                if (brushColor == ERASE_COLOR) {
                     mainRedraw();
 
                     ctx.lineWidth = 2;
@@ -211,7 +213,7 @@ document.addEventListener("touchmove", e => {
                 line(lastStrokeX, lastStrokeY, touchX, touchY, brushSize*2, ctx);
                 extendCurrentStroke(touchX, touchY);
 
-                if (brushColor == "white") {
+                if (brushColor == ERASE_COLOR) {
                     mainRedraw();
 
                     ctx.lineWidth = 1.5;
@@ -288,22 +290,30 @@ function mainRedraw() {
 
     //Drawing strokes using one continuous line
     strokes.forEach(stroke => {
-        ctx.lineWidth = stroke.brushSize*zoom*2;
         ctx.strokeStyle = stroke.strokeColor;
+        if (stroke.strokeColor == DRAW_COLOR) {
+            ctx.globalCompositeOperation = "source-over";
+        } else {
+            ctx.globalCompositeOperation = "destination-out";
+        }
+        ctx.lineWidth = stroke.brushSize*zoom*2;
         ctx.beginPath();
         ctx.moveTo(stroke.x[0]*zoom+offsetX, stroke.y[0]*zoom+offsetY)
         for (let i = 0; i < stroke.x.length; i++) {
             ctx.lineTo(stroke.x[i]*zoom+offsetX, stroke.y[i]*zoom+offsetY);
         }
         ctx.stroke();
-    })
-    ctx.strokeStyle = "black";
+    });
 
     //Drawing the gridlines that are visible on screen
     xStart = Math.round(-offsetX/dynamicGridSize)*dynamicGridSize;
     yStart = Math.round(-offsetY/dynamicGridSize)*dynamicGridSize;
 
     lineResolution = dynamicGridSize/4;
+
+    ctx.strokeStyle = "black";
+    ctx.globalCompositeOperation = "destination-over";
+    // ctx.globalCompositeOperation = "difference";
 
     let i = 0; //TODO: Optimize grid drawing
     for (var x = xStart-dynamicGridSize; x < W+xStart+dynamicGridSize; x += lineResolution) {
@@ -331,6 +341,7 @@ function mainRedraw() {
         ctx.stroke();
         i++;
     }
+    ctx.globalCompositeOperation = "source-over";
 
     //Drawing figure outline
     ctx.lineWidth = 2;
@@ -352,8 +363,8 @@ mainRedraw();
 //Creating Buttons for uiCanvas--------------------------------------------------------------------
 var brushPlus = new Button(15+W, 10, 70, 70, () => {brushSize = Math.min(brushSize+BRUSH_DELTA, MAX_BRUSH_SIZE)}, '\uF067', 2, false, false);
 var brushMinus = new Button(15+W, 310, 70, 70, () => {brushSize = Math.max(brushSize-BRUSH_DELTA, MIN_BRUSH_SIZE)}, '\uF068', 3, false, false);
-var pencil = new Button(15+W, H-250, 70, 70, () => {brushColor = "black"}, '\uF040', 0, true, false);
-var eraser = new Button(15+W, pencil.y+70, 70, 70, () => {brushColor = "white"}, '\uF12d', 0, true, false);
+var pencil = new Button(15+W, H-250, 70, 70, () => {brushColor = DRAW_COLOR}, '\uF040', 0, true, false);
+var eraser = new Button(15+W, pencil.y+70, 70, 70, () => {brushColor = ERASE_COLOR}, '\uF12d', 0, true, false);
 var resetZoom = new Button(15+W, H-80, 70, 70, zoomOut, '\uF066', 0, false, false);
 var yesEndTest = new Button((W+UI_WIDTH)/2-105, H/2-115, 70, 70, endTest, '\uF00C', 0, false, true);
 var noEndTest = new Button((W+UI_WIDTH)/2+35, H/2-115, 70, 70, () => {endTestPrompted = false; uiRedraw(); lastZoomed = true;}, '\uF00D', 0, false, true);
@@ -412,10 +423,10 @@ function uiRedraw () {
     line(UI_CENTER, sliderHeight, UI_CENTER, 280, 6, uiCtx)
 
     //Draw current brush size
-    if (brushColor == "white") {
+    if (brushColor == ERASE_COLOR) {
         uiCtx.fillStyle = "#f2f2f2";
     } else {
-        uiCtx.fillStyle = "black";
+        uiCtx.fillStyle = DRAW_COLOR;
     }
     circle(UI_CENTER, sliderHeight, brushSize/MAX_BRUSH_SIZE*UI_BRUSH_RAD+4, uiCtx);
 
@@ -449,18 +460,18 @@ function uiRedraw () {
     uiCtx.fillText("Test", 45, H-29.5);
 
     //Draw Eraser/Pencil Toggle
-    uiCtx.lineWidth = 1.5 + 1.5*(brushColor == "black");
+    uiCtx.lineWidth = 1.5 + 1.5*(brushColor == DRAW_COLOR);
     uiCtx.beginPath();
     uiCtx.roundRect(pencil.x, pencil.y, pencil.w, pencil.h, [10, 10, 0, 0]);
     uiCtx.stroke();
-    uiCtx.lineWidth = 1.5 + 1.5*(brushColor == "white");
+    uiCtx.lineWidth = 1.5 + 1.5*(brushColor == ERASE_COLOR);
     uiCtx.beginPath();
     uiCtx.roundRect(eraser.x, eraser.y, eraser.w, eraser.h, [0, 0, 10, 10]);
     uiCtx.stroke();
 
     uiCtx.fillStyle = 'rgba(0,0,0,0.1)';
     uiCtx.beginPath();
-    if (brushColor == "white") {
+    if (brushColor == ERASE_COLOR) {
         uiCtx.roundRect(pencil.x, pencil.y, pencil.w, pencil.h, [10, 10, 0, 0]);
     } else {
         uiCtx.roundRect(eraser.x, eraser.y, eraser.w, eraser.h, [0, 0, 10, 10]);
