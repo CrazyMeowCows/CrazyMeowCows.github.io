@@ -24,9 +24,15 @@
         position: absolute;
     }
 </style>
+
+<!-- Colors: FFFFFF, 4F3564, 000000 -->
 <!-- Font Awesome by Dave Gandy - http://fontawesome.io  -->
 <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css">
-<!-- Colors: FFFFFF, 4F3564, 000000 -->
+
+<script src="buttons.js"></script>
+<script src="math.js"></script>
+<script src="animations.js"></script>
+
 
 <script>
 //Constant Declarations----------------------------------------------------------------------------
@@ -135,22 +141,13 @@ function extendCurrentStroke (rawX, rawY) {
 }
 
 var buttons = [];
-function Button (x, y, width, height, event, icon, iconVoffset, hideOutline, dontPush) {
-    this.x = x;
-    this.y = y;
-    this.w = width;
-    this.h = height;
-    this.event = event;
-    this.icon = icon;
-    this.iconVoffset = iconVoffset;
-    this.hideOutline = hideOutline;
-    this.dontPush = dontPush;
-
-    this.trans = 0;
-    if (!dontPush) {
-        buttons.push(this);
-    }
-}
+var brushPlus = new Button(15+W, 10, 70, 70, () => {brushSize = Math.min(brushSize+BRUSH_DELTA, MAX_BRUSH_SIZE)}, '\uF067', 2, false, false);
+var brushMinus = new Button(15+W, 310, 70, 70, () => {brushSize = Math.max(brushSize-BRUSH_DELTA, MIN_BRUSH_SIZE)}, '\uF068', 3, false, false);
+var pencil = new Button(15+W, H-250, 70, 70, () => {brushColor = DRAW_COLOR}, '\uF040', 0, true, false);
+var eraser = new Button(15+W, pencil.y+70, 70, 70, () => {brushColor = ERASE_COLOR}, '\uF12d', 0, true, false);
+var resetZoom = new Button(15+W, H-80, 70, 70, zoomOut, '\uF066', 0, false, false);
+var yesEndTest = new Button((W+UI_WIDTH)/2-105, H/2-115, 70, 70, endTest, '\uF00C', 0, false, true);
+var noEndTest = new Button((W+UI_WIDTH)/2+35, H/2-115, 70, 70, () => {endTestPrompted = false; uiRedraw(); lastZoomed = true;}, '\uF00D', 0, false, true);
 
 //TouchStart Listener------------------------------------------------------------------------------
 document.addEventListener("touchstart", e => {
@@ -163,6 +160,7 @@ document.addEventListener("touchstart", e => {
     if (endTestPrompted) { //End Test Promt is Active
         handleButtonTouch(yesEndTest, touch);
         handleButtonTouch(noEndTest, touch);
+        uiRedraw();
         return;
     }
     if (touchX <= 80 && touchY >= H-80) { //Check for EndTest Button
@@ -174,6 +172,7 @@ document.addEventListener("touchstart", e => {
         buttons.forEach(button => {
             handleButtonTouch(button, touch)
         });
+        uiRedraw();
         return;
     }
     if (touch.touchType == "stylus") { //Stylus
@@ -289,6 +288,7 @@ function mainRedraw() {
 }    
 mainRedraw();
 
+//Drawing the content of the grid canvas-----------------------------------------------------------
 function gridCtxRedraw() {
     gridCtx.clearRect(0, 0, W, H);
 
@@ -325,6 +325,7 @@ function gridCtxRedraw() {
     }
 }
 
+//Drawing the content of the draw canvas-----------------------------------------------------------
 function drawCtxRedraw() {
     drawCtx.clearRect(0, 0, W, H);
 
@@ -346,6 +347,7 @@ function drawCtxRedraw() {
     });
 }
 
+//Drawing the content of the figure canvas---------------------------------------------------------
 function figureCtxRedraw () {
     figureCtx.clearRect(0, 0, W, H);
     figureCtx.lineWidth = 2;
@@ -363,55 +365,8 @@ function figureCtxRedraw () {
     line(W, 0, W, H, 5, figureCtx);
 }
 
-//Creating Buttons for uiCanvas--------------------------------------------------------------------
-var brushPlus = new Button(15+W, 10, 70, 70, () => {brushSize = Math.min(brushSize+BRUSH_DELTA, MAX_BRUSH_SIZE)}, '\uF067', 2, false, false);
-var brushMinus = new Button(15+W, 310, 70, 70, () => {brushSize = Math.max(brushSize-BRUSH_DELTA, MIN_BRUSH_SIZE)}, '\uF068', 3, false, false);
-var pencil = new Button(15+W, H-250, 70, 70, () => {brushColor = DRAW_COLOR}, '\uF040', 0, true, false);
-var eraser = new Button(15+W, pencil.y+70, 70, 70, () => {brushColor = ERASE_COLOR}, '\uF12d', 0, true, false);
-var resetZoom = new Button(15+W, H-80, 70, 70, zoomOut, '\uF066', 0, false, false);
-var yesEndTest = new Button((W+UI_WIDTH)/2-105, H/2-115, 70, 70, endTest, '\uF00C', 0, false, true);
-var noEndTest = new Button((W+UI_WIDTH)/2+35, H/2-115, 70, 70, () => {endTestPrompted = false; uiRedraw(); lastZoomed = true;}, '\uF00D', 0, false, true);
-function drawIconButton(button) {
-    uiCtx.font = '60px FontAwesome';
-    uiCtx.fillText(button.icon, button.x+button.w/2, button.y+button.h/2+button.iconVoffset);
 
-    if (!button.hideOutline) {
-        uiCtx.beginPath();
-        uiCtx.roundRect(button.x, button.y, button.w, button.h, [10]);
-        uiCtx.stroke();
-
-        let oldColor = uiCtx.fillStyle;
-        uiCtx.fillStyle = 'rgba(0,0,0,'+button.trans/20+')';
-        uiCtx.beginPath();
-        uiCtx.roundRect(button.x, button.y, button.w, button.h, [10]);
-        uiCtx.fill();
-        uiCtx.fillStyle = oldColor;
-    }
-}
-
-//Given a touch, adjust the brush size slider
-function handleSliderTouch (touch) {
-    gridCtxRedraw();
-    currentStroke = undefined;
-
-    if (touch.pageY >= SLIDER_Y1-10 && touch.pageY <= SLIDER_Y2+10) { //Brush Size Slider
-        lastZoomed = true;
-        brushSize = lerp(MIN_BRUSH_SIZE, MAX_BRUSH_SIZE, (SLIDER_Y2-touch.pageY)/(SLIDER_Y2-SLIDER_Y1));
-        uiRedraw();
-    }
-}
-
-//Given a button and touch, check if button is pressed
-function handleButtonTouch (button, touch) {
-    if (touch.pageX > button.x && touch.pageX < button.x+button.w && touch.pageY > button.y && touch.pageY < button.y+button.h) {
-        button.trans = 10*(!button.dontPush);
-        button.event();
-        uiRedraw();
-    }
-}
-
-
-//Drawing the content of the ui canvas-------------------------------------------------------------
+//Drawing the content of the UI canvas-------------------------------------------------------------
 function uiRedraw () {
     //Clear the canvas every redraw
     uiCtx.clearRect(0, 0, W+UI_WIDTH, H);
@@ -462,7 +417,7 @@ function uiRedraw () {
     uiCtx.fillStyle = "#4F3564";
     let recurse = false;
     buttons.forEach(button => {
-        drawIconButton(button);
+        drawIconButton(button, uiCtx);
         if (button.trans-- > 0) {
             recurse = true;
         }
@@ -537,9 +492,9 @@ function endTestPrompt() {
 
     uiCtx.lineWidth = 2;
     uiCtx.fillStyle = "Green";
-    drawIconButton(yesEndTest);
+    drawIconButton(yesEndTest, uiCtx);
     uiCtx.fillStyle = "#6b0000";
-    drawIconButton(noEndTest);
+    drawIconButton(noEndTest, uiCtx);
 }
 
 function endTest() {
@@ -561,43 +516,19 @@ function zoomOut() {
     animInc = 0;
     zoomOutAnimation();
 }
-var animInc = 0;
-function zoomOutAnimation() {
-    zoom -= 0.01*Math.sign(10-animInc);
-    mainRedraw();
-
-    if (animInc < 20) {
-        animInc++;    
-        requestAnimationFrame(zoomOutAnimation);
-    }
-}
 
 function decrementTimer() {
+    if (endTestPrompted) {
+        return;
+    }
     if (timerSeconds > 0) {
-        if (!endTestPrompted) {
-            timerSeconds--;
-            uiRedraw();
-        }
+        timerSeconds--;
+        uiRedraw();
     } else {
         endTest();
     }
 }
 var timerInterval = setInterval(decrementTimer, 1000);
-
-//Given a theta value, return the radius of the selected function--------------
-function calcRad(t) {
-    return (1-1/6*(Math.sin(4*t+PI/2))-1/200*Math.pow(Math.cos(30*t), 2)*Math.sin(t)*Math.tan(t/2))/ROOT_PI*(W/2);
-}
-
-//Clamp number between minimum and maximum values------------------------------
-function clamp(x, min, max) {
-    return Math.max(Math.min(x, max), min);
-}
-
-//Given value from 0-1 (alpha) interpolate between a and b
-function lerp(a, b, alpha) {
-    return a + clamp(alpha, 0, 1)*(b-a);
-}
 
 //Easy Circle Drawing----------------------------------------------------------
 function circle(x, y, r, fill, ctx) {

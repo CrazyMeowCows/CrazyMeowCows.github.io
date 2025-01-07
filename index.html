@@ -21,9 +21,12 @@
         position: absolute;
     }
 </style>
-<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css">
-<!-- Font Awesome by Dave Gandy - http://fontawesome.io  -->
 <!-- Colors: FFFFFF, 4F3564, 000000 -->
+<!-- Font Awesome by Dave Gandy - http://fontawesome.io  -->
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css">
+
+<script src="buttons.js"></script>
+
 
 <script>
 //Constant Declarations----------------------------------------------------------------------------
@@ -43,79 +46,55 @@ canvas.height = H;
 ctx.textAlign = "center";
 ctx.textBaseline = "middle";
 
-var buttons = [];
-function Button (x, y, width, height, event, icon, iconVoffset, hideOutline, dontPush) {
-    this.x = x;
-    this.y = y;
-    this.w = width;
-    this.h = height;
-    this.event = event;
-    this.icon = icon;
-    this.iconVoffset = iconVoffset;
-    this.hideOutline = hideOutline;
 
-    this.trans = 0;
-    if (!dontPush) {
-        buttons.push(this);
-    }
-}
+//Variable Declarations----------------------------------------------------------------------------
+var buttons = [];
+var practice = new Button(W/2-160, 230, 320, 70, () => {location.href = "testScreen.html";}, 'Practice', 0, false, false);
+var test = new Button(W/2-160, 340, 320, 70, () => {location.href = "testScreen.html";}, 'Begin Test', 0, false, false);
+var test = new Button(W/2-160, 450, 320, 70, () => {location.href = "testScreen.html";}, 'Info', 0, false, false);
+var settings = new Button(W-80, H-80, 70, 70, () => {alert("settings")}, '\uF013', 0, false, false);
+
 
 //TouchStart Listener------------------------------------------------------------------------------
 document.addEventListener("touchstart", e => {
-    touches = e.touches;
-    touch = touches[0];
-    let touchX = touch.pageX; 
-    let touchY = touch.pageY;
-
     buttons.forEach(button => {
-        if (touchX > button.x && touchX < button.x+button.w && touchY > button.y && touchY < button.y+button.h) {
-            button.event();
-            redraw();
-        }
+        handleButtonTouch(button, e.touches[0]);
     });
 })
 
-//Creating Buttons for canvas--------------------------------------------------------------------
-var practice = new Button(W/2-160, 180, 320, 70, () => {location.href = "testScreen.html";}, 'Practice', 0, false, false);
-var test = new Button(W/2-160, 310, 320, 70, () => {location.href = "testScreen.html";}, 'Begin Test', 0, false, false);
-var settings = new Button(W-80, H-80, 70, 70, () => {alert("settings")}, '\uF013', 0, false, false);
-
-function drawIconButton(button) {
-    ctx.font = '60px FontAwesome';
-    ctx.fillText(button.icon, button.x+button.w/2, button.y+button.h/2+button.iconVoffset);
-
-    if (!button.hideOutline) {
-        ctx.beginPath();
-        ctx.roundRect(button.x, button.y, button.w, button.h, [10]);
-        ctx.stroke();
-
-        let oldColor = ctx.fillStyle;
-        ctx.fillStyle = 'rgba(0,0,0,'+button.trans/20+')';
-        ctx.beginPath();
-        ctx.roundRect(button.x, button.y, button.w, button.h, [10]);
-        ctx.fill();
-        ctx.fillStyle = oldColor;
-    }
-}
 
 //Drawing the content of the main canvas-----------------------------------------------------------
 function redraw() {
     //Clear the canvas every redraw
     ctx.clearRect(0, 0, W, H);
 
-    ctx.font = '20px Times New Roman';
+
+    ctx.font = 'normal 500 20px Times New Roman';
     ctx.fillStyle = "black";
+
+    //Copyright Text
+    ctx.textAlign = "left";
+    ctx.fillText('2025 McPhail Patents and Research LLC', 35, H-25);
+
+    //Version Number
+    ctx.textAlign = "center";
     ctx.fillText(VER, 30, 20);
 
-    ctx.font = '65px Times New Roman';
-    ctx.fillText("DPAA Testing Software", W/2, 80);
+    //Title
+    ctx.font = 'normal 500 65px Times New Roman';
+    ctx.fillText("DPAA Testing Software", W/2, 160);
 
     //Draw icon buttons
     ctx.lineWidth = 1.5;
     ctx.fillStyle = "#4F3564";
     buttons.forEach(button => {
-        drawIconButton(button);
+        drawIconButton(button, ctx);
     });
+
+    //Copyright Icon
+    ctx.font = '20px FontAwesome';
+    ctx.fillStyle = "black";
+    ctx.fillText('\uF1F9', 20, H-25);
 }    
 redraw(); //Call redraw to start loading the used fonts
 function load () { 
