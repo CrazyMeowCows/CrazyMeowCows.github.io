@@ -92,6 +92,11 @@ function redraw() {
         drawIconButton(button, ctx);
     });
 
+    ctx.fillStyle = 'rgba(0,0,0,0.4)';
+    ctx.beginPath();
+    ctx.roundRect(info.x, info.y, info.w, info.h, [10]);
+    ctx.fill();
+
     //Copyright Icon
     ctx.font = '20px FontAwesome';
     ctx.fillStyle = "black";
