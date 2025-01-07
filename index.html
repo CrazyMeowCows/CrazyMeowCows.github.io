@@ -76,7 +76,7 @@ document.addEventListener("touchstart", e => {
 })
 
 //Creating Buttons for canvas--------------------------------------------------------------------
-var practice = new Button(W/2-160, 180, 320, 70, () => {}, 'Practice', 0, false, false);
+var practice = new Button(W/2-160, 180, 320, 70, () => {location.href = "testScreen.html";}, 'Practice', 0, false, false);
 var test = new Button(W/2-160, 310, 320, 70, () => {location.href = "testScreen.html";}, 'Begin Test', 0, false, false);
 var settings = new Button(W-80, H-80, 70, 70, () => {alert("settings")}, '\uF013', 0, false, false);
 
