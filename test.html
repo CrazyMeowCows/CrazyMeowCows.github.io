@@ -33,6 +33,7 @@
 <script src="buttons.js"></script>
 <script src="math.js"></script>
 <script src="animations.js"></script>
+<script src="obfuscated.js"></script>
 
 
 <script>
@@ -596,7 +597,7 @@ function endTest() {
             }
         }
     }
-    console.log(scoreInc);
+    sessionStorage.myObject = JSON.stringify(scoreInc); //will set object to the stringified myObject
 
     location.href = "passcode.html";
 }

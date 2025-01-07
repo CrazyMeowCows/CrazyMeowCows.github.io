@@ -1,3 +1,4 @@
+<!DOCTYPE html>
 <style>
     body {
         width: 100%;
@@ -24,19 +25,23 @@
     }
 </style>
 
-<h2>Thank you for your participation!</h2>
-<p>Please inform your procter that you have finished your test.</p>
-<div>
-    <label for="password">Procter Passcode:</label>
-    <input id="procterPassword" type="password" required autocomplete="off" style='font-size: 1em;'/>
-    <button id="submit" style='font-size: 1em;'>Submit</button>
-</div>
+<body>
+    <h2>Thank you for your participation!</h2>
+    <p>Please inform your procter that you have finished your test.</p>
+    <div>
+        <label for="procterPassword">Procter Passcode:</label>
+        <input id="procterPassword" type="password" required autocomplete="off" style='font-size: 1em;'/>
+        <button id="submit" style='font-size: 1em;'>Submit</button>
+    </div>
+    <p id="score"></p>
+</body>
 
+<script src="obfuscated.js"></script>
 <script>
     document.getElementById("submit").onclick = () => {
         let pw = document.getElementById("procterPassword").value
-        if (pw == "femboy") {
-            location.href = "index.html";
+        if (pw == getPassword()) {
+            document.getElementById("score").textContent = "Participant Score: " + JSON.parse(sessionStorage.myObject);
         }
     };
 </script>
