@@ -8,7 +8,7 @@
 <canvas id="drawCanvas" width="0" height="0"></canvas>    
 <canvas id="figureCanvas" width="0" height="0"></canvas>    
 <canvas id="uiCanvas" width="0" height="0"></canvas>
-<canvas id="scoreCanvas" width="0" height="0"></canvas>
+<canvas id="scoreCanvas" width="0" height="0" style="display: none;"></canvas>
 <style>
     body {
         width: 100%;
@@ -122,7 +122,7 @@ var lastStrokeX;
 var lastStrokeY;
 var brushColor = DRAW_COLOR;
 
-var maxTimeSeconds = 5*60;
+var maxTimeSeconds = 0.1*60;
 var timerSeconds = maxTimeSeconds;
 var endTestPrompted = false;
 var isScoring = false;
@@ -151,6 +151,7 @@ var eraser = new Button(15+W, pencil.y+70, 70, 70, () => {brushColor = ERASE_COL
 var resetZoom = new Button(15+W, H-80, 70, 70, () => {zoomOut(true)}, '\uF066', 0, false, false);
 var yesEndTest = new Button((W+UI_WIDTH)/2-105, H/2-115, 70, 70, endTest, '\uF00C', 0, false, true);
 var noEndTest = new Button((W+UI_WIDTH)/2+35, H/2-115, 70, 70, () => {endTestPrompted = false; uiRedraw(); lastZoomed = true;}, '\uF00D', 0, false, true);
+var expiredOk = new Button((W+UI_WIDTH)/2-35, H/2-115, 70, 70, endTest, '\uF061', 0, false, true);
 
 //TouchStart Listener------------------------------------------------------------------------------
 document.addEventListener("touchstart", e => {
@@ -160,7 +161,12 @@ document.addEventListener("touchstart", e => {
     let touchY = touch.pageY;
     if (COMP_TESTING) {touch.touchType = "stylus";}
 
-    if (endTestPrompted) { //End Test Promt is Active
+    if (endTestPrompted == "timerExpired") { //End Test Promt is Active
+        if (!isScoring) {
+            handleButtonTouch(expiredOk, touch);
+        }
+        return;
+    } else if (endTestPrompted == "endEarly") {
         if (!isScoring) {
             handleButtonTouch(yesEndTest, touch);
             handleButtonTouch(noEndTest, touch);
@@ -214,7 +220,7 @@ document.addEventListener("touchmove", e => {
     let touchY = touch.pageY;
     if (COMP_TESTING) {touch.touchType = "stylus";}
 
-    if (endTestPrompted) { //End Test Promt is Active
+    if (endTestPrompted != "none") { //End Test Promt is Active
         return;
     }
     if (touch.pageX > W) { //Touch is on UI Bar
@@ -479,7 +485,7 @@ function load () {
 load(); //Begin loading loop
 
 function endTestPrompt() {
-    endTestPrompted = true;
+    endTestPrompted = "endEarly";
 
     uiCtx.fillStyle = 'rgba(0,0,0,0.3)';
     uiCtx.fillRect(0, 0, W+UI_WIDTH, H);
@@ -503,11 +509,33 @@ function endTestPrompt() {
     drawIconButton(noEndTest, uiCtx);
 }
 
-function endTest() {
-    clearInterval(timerInterval);
-    isScoring = true;
-    console.log("s");
+function timerExpiredPrompt() {
+    endTestPrompted = "timerExpired";
 
+    uiCtx.fillStyle = 'rgba(0,0,0,0.3)';
+    uiCtx.fillRect(0, 0, W+UI_WIDTH, H);
+
+    uiCtx.fillStyle = 'white';
+    uiCtx.strokeStyle = 'black';
+    uiCtx.lineWidth = 3;
+    uiCtx.beginPath();
+    uiCtx.roundRect((W+UI_WIDTH)/2-140, H/2-190, 280, 170, [10]);
+    uiCtx.fill();
+    uiCtx.stroke();
+
+    uiCtx.font = 'normal 500 30px Times New Roman';
+    uiCtx.fillStyle = "black";
+    uiCtx.fillText("Timer Expired", (W+UI_WIDTH)/2, H/2-150);
+
+    uiCtx.lineWidth = 2;
+    uiCtx.fillStyle = "Green";
+    drawIconButton(expiredOk, uiCtx);
+}
+
+function endTest() {
+    isScoring = true;
+
+    clearInterval(timerInterval);
     zoomOut(false)
 
     scoreCanvas.width = SCORE_AREA_SIZE; scoreCanvas.height = SCORE_AREA_SIZE;
@@ -542,7 +570,6 @@ function endTest() {
             let theta = -Math.atan2(y, x);
             let r = Math.hypot(x, y);
             let figureR = calcRad(theta)*W/2
-            // console.log("R: " + r + " | FR: " + figureR);
             if (r <= figureR) {
                 scoreInc++;
             } else {
@@ -578,7 +605,7 @@ function decrementTimer() {
         timerSeconds--;
         uiRedraw();
     } else {
-        endTest();
+        timerExpiredPrompt();
     }
 }
 var timerInterval = setInterval(decrementTimer, 1000);
