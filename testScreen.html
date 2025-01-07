@@ -8,7 +8,7 @@
 <canvas id="drawCanvas" width="0" height="0"></canvas>    
 <canvas id="figureCanvas" width="0" height="0"></canvas>    
 <canvas id="uiCanvas" width="0" height="0"></canvas>
-<canvas id="scoreCanvas" width="1000" height="1000"></canvas>
+<canvas id="scoreCanvas" width="0" height="0"></canvas>
 <style>
     body {
         width: 100%;
@@ -50,8 +50,9 @@ const UI_CENTER = UI_WIDTH/2+W;
 
 const GRID_SIZE = W/6;
 const ZOOM_SENS = 0.002;
-const MAX_ZOOM = 17;
+const MAX_ZOOM = 2000;
 const THETA_RESOLUTION = 0.01;
+const SCORE_AREA_SIZE = 2000; //DO NOT CHANGE - STANDARDIZES TEST RESULTS - MAX SCORE: 215342
 
 const MAX_BRUSH_SIZE = 45;
 const MIN_BRUSH_SIZE = 10;
@@ -283,8 +284,8 @@ function mainRedraw() {
     offsetY -= gridDelta*(zoomY-offsetY)/oldGridSize;
     oldGridSize = dynamicGridSize;
 
-    offsetX = clamp(offsetX, -W/1.5*zoom+W, W/1.5*zoom);
-    offsetY = clamp(offsetY, -H/1.5*zoom+H, H/1.5*zoom);
+    offsetX = clamp(offsetX, -W*0.55*zoom+W, W*0.55*zoom);
+    offsetY = clamp(offsetY, -H*0.55*zoom+H, H*0.55*zoom);
 
     //Call each canvas' redraw functions
     gridCtxRedraw();
@@ -359,12 +360,12 @@ function figureCtxRedraw () {
 
     //Drawing figure outline
     figureCtx.beginPath();
-    figureCtx.moveTo(offsetX+calcRad(0)*zoom, offsetY);
+    figureCtx.moveTo(offsetX+calcRad(0)*W/2*zoom, offsetY);
     for (let theta = THETA_RESOLUTION; theta < TAU; theta += THETA_RESOLUTION) {
-        let r = calcRad(theta);
+        let r = calcRad(theta)*W/2;
         figureCtx.lineTo(offsetX+r*Math.cos(theta)*zoom, offsetY-r*Math.sin(theta)*zoom);
     }
-    figureCtx.lineTo(offsetX+calcRad(0)*zoom, offsetY);
+    figureCtx.lineTo(offsetX+calcRad(0)*W/2*zoom, offsetY);
     figureCtx.stroke();
 
     line(W, 0, W, H, 5, figureCtx);
@@ -509,10 +510,14 @@ function endTest() {
 
     zoomOut(false)
 
+    scoreCanvas.width = SCORE_AREA_SIZE; scoreCanvas.height = SCORE_AREA_SIZE;
     scoreCtx.clearRect(0, 0, W, H);
 
     //Drawing strokes using one continuous line
-    scoreCtx.strokeStyle = "black";
+    scoreCtx.strokeStyle = "red";
+    scoreCtx.lineCap = "round";
+    scoreCtx.lineJoin = "round";
+
     strokes.forEach(stroke => {
         if (stroke.strokeColor == DRAW_COLOR) {
             scoreCtx.globalCompositeOperation = "source-over";
@@ -521,20 +526,31 @@ function endTest() {
         }
         scoreCtx.lineWidth = stroke.brushSize*2;
         scoreCtx.beginPath();
-        scoreCtx.moveTo(stroke.x[0]+500, stroke.y[0]+500)
+        scoreCtx.moveTo(stroke.x[0]+SCORE_AREA_SIZE/2, stroke.y[0]+SCORE_AREA_SIZE/2)
         for (let i = 0; i < stroke.x.length; i++) {
-            scoreCtx.lineTo(stroke.x[i]+500, stroke.y[i]+500);
+            scoreCtx.lineTo(stroke.x[i]+SCORE_AREA_SIZE/2, stroke.y[i]+SCORE_AREA_SIZE/2);
         }
         scoreCtx.stroke();
     });
 
-    drawData = drawCtx.getImageData(0, 0, W, H);
+    let scoreInc = 0;
+    imgData = scoreCtx.getImageData(0, 0, SCORE_AREA_SIZE, SCORE_AREA_SIZE);
     for (let i = 0; i < imgData.data.length; i += 4) {
-        imgData.data[i+0] = 255;
-        imgData.data[i+1] = 0;
-        imgData.data[i+2] = 0;
-        imgData.data[i+3] = 255;
+        if (imgData.data[i] != 0) {
+            let x = (i / 4) % SCORE_AREA_SIZE - SCORE_AREA_SIZE/2;
+            let y = Math.floor((i / 4) / SCORE_AREA_SIZE) - SCORE_AREA_SIZE/2;
+            let theta = -Math.atan2(y, x);
+            let r = Math.hypot(x, y);
+            let figureR = calcRad(theta)*W/2
+            // console.log("R: " + r + " | FR: " + figureR);
+            if (r <= figureR) {
+                scoreInc++;
+            } else {
+                scoreInc--;
+            }
+        }
     }
+    console.log(scoreInc);
     // location.href = "index.html";
 }
 
