@@ -49,9 +49,9 @@ ctx.textBaseline = "middle";
 
 //Variable Declarations----------------------------------------------------------------------------
 var buttons = [];
-var practice = new Button(W/2-160, 230, 320, 70, () => {location.href = "test.html";}, 'Practice', 0, false, false);
-var test = new Button(W/2-160, 340, 320, 70, () => {location.href = "test.html";}, 'Begin Test', 0, false, false);
-var info = new Button(W/2-160, 450, 320, 70, () => {location.href = "info.html";}, 'Info', 0, false, false);
+var practice = new Button(W/2-160, 260, 320, 70, () => {location.href = "test.html";}, 'Practice', 0, false, false);
+var test = new Button(W/2-160, 370, 320, 70, () => {location.href = "test.html";}, 'Begin Test', 0, false, false);
+var info = new Button(W/2-160, 480, 320, 70, () => {}, 'Info', 0, false, false);
 var settings = new Button(W-80, H-80, 70, 70, () => {location.href = "settings.html";}, '\uF013', 0, false, false);
 
 
@@ -82,7 +82,8 @@ function redraw() {
 
     //Title
     ctx.font = 'normal 500 65px Times New Roman';
-    ctx.fillText("DPAA Testing Software", W/2, 160);
+    ctx.fillText("Area Filling", W/2, 130);
+    ctx.fillText("Accuracy Evaluation Tool", W/2, 200);
 
     //Draw icon buttons
     ctx.lineWidth = 1.5;

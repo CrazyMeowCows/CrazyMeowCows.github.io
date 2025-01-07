@@ -27,7 +27,7 @@
 </style>
 
 <!-- Colors: FFFFFF, 4F3564, 000000 -->
-<!-- Font Awesome by Dave Gandy - http://fontawesome.io  -->
+<!-- Font Awesome by Dave Gandy - http://fontawesome.io -->    
 <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css">
 
 <script src="buttons.js"></script>
@@ -50,13 +50,16 @@ const UI_CENTER = UI_WIDTH/2+W;
 
 const GRID_SIZE = W/6;
 const ZOOM_SENS = 0.002;
-const MAX_ZOOM = 2000;
+const MAX_ZOOM = 1000;
 const THETA_RESOLUTION = 0.01;
-const SCORE_AREA_SIZE = 2000; //DO NOT CHANGE - STANDARDIZES TEST RESULTS - MAX SCORE: 215342
 
-const MAX_BRUSH_SIZE = 45;
-const MIN_BRUSH_SIZE = 10;
-const UI_BRUSH_RAD = 21;
+ //DO NOT CHANGE - STANDARDIZES TEST RESULTS - MAX SCORE: 6305645
+const FIGURE_SCALE = 0.6*W;
+const SCORE_AREA_SIZE = 5000;
+
+const MAX_BRUSH_SIZE = 5;
+const MIN_BRUSH_SIZE = 1;
+const UI_BRUSH_RAD = 18;
 const BRUSH_DELTA = (MAX_BRUSH_SIZE-MIN_BRUSH_SIZE)/6;
 const DRAW_COLOR = "#4F3564";
 const ERASE_COLOR = "#FFFFFF";
@@ -116,15 +119,15 @@ var panX;
 var panY;
 var dynamicGridSize;
 
-var brushSize = (MAX_BRUSH_SIZE-MIN_BRUSH_SIZE)/2+MIN_BRUSH_SIZE;
+var brushSize = MAX_BRUSH_SIZE;
 var currentStroke;
 var lastStrokeX;
 var lastStrokeY;
 var brushColor = DRAW_COLOR;
 
-var maxTimeSeconds = 0.1*60;
+var maxTimeSeconds = 10*60;
 var timerSeconds = maxTimeSeconds;
-var endTestPrompted = false;
+var endTestPrompted = "none";
 var isScoring = false;
 
 var strokes = [];
@@ -150,7 +153,7 @@ var pencil = new Button(15+W, H-250, 70, 70, () => {brushColor = DRAW_COLOR}, '\
 var eraser = new Button(15+W, pencil.y+70, 70, 70, () => {brushColor = ERASE_COLOR}, '\uF12d', 0, true, false);
 var resetZoom = new Button(15+W, H-80, 70, 70, () => {zoomOut(true)}, '\uF066', 0, false, false);
 var yesEndTest = new Button((W+UI_WIDTH)/2-105, H/2-115, 70, 70, endTest, '\uF00C', 0, false, true);
-var noEndTest = new Button((W+UI_WIDTH)/2+35, H/2-115, 70, 70, () => {endTestPrompted = false; uiRedraw(); lastZoomed = true;}, '\uF00D', 0, false, true);
+var noEndTest = new Button((W+UI_WIDTH)/2+35, H/2-115, 70, 70, () => {endTestPrompted = "none"; uiRedraw(); lastZoomed = true;}, '\uF00D', 0, false, true);
 var expiredOk = new Button((W+UI_WIDTH)/2-35, H/2-115, 70, 70, endTest, '\uF061', 0, false, true);
 
 //TouchStart Listener------------------------------------------------------------------------------
@@ -271,7 +274,7 @@ document.addEventListener("touchend", e => { //Clear the Eraser Outline
 
 //Wheel Listener-----------------------------------------------------------------------------------
 document.addEventListener("wheel", e => { //TODO: REMOVE
-    if (!endTestPrompted) {
+    if (endTestPrompted == "none") {
         zoom = clamp(zoom-e.deltaY*ZOOM_SENS*Math.abs(zoom)/2, 1, MAX_ZOOM);
 
         zoomX = e.pageX;
@@ -290,6 +293,7 @@ function mainRedraw() {
     offsetY -= gridDelta*(zoomY-offsetY)/oldGridSize;
     oldGridSize = dynamicGridSize;
 
+    //Limits panning
     offsetX = clamp(offsetX, -W*0.55*zoom+W, W*0.55*zoom);
     offsetY = clamp(offsetY, -H*0.55*zoom+H, H*0.55*zoom);
 
@@ -366,12 +370,12 @@ function figureCtxRedraw () {
 
     //Drawing figure outline
     figureCtx.beginPath();
-    figureCtx.moveTo(offsetX+calcRad(0)*W/2*zoom, offsetY);
+    figureCtx.moveTo(offsetX+calcRad(0)*FIGURE_SCALE*zoom, offsetY);
     for (let theta = THETA_RESOLUTION; theta < TAU; theta += THETA_RESOLUTION) {
-        let r = calcRad(theta)*W/2;
+        let r = calcRad(theta)*FIGURE_SCALE;
         figureCtx.lineTo(offsetX+r*Math.cos(theta)*zoom, offsetY-r*Math.sin(theta)*zoom);
     }
-    figureCtx.lineTo(offsetX+calcRad(0)*W/2*zoom, offsetY);
+    figureCtx.lineTo(offsetX+calcRad(0)*FIGURE_SCALE*zoom, offsetY);
     figureCtx.stroke();
 
     line(W, 0, W, H, 5, figureCtx);
@@ -421,7 +425,7 @@ function uiRedraw () {
     } else {
         uiCtx.fillStyle = DRAW_COLOR;
     }
-    circle(UI_CENTER, sliderHeight, brushSize/MAX_BRUSH_SIZE*UI_BRUSH_RAD+4, true, uiCtx);
+    circle(UI_CENTER, sliderHeight, brushSize/MAX_BRUSH_SIZE*UI_BRUSH_RAD+5, true, uiCtx);
     uiCtx.stroke();
 
     //Draw icon buttons
@@ -541,6 +545,21 @@ function endTest() {
     scoreCanvas.width = SCORE_AREA_SIZE; scoreCanvas.height = SCORE_AREA_SIZE;
     scoreCtx.clearRect(0, 0, W, H);
 
+    let drawToScoreScale = SCORE_AREA_SIZE/FIGURE_SCALE*0.5;
+
+    //Drawing figure outline
+    // scoreCtx.lineWidth = 2;
+    // scoreCtx.strokeStyle = "black";
+
+    // scoreCtx.beginPath();
+    // scoreCtx.moveTo(calcRad(0)*FIGURE_SCALE*drawToScoreScale+SCORE_AREA_SIZE/2, SCORE_AREA_SIZE/2);
+    // for (let theta = THETA_RESOLUTION; theta < TAU; theta += THETA_RESOLUTION) {
+    //     let r = calcRad(theta)*FIGURE_SCALE*drawToScoreScale;
+    //     scoreCtx.lineTo(r*Math.cos(theta)+SCORE_AREA_SIZE/2, r*Math.sin(theta)+SCORE_AREA_SIZE/2);
+    // }
+    // scoreCtx.lineTo(calcRad(0)*FIGURE_SCALE*drawToScoreScale+SCORE_AREA_SIZE/2, SCORE_AREA_SIZE/2);
+    // scoreCtx.stroke();
+
     //Drawing strokes using one continuous line
     scoreCtx.strokeStyle = "red";
     scoreCtx.lineCap = "round";
@@ -552,11 +571,11 @@ function endTest() {
         } else {
             scoreCtx.globalCompositeOperation = "destination-out";
         }
-        scoreCtx.lineWidth = stroke.brushSize*2;
+        scoreCtx.lineWidth = stroke.brushSize*2*drawToScoreScale;
         scoreCtx.beginPath();
-        scoreCtx.moveTo(stroke.x[0]+SCORE_AREA_SIZE/2, stroke.y[0]+SCORE_AREA_SIZE/2)
+        scoreCtx.moveTo(stroke.x[0]*drawToScoreScale+SCORE_AREA_SIZE/2, stroke.y[0]*drawToScoreScale+SCORE_AREA_SIZE/2)
         for (let i = 0; i < stroke.x.length; i++) {
-            scoreCtx.lineTo(stroke.x[i]+SCORE_AREA_SIZE/2, stroke.y[i]+SCORE_AREA_SIZE/2);
+            scoreCtx.lineTo(stroke.x[i]*drawToScoreScale+SCORE_AREA_SIZE/2, stroke.y[i]*drawToScoreScale+SCORE_AREA_SIZE/2);
         }
         scoreCtx.stroke();
     });
@@ -569,7 +588,7 @@ function endTest() {
             let y = Math.floor((i / 4) / SCORE_AREA_SIZE) - SCORE_AREA_SIZE/2;
             let theta = -Math.atan2(y, x);
             let r = Math.hypot(x, y);
-            let figureR = calcRad(theta)*W/2
+            let figureR = calcRad(theta)*FIGURE_SCALE*drawToScoreScale;
             if (r <= figureR) {
                 scoreInc++;
             } else {
@@ -579,7 +598,7 @@ function endTest() {
     }
     console.log(scoreInc);
 
-    location.href = "passcode.html";
+    // location.href = "passcode.html";
 }
 
 //Helper Functions---------------------------------------------------------------------------------
@@ -599,7 +618,7 @@ function zoomOut(animate) {
 }
 
 function decrementTimer() {
-    if (endTestPrompted) {
+    if (endTestPrompted != "none") {
         return;
     }
     if (timerSeconds > 0) {
