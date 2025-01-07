@@ -68,7 +68,7 @@ document.addEventListener("touchstart", e => {
     let touchY = touch.pageY;
 
     buttons.forEach(button => {
-        if (touchX > button.x && touchX < button.x+button.w > button.y && touchY < button.y+button.h) {
+        if (touchX > button.x && touchX < button.x+button.w && touchY > button.y && touchY < button.y+button.h) {
             button.event();
             redraw();
         }
@@ -76,8 +76,8 @@ document.addEventListener("touchstart", e => {
 })
 
 //Creating Buttons for canvas--------------------------------------------------------------------
-// var brushPlus = new Button(W/2-100, 10, 200, 70, () => {brushSize = Math.min(brushSize+BRUSH_DELTA, MAX_BRUSH_SIZE)}, '\uF067', 2, false, false);
-// var brushMinus = new Button(W/2-100, 310, 200, 70, () => {brushSize = Math.max(brushSize-BRUSH_DELTA, MIN_BRUSH_SIZE)}, '\uF068', 3, false, false);
+var practice = new Button(W/2-160, 180, 320, 70, () => {}, 'Practice', 0, false, false);
+var test = new Button(W/2-160, 310, 320, 70, () => {location.href = "testScreen.html";}, 'Begin Test', 0, false, false);
 var settings = new Button(W-80, H-80, 70, 70, () => {alert("settings")}, '\uF013', 0, false, false);
 
 function drawIconButton(button) {
@@ -107,7 +107,7 @@ function redraw() {
     ctx.fillStyle = "black";
     ctx.fillText(VER, 30, 20);
 
-    ctx.font = '50px Times New Roman';
+    ctx.font = '65px Times New Roman';
     ctx.fillText("DPAA Testing Software", W/2, 80);
 
     //Draw icon buttons
