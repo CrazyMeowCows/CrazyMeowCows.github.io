@@ -4,7 +4,9 @@
 <title>DPAA Testing Software</title>
 </head>
 
-<canvas id="mainCanvas" width="0" height="0"></canvas>    
+<canvas id="gridCanvas" width="0" height="0"></canvas>    
+<canvas id="drawCanvas" width="0" height="0"></canvas>    
+<canvas id="figureCanvas" width="0" height="0"></canvas>    
 <canvas id="uiCanvas" width="0" height="0"></canvas>
 <style>
     body {
@@ -55,28 +57,34 @@ const ERASE_COLOR = "#FFFFFF";
 const COMP_TESTING = true;
 
 //Canvas Setup and Styling-------------------------------------------------------------------------
-var mainCanvas = document.getElementById('mainCanvas')
-var ctx = mainCanvas.getContext("2d", { willReadFrequently: true, aplha: false });
+var gridCanvas = document.getElementById('gridCanvas')
+var gridCtx = gridCanvas.getContext("2d", { willReadFrequently: false, aplha: false });
+
+var drawCanvas = document.getElementById('drawCanvas')
+var drawCtx = drawCanvas.getContext("2d", { willReadFrequently: true, aplha: false });
+
+var figureCanvas = document.getElementById('figureCanvas')
+var figureCtx = figureCanvas.getContext("2d", { willReadFrequently: true, aplha: false });
 
 var uiCanvas = document.getElementById('uiCanvas')
 var uiCtx = uiCanvas.getContext("2d", { willReadFrequently: false, aplha: false });
 
-mainCanvas.width = W;
-mainCanvas.height = H;
+gridCanvas.width = W; gridCanvas.height = H;
+drawCanvas.width = W; drawCanvas.height = H;
+figureCanvas.width = W; figureCanvas.height = H;
 
 uiCanvas.width = W+UI_WIDTH;
 uiCanvas.height = H;
 
-ctx.lineCap = "round";
-ctx.lineJoin = "round";
+gridCtx.strokeStyle = "black";
 
-ctx.fillStyle = "black";
-ctx.strokeStyle = "black";
+drawCtx.lineCap = "round";
+drawCtx.lineJoin = "round";
+
+figureCtx.strokeStyle = "black";
 
 uiCtx.textAlign = "center";
 uiCtx.textBaseline = "middle";
-
-uiCtx.lineCap = "round";
 
 
 //Variable Declarations----------------------------------------------------------------------------
@@ -148,21 +156,17 @@ document.addEventListener("touchstart", e => {
             if (touchX <= 80 && touchY >= H-80) {
                 endTestPrompt();
             } else if (touch.touchType == "stylus" || COMP_TESTING) { //Stylus ---------------
-                ctx.fillStyle = brushColor;
-                circle(touch.pageX, touch.pageY, brushSize, ctx);
-
                 currentStroke = new PenStroke(touch.pageX, touch.pageY, brushColor);
                 strokes.push(currentStroke);
 
+                drawCtx.fillStyle = brushColor;
                 if (brushColor == ERASE_COLOR) {
-                    mainRedraw();
-
-                    ctx.lineWidth = 2;
-                    ctx.strokeStyle = "black";
-                    ctx.beginPath();
-                    ctx.arc(touch.pageX, touch.pageY, brushSize, 0, TAU, false);
-                    ctx.stroke();
+                    drawCtx.globalCompositeOperation = "destination-out";
+                } else {
+                    drawCtx.globalCompositeOperation = "source-over";
                 }
+
+                circle(touch.pageX, touch.pageY, brushSize, drawCtx);
 
             } else if (touches.length <= 1) { //Single Finger Pan ---------------------
                 panX = touch.pageX;
@@ -209,19 +213,9 @@ document.addEventListener("touchmove", e => {
     if (!endTestPrompted) {
         if (touch.pageX <= W) {
             if (touch.touchType == "stylus" && currentStroke != undefined) { //Stylus ----------
-                ctx.strokeStyle = brushColor;
-                line(lastStrokeX, lastStrokeY, touchX, touchY, brushSize*2, ctx);
+                drawCtx.strokeStyle = brushColor;
+                line(lastStrokeX, lastStrokeY, touchX, touchY, brushSize*2, drawCtx);
                 extendCurrentStroke(touchX, touchY);
-
-                if (brushColor == ERASE_COLOR) {
-                    mainRedraw();
-
-                    ctx.lineWidth = 1.5;
-                    ctx.strokeStyle = "black";
-                    ctx.beginPath();
-                    ctx.arc(touch.pageX, touch.pageY, brushSize, 0, TAU, false);
-                    ctx.stroke();
-                }
 
             } else if (touches.length <= 1 && touch.touchType != "stylus") { //Single Finger Pan ---------------------
                 if (lastZoomed) {
@@ -275,8 +269,9 @@ document.addEventListener("wheel", e => { //TESTING --------------------------- 
 //Drawing the content of the main canvas-----------------------------------------------------------
 function mainRedraw() {
     //Clear the canvas every redraw
-    ctx.clearRect(0, 0, W, H);
-    ctx.fillText(VER, 10, 20);
+    gridCtx.clearRect(0, 0, W, H);
+    drawCtx.clearRect(0, 0, W, H);
+    figureCtx.clearRect(0, 0, W, H);
 
     //Calculate screen offsets for zooming and panning
     let dynamicGridSize = GRID_SIZE*zoom;
@@ -290,19 +285,19 @@ function mainRedraw() {
 
     //Drawing strokes using one continuous line
     strokes.forEach(stroke => {
-        ctx.strokeStyle = stroke.strokeColor;
+        drawCtx.strokeStyle = stroke.strokeColor;
         if (stroke.strokeColor == DRAW_COLOR) {
-            ctx.globalCompositeOperation = "source-over";
+            drawCtx.globalCompositeOperation = "source-over";
         } else {
-            ctx.globalCompositeOperation = "destination-out";
+            drawCtx.globalCompositeOperation = "destination-out";
         }
-        ctx.lineWidth = stroke.brushSize*zoom*2;
-        ctx.beginPath();
-        ctx.moveTo(stroke.x[0]*zoom+offsetX, stroke.y[0]*zoom+offsetY)
+        drawCtx.lineWidth = stroke.brushSize*zoom*2;
+        drawCtx.beginPath();
+        drawCtx.moveTo(stroke.x[0]*zoom+offsetX, stroke.y[0]*zoom+offsetY)
         for (let i = 0; i < stroke.x.length; i++) {
-            ctx.lineTo(stroke.x[i]*zoom+offsetX, stroke.y[i]*zoom+offsetY);
+            drawCtx.lineTo(stroke.x[i]*zoom+offsetX, stroke.y[i]*zoom+offsetY);
         }
-        ctx.stroke();
+        drawCtx.stroke();
     });
 
     //Drawing the gridlines that are visible on screen
@@ -311,51 +306,48 @@ function mainRedraw() {
 
     lineResolution = dynamicGridSize/4;
 
-    ctx.strokeStyle = "black";
-    ctx.globalCompositeOperation = "destination-over";
-    // ctx.globalCompositeOperation = "difference";
+    gridCtx.strokeStyle = "black";
 
     let i = 0; //TODO: Optimize grid drawing
     for (var x = xStart-dynamicGridSize; x < W+xStart+dynamicGridSize; x += lineResolution) {
         if (i%4 == 0) {
-            ctx.lineWidth = 1;
+            gridCtx.lineWidth = 1;
         } else {
-            ctx.lineWidth = 0.5;
+            gridCtx.lineWidth = 0.5;
         }
-        ctx.beginPath();
-        ctx.moveTo(x+offsetX, 0);
-        ctx.lineTo(x+offsetX, H);
-        ctx.stroke();
+        gridCtx.beginPath();
+        gridCtx.moveTo(x+offsetX, 0);
+        gridCtx.lineTo(x+offsetX, H);
+        gridCtx.stroke();
         i++;
     }
     i = 0;
     for (var y = yStart-dynamicGridSize; y < H+yStart+dynamicGridSize; y += lineResolution) {
         if (i%4 == 0) {
-            ctx.lineWidth = 1;
+            gridCtx.lineWidth = 1;
         } else {
-            ctx.lineWidth = 0.5;
+            gridCtx.lineWidth = 0.5;
         }
-        ctx.beginPath();
-        ctx.moveTo(0, y+offsetY);
-        ctx.lineTo(W, y+offsetY);
-        ctx.stroke();
+        gridCtx.beginPath();
+        gridCtx.moveTo(0, y+offsetY);
+        gridCtx.lineTo(W, y+offsetY);
+        gridCtx.stroke();
         i++;
     }
-    ctx.globalCompositeOperation = "source-over";
 
     //Drawing figure outline
-    ctx.lineWidth = 2;
-    ctx.beginPath();
-    ctx.moveTo(offsetX+calcRad(0)*zoom, offsetY);
+    figureCtx.lineWidth = 2;
+    figureCtx.beginPath();
+    figureCtx.moveTo(offsetX+calcRad(0)*zoom, offsetY);
     for (let theta = THETA_RESOLUTION; theta < TAU; theta += THETA_RESOLUTION) {
         let r = calcRad(theta);
-        ctx.lineTo(offsetX+r*Math.cos(theta)*zoom, offsetY-r*Math.sin(theta)*zoom);
+        figureCtx.lineTo(offsetX+r*Math.cos(theta)*zoom, offsetY-r*Math.sin(theta)*zoom);
     }
-    ctx.lineTo(offsetX+calcRad(0)*zoom, offsetY);
-    ctx.stroke();
+    figureCtx.lineTo(offsetX+calcRad(0)*zoom, offsetY);
+    figureCtx.stroke();
 
     //Line at right side of canvas to seperate UI
-    line(W, 0, W, H, 5, ctx);
+    line(W, 0, W, H, 5, figureCtx);
 }    
 mainRedraw();
 
@@ -391,6 +383,7 @@ function drawIconButton(button) {
 function uiRedraw () {
     //Clear the canvas every redraw
     uiCtx.clearRect(0, 0, W+UI_WIDTH, H);
+    uiCtx.fillText(VER, 10, 20);
 
     // Draw Timer
     uiCtx.fillStyle = "white";
