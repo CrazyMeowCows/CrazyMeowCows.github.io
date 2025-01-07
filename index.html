@@ -49,9 +49,9 @@ ctx.textBaseline = "middle";
 
 //Variable Declarations----------------------------------------------------------------------------
 var buttons = [];
-var practice = new Button(W/2-160, 260, 320, 70, () => {location.href = "test.html";}, 'Practice', 0, false, false);
-var test = new Button(W/2-160, 370, 320, 70, () => {location.href = "test.html";}, 'Begin Test', 0, false, false);
-var info = new Button(W/2-160, 480, 320, 70, () => {}, 'Info', 0, false, false);
+var practice = new Button(W/2-160, 290, 320, 70, () => {location.href = "test.html";}, 'Practice', 0, false, false);
+var test = new Button(W/2-160, 400, 320, 70, () => {location.href = "test.html";}, 'Begin Test', 0, false, false);
+// var info = new Button(W/2-160, 480, 320, 70, () => {}, 'Info', 0, false, false);
 var settings = new Button(W-80, H-80, 70, 70, () => {location.href = "settings.html";}, '\uF013', 0, false, false);
 
 
@@ -82,8 +82,8 @@ function redraw() {
 
     //Title
     ctx.font = 'normal 500 65px Times New Roman';
-    ctx.fillText("Area Filling", W/2, 130);
-    ctx.fillText("Accuracy Evaluation Tool", W/2, 200);
+    ctx.fillText("Area Filling", W/2, 150);
+    ctx.fillText("Accuracy Evaluation Tool", W/2, 220);
 
     //Draw icon buttons
     ctx.lineWidth = 1.5;
@@ -91,11 +91,6 @@ function redraw() {
     buttons.forEach(button => {
         drawIconButton(button, ctx);
     });
-
-    ctx.fillStyle = 'rgba(0,0,0,0.4)';
-    ctx.beginPath();
-    ctx.roundRect(info.x, info.y, info.w, info.h, [10]);
-    ctx.fill();
 
     //Copyright Icon
     ctx.font = '20px FontAwesome';
