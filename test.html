@@ -8,7 +8,8 @@
 <canvas id="drawCanvas" width="0" height="0"></canvas>    
 <canvas id="figureCanvas" width="0" height="0"></canvas>    
 <canvas id="uiCanvas" width="0" height="0"></canvas>
-<canvas id="scoreCanvas" width="0" height="0" style="display: none;"></canvas>
+<!-- <canvas id="scoreCanvas" width="0" height="0" style="display: none;"></canvas> -->
+<canvas id="scoreCanvas" width="0" height="0"></canvas>
 <style>
     body {
         width: 100%;
@@ -565,6 +566,7 @@ function endTest() {
 
     //Drawing strokes using one continuous line
     scoreCtx.strokeStyle = "red";
+    scoreCtx.fillStyle = "red";
     scoreCtx.lineCap = "round";
     scoreCtx.lineJoin = "round";
 
@@ -582,6 +584,7 @@ function endTest() {
         }
         scoreCtx.stroke();
     });
+    scoreCtx.fillRect(0, 0, 100, 100);
 
     let scoreInc = 0;
     let max = 0;
@@ -603,8 +606,8 @@ function endTest() {
             }
         }
     }
-    uiCtx.fillText(scoreInc, 30, 30);
-    uiCtx.fillText(max, 30, 60);
+    uiCtx.fillText(scoreInc, 130, 130);
+    uiCtx.fillText(max, 130, 160);
     sessionStorage.scoreObject = JSON.stringify(scoreInc+69); //Stores drawing score in the session storages
 
     // location.href = "passcode.html";
