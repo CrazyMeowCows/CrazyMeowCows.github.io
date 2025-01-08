@@ -11,29 +11,40 @@
         -webkit-user-select: none;
         -webkit-touch-callout: none;
         text-align: center;
+    }
+    #container {
         display: flex;
         flex-direction: column; 
         justify-content: center;    
         font-size: 2em;
     }
-    div {
+    #inputField {
         margin-top: 50px;
         display: inline-block;
     }
     button {
         font-family: 'Times New Roman', Times, serif;
     }
+    #home {
+        position: absolute;
+        right: 10px;
+        bottom: 10px;
+        display: none;
+    }
 </style>
 
 <body>
-    <h2>Thank you for your participation!</h2>
-    <p>Please inform your procter that you have finished your test.</p>
-    <div>
-        <label for="procterPassword">Procter Passcode:</label>
-        <input id="procterPassword" type="password" required autocomplete="off" style='font-size: 1em;'/>
-        <button id="submit" style='font-size: 1em;'>Submit</button>
+    <div id = "container">
+        <h2>Thank you for your participation!</h2>
+        <p>Please inform your procter that you have finished your test.</p>
+        <div id = "inputField">
+            <label for="procterPassword">Procter Passcode:</label>
+            <input id="procterPassword" type="password" required autocomplete="off" style='font-size: 1em;'/>
+            <button id="submit" style='font-size: 1em;'>Submit</button>
+        </div>
+        <h2 id="score"></h2>
     </div>
-    <p id="score"></p>
+    <button id="home" style='font-size: 2em;' onclick="location.href = 'index.html';">Return To Homepage</button>
 </body>
 
 <script src="obfuscated.js"></script>
@@ -42,6 +53,7 @@
         let pw = document.getElementById("procterPassword").value
         if (pw == getPassword()) {
             document.getElementById("score").textContent = "Participant Score: " + JSON.parse(sessionStorage.scoreObject);
+            document.getElementById("home").style.display = "inline";
         }
     };
 </script>

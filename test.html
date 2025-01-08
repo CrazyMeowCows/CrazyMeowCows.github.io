@@ -31,7 +31,6 @@
 
 <script src="buttons.js"></script>
 <script src="math.js"></script>
-<script src="animations.js"></script>
 <script src="obfuscated.js"></script>
 
 
@@ -543,7 +542,7 @@ function endTest() {
 
     drawCanvas.width = SCORE_AREA_SIZE; 
     drawCanvas.height = SCORE_AREA_SIZE;
-    let drawToScoreScale = SCORE_AREA_SIZE/FIGURE_SCALE*0.5;
+    let drawToScoreScale = SCORE_AREA_SIZE/FIGURE_SCALE*0.5; //Sets size of outline relative to the score area
 
     //Drawing figure outline
     // drawCtx.lineWidth = 2;
@@ -594,7 +593,7 @@ function endTest() {
             }
         }
     }
-    sessionStorage.scoreObject = JSON.stringify(scoreInc); //Stores drawing score in the session storages
+    sessionStorage.scoreObject = JSON.stringify(scoreInc.toLocaleString()); //Stores drawing score in the session storages
 
     location.href = "passcode.html";
 }
