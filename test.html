@@ -50,12 +50,12 @@ const UI_CENTER = UI_WIDTH/2+W;
 
 const GRID_SIZE = W/6;
 const ZOOM_SENS = 0.002;
-const MAX_ZOOM = 1000;
+const MAX_ZOOM = 500;
 const THETA_RESOLUTION = 0.01;
 
- //DO NOT CHANGE - STANDARDIZES TEST RESULTS - MAX SCORE: 6305645
+ //DO NOT CHANGE - STANDARDIZES TEST RESULTS - MAX SCORE: 4035620
 const FIGURE_SCALE = 0.8*H;
-const SCORE_AREA_SIZE = 4000;
+const SCORE_AREA_SIZE = 4000; //CANNOT EXCEED 4096px by 4096px DUE TO iOS/SAFARI LIMITATIONS
 
 const MAX_BRUSH_SIZE = 5/768*H; //5 pixels on 1024x768
 const MIN_BRUSH_SIZE = 1/768*H;
@@ -67,7 +67,7 @@ const ERASE_COLOR = "#FFFFFF";
 const SLIDER_Y1 = 110;
 const SLIDER_Y2 = 280;
 
-var COMP_TESTING = false;
+var COMP_TESTING = true;
 
 
 //Canvas Setup and Styling-------------------------------------------------------------------------
@@ -546,22 +546,22 @@ function endTest() {
     let drawToScoreScale = SCORE_AREA_SIZE/FIGURE_SCALE*0.5;
 
     //Drawing figure outline
-    drawCtx.lineWidth = 2;
-    drawCtx.strokeStyle = "black";
-    drawCtx.lineCap = "round";
-    drawCtx.lineJoin = "round";
+    // drawCtx.lineWidth = 2;
+    // drawCtx.strokeStyle = "black";
 
-    drawCtx.beginPath();
-    drawCtx.moveTo(calcRad(0)*FIGURE_SCALE*drawToScoreScale+SCORE_AREA_SIZE/2, SCORE_AREA_SIZE/2);
-    for (let theta = THETA_RESOLUTION; theta < TAU; theta += THETA_RESOLUTION) {
-        let r = calcRad(theta)*FIGURE_SCALE*drawToScoreScale;
-        drawCtx.lineTo(r*Math.cos(theta)+SCORE_AREA_SIZE/2, r*Math.sin(theta)+SCORE_AREA_SIZE/2);
-    }
-    drawCtx.lineTo(calcRad(0)*FIGURE_SCALE*drawToScoreScale+SCORE_AREA_SIZE/2, SCORE_AREA_SIZE/2);
-    drawCtx.stroke();
+    // drawCtx.beginPath();
+    // drawCtx.moveTo(calcRad(0)*FIGURE_SCALE*drawToScoreScale+SCORE_AREA_SIZE/2, SCORE_AREA_SIZE/2);
+    // for (let theta = THETA_RESOLUTION; theta < TAU; theta += THETA_RESOLUTION) {
+    //     let r = calcRad(theta)*FIGURE_SCALE*drawToScoreScale;
+    //     drawCtx.lineTo(r*Math.cos(theta)+SCORE_AREA_SIZE/2, r*Math.sin(theta)+SCORE_AREA_SIZE/2);
+    // }
+    // drawCtx.lineTo(calcRad(0)*FIGURE_SCALE*drawToScoreScale+SCORE_AREA_SIZE/2, SCORE_AREA_SIZE/2);
+    // drawCtx.stroke();
 
     //Drawing strokes using one continuous line
     drawCtx.strokeStyle = "red";
+    drawCtx.lineCap = "round";
+    drawCtx.lineJoin = "round";
 
     strokes.forEach(stroke => {
         if (stroke.strokeColor == DRAW_COLOR) {
@@ -578,16 +578,9 @@ function endTest() {
         drawCtx.stroke();
     });
 
-    drawCtx.fillStyle = "gray";
-    drawCtx.fillRect(0, 0, 100, 100);
-
     let scoreInc = 0;
-    let max = 0;
     imgData = drawCtx.getImageData(0, 0, SCORE_AREA_SIZE, SCORE_AREA_SIZE);
     for (let i = 0; i < imgData.data.length; i += 4) {
-        max = Math.max(max, imgData.data[i]);
-        max = Math.max(max, imgData.data[i+1]);
-        max = Math.max(max, imgData.data[i+3]);
         if (imgData.data[i] != 0) {
             let x = (i / 4) % SCORE_AREA_SIZE - SCORE_AREA_SIZE/2;
             let y = Math.floor((i / 4) / SCORE_AREA_SIZE) - SCORE_AREA_SIZE/2;
@@ -601,12 +594,9 @@ function endTest() {
             }
         }
     }
-    uiCtx.fillStyle = "gray";
-    uiCtx.fillText(scoreInc, 130, 130);
-    uiCtx.fillText(max, 130, 160);
-    sessionStorage.scoreObject = JSON.stringify(scoreInc+69); //Stores drawing score in the session storages
+    sessionStorage.scoreObject = JSON.stringify(scoreInc); //Stores drawing score in the session storages
 
-    // location.href = "passcode.html";
+    location.href = "passcode.html";
 }
 
 //Helper Functions---------------------------------------------------------------------------------
