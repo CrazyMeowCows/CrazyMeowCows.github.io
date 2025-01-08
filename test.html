@@ -223,7 +223,7 @@ document.addEventListener("touchmove", e => {
     let touchX = touch.pageX; 
     let touchY = touch.pageY;
     // uiCtx.fillText(touch.touchType, 100, 100)
-    // if (COMP_TESTING) {touch.touchType = "stylus";}
+    if (COMP_TESTING) {touch.touchType = "stylus";}
     // uiCtx.fillText(touch.touchType, 100, 200)
 
     if (endTestPrompted != "none") { //End Test Promt is Active
@@ -584,8 +584,12 @@ function endTest() {
     });
 
     let scoreInc = 0;
+    let max = 0;
     imgData = scoreCtx.getImageData(0, 0, SCORE_AREA_SIZE, SCORE_AREA_SIZE);
     for (let i = 0; i < imgData.data.length; i += 4) {
+        max = Math.max(max, imgData.data[i]);
+        max = Math.max(max, imgData.data[i+1]);
+        max = Math.max(max, imgData.data[i+3]);
         if (imgData.data[i] != 0) {
             let x = (i / 4) % SCORE_AREA_SIZE - SCORE_AREA_SIZE/2;
             let y = Math.floor((i / 4) / SCORE_AREA_SIZE) - SCORE_AREA_SIZE/2;
@@ -599,9 +603,11 @@ function endTest() {
             }
         }
     }
+    uiCtx.fillText(scoreInc, 30, 30);
+    uiCtx.fillText(max, 30, 60);
     sessionStorage.scoreObject = JSON.stringify(scoreInc+69); //Stores drawing score in the session storages
 
-    location.href = "passcode.html";
+    // location.href = "passcode.html";
 }
 
 //Helper Functions---------------------------------------------------------------------------------
