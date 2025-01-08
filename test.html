@@ -8,8 +8,6 @@
 <canvas id="drawCanvas" width="0" height="0"></canvas>    
 <canvas id="figureCanvas" width="0" height="0"></canvas>    
 <canvas id="uiCanvas" width="0" height="0"></canvas>
-<!-- <canvas id="scoreCanvas" width="0" height="0" style="display: none;"></canvas> -->
-<canvas id="scoreCanvas" width="0" height="0"></canvas>
 <style>
     body {
         width: 100%;
@@ -84,9 +82,6 @@ var figureCtx = figureCanvas.getContext("2d", { willReadFrequently: false, aplha
 
 var uiCanvas = document.getElementById('uiCanvas')
 var uiCtx = uiCanvas.getContext("2d", { willReadFrequently: false, aplha: false });
-
-var scoreCanvas = document.getElementById('scoreCanvas')
-var scoreCtx = scoreCanvas.getContext("2d", { willReadFrequently: false, aplha: false });
 
 gridCanvas.width = W; gridCanvas.height = H;
 drawCanvas.width = W; drawCanvas.height = H;
@@ -546,47 +541,44 @@ function endTest() {
     clearInterval(timerInterval);
     zoomOut(false)
 
-    scoreCanvas.width = SCORE_AREA_SIZE; scoreCanvas.height = SCORE_AREA_SIZE;
-    scoreCtx.clearRect(0, 0, W, H);
-
+    drawCanvas.width = SCORE_AREA_SIZE; 
+    drawCanvas.height = SCORE_AREA_SIZE;
     let drawToScoreScale = SCORE_AREA_SIZE/FIGURE_SCALE*0.5;
 
     //Drawing figure outline
-    // scoreCtx.lineWidth = 2;
-    // scoreCtx.strokeStyle = "black";
+    drawCtx.lineWidth = 2;
+    drawCtx.strokeStyle = "black";
+    drawCtx.lineCap = "round";
+    drawCtx.lineJoin = "round";
 
-    // scoreCtx.beginPath();
-    // scoreCtx.moveTo(calcRad(0)*FIGURE_SCALE*drawToScoreScale+SCORE_AREA_SIZE/2, SCORE_AREA_SIZE/2);
-    // for (let theta = THETA_RESOLUTION; theta < TAU; theta += THETA_RESOLUTION) {
-    //     let r = calcRad(theta)*FIGURE_SCALE*drawToScoreScale;
-    //     scoreCtx.lineTo(r*Math.cos(theta)+SCORE_AREA_SIZE/2, r*Math.sin(theta)+SCORE_AREA_SIZE/2);
-    // }
-    // scoreCtx.lineTo(calcRad(0)*FIGURE_SCALE*drawToScoreScale+SCORE_AREA_SIZE/2, SCORE_AREA_SIZE/2);
-    // scoreCtx.stroke();
+    drawCtx.beginPath();
+    drawCtx.moveTo(calcRad(0)*FIGURE_SCALE*drawToScoreScale+SCORE_AREA_SIZE/2, SCORE_AREA_SIZE/2);
+    for (let theta = THETA_RESOLUTION; theta < TAU; theta += THETA_RESOLUTION) {
+        let r = calcRad(theta)*FIGURE_SCALE*drawToScoreScale;
+        drawCtx.lineTo(r*Math.cos(theta)+SCORE_AREA_SIZE/2, r*Math.sin(theta)+SCORE_AREA_SIZE/2);
+    }
+    drawCtx.lineTo(calcRad(0)*FIGURE_SCALE*drawToScoreScale+SCORE_AREA_SIZE/2, SCORE_AREA_SIZE/2);
+    drawCtx.stroke();
 
     //Drawing strokes using one continuous line
-    scoreCtx.strokeStyle = "red";
-    scoreCtx.lineCap = "round";
-    scoreCtx.lineJoin = "round";
+    drawCtx.strokeStyle = "red";
 
     strokes.forEach(stroke => {
         if (stroke.strokeColor == DRAW_COLOR) {
-            scoreCtx.globalCompositeOperation = "source-over";
+            drawCtx.globalCompositeOperation = "source-over";
         } else {
-            scoreCtx.globalCompositeOperation = "destination-out";
+            drawCtx.globalCompositeOperation = "destination-out";
         }
-        scoreCtx.lineWidth = stroke.brushSize*2*drawToScoreScale;
-        scoreCtx.beginPath();
-        scoreCtx.moveTo(stroke.x[0]*drawToScoreScale+SCORE_AREA_SIZE/2, stroke.y[0]*drawToScoreScale+SCORE_AREA_SIZE/2)
+        drawCtx.lineWidth = stroke.brushSize*2*drawToScoreScale;
+        drawCtx.beginPath();
+        drawCtx.moveTo(stroke.x[0]*drawToScoreScale+SCORE_AREA_SIZE/2, stroke.y[0]*drawToScoreScale+SCORE_AREA_SIZE/2)
         for (let i = 0; i < stroke.x.length; i++) {
-            scoreCtx.lineTo(stroke.x[i]*drawToScoreScale+SCORE_AREA_SIZE/2, stroke.y[i]*drawToScoreScale+SCORE_AREA_SIZE/2);
+            drawCtx.lineTo(stroke.x[i]*drawToScoreScale+SCORE_AREA_SIZE/2, stroke.y[i]*drawToScoreScale+SCORE_AREA_SIZE/2);
         }
-        scoreCtx.stroke();
+        drawCtx.stroke();
     });
-    drawCanvas.width = 1000;
-    drawCanvas.height = 1000;
 
-    drawCtx.fillStyle = "gray";
+    drawCtx.fillStyle = "red";
     drawCtx.fillRect(0, 0, 100, 100);
 
     let scoreInc = 0;
