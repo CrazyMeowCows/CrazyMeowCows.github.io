@@ -54,8 +54,7 @@
 <script src="obfuscated.js"></script>
 <script>
     document.getElementById("submit").onclick = () => {
-        let pw = document.getElementById("procterPassword").value
-        if (pw == getPassword()) {
+        if (document.getElementById("procterPassword").value == getPassword()) {
             document.getElementById("score").textContent = "Participant Score: " + JSON.parse(sessionStorage.scoreObject);
             document.getElementById("home").style.display = "inline";
         }
