@@ -31,7 +31,6 @@
 
 <script src="buttons.js"></script>
 <script src="math.js"></script>
-<script src="obfuscated.js"></script>
 
 
 <script>
@@ -67,7 +66,7 @@ const SLIDER_Y1 = 110;
 const SLIDER_Y2 = 280;
 
 var COMP_TESTING = false;
-
+var isTest = JSON.parse(sessionStorage.isTest) == "true";
 
 //Canvas Setup and Styling-------------------------------------------------------------------------
 var gridCanvas = document.getElementById('gridCanvas')
@@ -123,7 +122,8 @@ var brushColor = DRAW_COLOR;
 
 var maxTimeSeconds = 10*60;
 var timerSeconds = maxTimeSeconds;
-var endTestPrompted = "none";
+var activePrompt = "none";
+if (isTest) {activePrompt = "start";}
 var isScoring = false;
 
 var strokes = [];
@@ -148,8 +148,10 @@ var brushMinus = new Button(15+W, 310, 70, 70, () => {brushSize = Math.max(brush
 var pencil = new Button(15+W, H-250, 70, 70, () => {brushColor = DRAW_COLOR}, '\uF040', 0, true, false);
 var eraser = new Button(15+W, pencil.y+70, 70, 70, () => {brushColor = ERASE_COLOR}, '\uF12d', 0, true, false);
 var resetZoom = new Button(15+W, H-80, 70, 70, () => {zoomOut(true)}, '\uF066', 0, false, false);
-var yesEndTest = new Button((W+UI_WIDTH)/2-105, H/2-115, 70, 70, endTest, '\uF00C', 0, false, true);
-var noEndTest = new Button((W+UI_WIDTH)/2+35, H/2-115, 70, 70, () => {endTestPrompted = "none"; uiRedraw(); lastZoomed = true;}, '\uF00D', 0, false, true);
+
+var startTest = new Button((W+UI_WIDTH)/2-35, H/2-115, 70, 70, () => {activePrompt = "none"; uiRedraw()}, '\uF0DA', 0, false, true);
+var yesEndTest = new Button((W+UI_WIDTH)/2-85, H/2-115, 70, 70, endTest, '\uF00C', 0, false, true);
+var noEndTest = new Button((W+UI_WIDTH)/2+15, H/2-115, 70, 70, () => {activePrompt = "none"; uiRedraw(); lastZoomed = true;}, '\uF00D', 0, false, true);
 var expiredOk = new Button((W+UI_WIDTH)/2-35, H/2-115, 70, 70, endTest, '\uF061', 0, false, true);
 
 //TouchStart Listener------------------------------------------------------------------------------
@@ -160,16 +162,19 @@ document.addEventListener("touchstart", e => {
     let touchY = touch.pageY;
     if (COMP_TESTING) {touch.touchType = "stylus";}
 
-    if (endTestPrompted == "timerExpired") { //End Test Promt is Active
+    if (activePrompt == "timerExpired") { //End Test Promt is Active
         if (!isScoring) {
             handleButtonTouch(expiredOk, touch);
         }
         return;
-    } else if (endTestPrompted == "endEarly") {
+    } else if (activePrompt == "endEarly") {
         if (!isScoring) {
             handleButtonTouch(yesEndTest, touch);
             handleButtonTouch(noEndTest, touch);
         }
+        return;
+    } else if (activePrompt == "start") {
+        handleButtonTouch(startTest, touch);
         return;
     }
     if (touchX <= 80 && touchY >= H-80) { //Check for EndTest Button
@@ -221,7 +226,7 @@ document.addEventListener("touchmove", e => {
     if (COMP_TESTING) {touch.touchType = "stylus";}
     // uiCtx.fillText(touch.touchType, 100, 200)
 
-    if (endTestPrompted != "none") { //End Test Promt is Active
+    if (activePrompt != "none") { //End Test Promt is Active
         return;
     }
     if (touch.pageX > W) { //Touch is on UI Bar
@@ -272,7 +277,7 @@ document.addEventListener("touchend", e => { //Clear the Eraser Outline
 
 //Wheel Listener-----------------------------------------------------------------------------------
 document.addEventListener("wheel", e => { //TODO: REMOVE
-    if (endTestPrompted == "none") {
+    if (activePrompt == "none") {
         zoom = clamp(zoom-e.deltaY*ZOOM_SENS*Math.abs(zoom)/2, 1, MAX_ZOOM);
 
         zoomX = e.pageX;
@@ -386,25 +391,27 @@ function uiRedraw () {
     uiCtx.clearRect(0, 0, W+UI_WIDTH, H);
 
     // Draw Timer
-    uiCtx.fillStyle = "white";
-    uiCtx.strokeStyle = "black";
-    uiCtx.lineWidth = 2;
-    uiCtx.beginPath();
-    uiCtx.roundRect(W/2-85, -2, 170, 57, [0, 0, 10, 10]);
-    uiCtx.fill();
-    uiCtx.stroke();
+    if (isTest) {
+        uiCtx.fillStyle = "white";
+        uiCtx.strokeStyle = "black";
+        uiCtx.lineWidth = 2;
+        uiCtx.beginPath();
+        uiCtx.roundRect(W/2-85, -2, 170, 57, [0, 0, 10, 10]);
+        uiCtx.fill();
+        uiCtx.stroke();
 
-    let mins = "" + Math.floor(timerSeconds/60);
-    if (mins.length <= 1) {
-        mins = "0"+mins;
+        let mins = "" + Math.floor(timerSeconds/60);
+        if (mins.length <= 1) {
+            mins = "0"+mins;
+        }
+        let secs = "" + timerSeconds%60;
+        if (secs.length <= 1) {
+            secs = "0"+secs;
+        }
+        uiCtx.fillStyle = "black";
+        uiCtx.font = "normal 500 60px Times New Roman";
+        uiCtx.fillText(mins+":"+secs, W/2, 27);
     }
-    let secs = "" + timerSeconds%60;
-    if (secs.length <= 1) {
-        secs = "0"+secs;
-    }
-    uiCtx.fillStyle = "black";
-    uiCtx.font = "normal 500 60px Times New Roman";
-    uiCtx.fillText(mins+":"+secs, W/2, 27);
 
     //Draw brush size slider
     let sliderHeight = SLIDER_Y2-(brushSize-MIN_BRUSH_SIZE)/(MAX_BRUSH_SIZE-MIN_BRUSH_SIZE)*(SLIDER_Y2-SLIDER_Y1);
@@ -480,14 +487,38 @@ uiRedraw(); //Call uiRedraw to start loading the used fonts
 function load () { 
     if (document.fonts.check('1px FontAwesome')) {
         uiRedraw(); //Call uiRedraw once fonts are loaded to display everything correctly
+        if (isTest) {
+            beginTestPrompt()
+        }
     } else {
         setTimeout(load, 20); //Recursively check every 20ms until font loads
     }
 }
 load(); //Begin loading loop
 
+function beginTestPrompt() {
+    uiCtx.fillStyle = 'rgba(0,0,0,0.3)';
+    uiCtx.fillRect(0, 0, W+UI_WIDTH, H);
+
+    uiCtx.fillStyle = 'white';
+    uiCtx.strokeStyle = 'black';
+    uiCtx.lineWidth = 3;
+    uiCtx.beginPath();
+    uiCtx.roundRect((W+UI_WIDTH)/2-180, H/2-190, 360, 170, [10]);
+    uiCtx.fill();
+    uiCtx.stroke();
+
+    uiCtx.font = 'normal 500 30px Times New Roman';
+    uiCtx.fillStyle = "black";
+    uiCtx.fillText("Begin Test When Ready", (W+UI_WIDTH)/2, H/2-150);
+
+    uiCtx.lineWidth = 2;
+    uiCtx.fillStyle = "Green";
+    drawIconButton(startTest, uiCtx);
+}
+
 function endTestPrompt() {
-    endTestPrompted = "endEarly";
+    activePrompt = "endEarly";
 
     uiCtx.fillStyle = 'rgba(0,0,0,0.3)';
     uiCtx.fillRect(0, 0, W+UI_WIDTH, H);
@@ -496,13 +527,21 @@ function endTestPrompt() {
     uiCtx.strokeStyle = 'black';
     uiCtx.lineWidth = 3;
     uiCtx.beginPath();
-    uiCtx.roundRect((W+UI_WIDTH)/2-220, H/2-190, 440, 170, [10]);
+    if (isTest) {
+        uiCtx.roundRect((W+UI_WIDTH)/2-220, H/2-190, 440, 170, [10]);
+    } else {
+        uiCtx.roundRect((W+UI_WIDTH)/2-180, H/2-190, 360, 170, [10]);
+    }
     uiCtx.fill();
     uiCtx.stroke();
 
     uiCtx.font = 'normal 500 30px Times New Roman';
     uiCtx.fillStyle = "black";
-    uiCtx.fillText("End Test Before Timer Expires?", (W+UI_WIDTH)/2, H/2-150);
+    if (isTest) {
+        uiCtx.fillText("End Test Before Timer Expires?", (W+UI_WIDTH)/2, H/2-150);
+    } else {
+        uiCtx.fillText("End Practice Session?", (W+UI_WIDTH)/2, H/2-150);
+    }
 
     uiCtx.lineWidth = 2;
     uiCtx.fillStyle = "Green";
@@ -512,7 +551,7 @@ function endTestPrompt() {
 }
 
 function timerExpiredPrompt() {
-    endTestPrompted = "timerExpired";
+    activePrompt = "timerExpired";
 
     uiCtx.fillStyle = 'rgba(0,0,0,0.3)';
     uiCtx.fillRect(0, 0, W+UI_WIDTH, H);
@@ -535,6 +574,10 @@ function timerExpiredPrompt() {
 }
 
 function endTest() {
+    if (!isTest) {
+        location.href = "index.html";
+        return;
+    }
     isScoring = true;
 
     clearInterval(timerInterval);
@@ -544,6 +587,7 @@ function endTest() {
     drawCanvas.height = SCORE_AREA_SIZE;
     let drawToScoreScale = SCORE_AREA_SIZE/FIGURE_SCALE*0.5; //Sets size of outline relative to the score area
 
+    drawCanvas.style.display = "none";
     //Drawing figure outline
     // drawCtx.lineWidth = 2;
     // drawCtx.strokeStyle = "black";
@@ -595,7 +639,7 @@ function endTest() {
     }
     sessionStorage.scoreObject = JSON.stringify(scoreInc.toLocaleString()); //Stores drawing score in the session storages
 
-    location.href = "passcode.html";
+    location.href = "endPasscode.html";
 }
 
 //Helper Functions---------------------------------------------------------------------------------
@@ -628,7 +672,7 @@ function zoomOutAnimation() {
 }
 
 function decrementTimer() {
-    if (endTestPrompted != "none") {
+    if (activePrompt != "none" || !isTest) {
         return;
     }
     if (timerSeconds > 0) {
@@ -638,7 +682,9 @@ function decrementTimer() {
         timerExpiredPrompt();
     }
 }
-var timerInterval = setInterval(decrementTimer, 1000);
+if (isTest) {
+    var timerInterval = setInterval(decrementTimer, 1000);
+}
 
 //Easy Circle Drawing----------------------------------------------------------
 function circle(x, y, r, fill, ctx) {
