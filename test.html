@@ -62,14 +62,13 @@ const MAX_BRUSH_SIZE = 5/768*H; //5 pixels on 1024x768
 const MIN_BRUSH_SIZE = 1/768*H;
 const UI_BRUSH_RAD = 18;
 const BRUSH_DELTA = (MAX_BRUSH_SIZE-MIN_BRUSH_SIZE)/6;
-// const DRAW_COLOR = "#4F3564";
-const DRAW_COLOR = "Red";
+const DRAW_COLOR = "#4F3564";
 const ERASE_COLOR = "#FFFFFF";
 
 const SLIDER_Y1 = 110;
 const SLIDER_Y2 = 280;
 
-var COMP_TESTING = true;
+var COMP_TESTING = false;
 
 
 //Canvas Setup and Styling-------------------------------------------------------------------------
@@ -223,9 +222,9 @@ document.addEventListener("touchmove", e => {
     let touch = touches[0];
     let touchX = touch.pageX; 
     let touchY = touch.pageY;
-    uiCtx.fillText(touch.touchType, 100, 100)
-    if (COMP_TESTING) {touch.touchType = "stylus";}
-    uiCtx.fillText(touch.touchType, 100, 200)
+    // uiCtx.fillText(touch.touchType, 100, 100)
+    // if (COMP_TESTING) {touch.touchType = "stylus";}
+    // uiCtx.fillText(touch.touchType, 100, 200)
 
     if (endTestPrompted != "none") { //End Test Promt is Active
         return;
