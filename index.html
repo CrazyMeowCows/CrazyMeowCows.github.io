@@ -30,7 +30,7 @@
 
 <script>
 //Constant Declarations----------------------------------------------------------------------------
-const VER = "2.4.0";
+const VER = "2.4.1";
 
 const W = window.innerWidth;
 const H = window.innerHeight;
@@ -57,9 +57,11 @@ var settings = new Button(W-80, H-80, 70, 70, () => {location.href = "settings.h
 
 //TouchStart Listener------------------------------------------------------------------------------
 document.addEventListener("touchstart", e => {
-    buttons.forEach(button => {
-        handleButtonTouch(button, e.touches[0]);
-    });
+    if (e.timeStamp > 500) {
+        buttons.forEach(button => {
+            handleButtonTouch(button, e.touches[0]);
+        });
+    }  
 })
 
 
