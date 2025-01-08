@@ -149,7 +149,7 @@ var pencil = new Button(15+W, H-250, 70, 70, () => {brushColor = DRAW_COLOR}, '\
 var eraser = new Button(15+W, pencil.y+70, 70, 70, () => {brushColor = ERASE_COLOR}, '\uF12d', 0, true, false);
 var resetZoom = new Button(15+W, H-80, 70, 70, () => {zoomOut(true)}, '\uF066', 0, false, false);
 
-var startTest = new Button((W+UI_WIDTH)/2-35, H/2-115, 70, 70, () => {activePrompt = "none"; uiRedraw()}, '\uF0DA', 0, false, true);
+var startTest = new Button((W+UI_WIDTH)/2-35, H/2-115, 70, 70, () => {activePrompt = "none"; uiRedraw(); lastZoomed = true;}, '\uF0DA', 0, false, true);
 var yesEndTest = new Button((W+UI_WIDTH)/2-85, H/2-115, 70, 70, endTest, '\uF00C', 0, false, true);
 var noEndTest = new Button((W+UI_WIDTH)/2+15, H/2-115, 70, 70, () => {activePrompt = "none"; uiRedraw(); lastZoomed = true;}, '\uF00D', 0, false, true);
 var expiredOk = new Button((W+UI_WIDTH)/2-35, H/2-115, 70, 70, endTest, '\uF061', 0, false, true);
@@ -222,15 +222,16 @@ document.addEventListener("touchmove", e => {
     let touch = touches[0];
     let touchX = touch.pageX; 
     let touchY = touch.pageY;
-    // uiCtx.fillText(touch.touchType, 100, 100)
     if (COMP_TESTING) {touch.touchType = "stylus";}
-    // uiCtx.fillText(touch.touchType, 100, 200)
 
     if (activePrompt != "none") { //End Test Promt is Active
         return;
     }
     if (touch.pageX > W) { //Touch is on UI Bar
         handleSliderTouch(touch);
+        return;
+    }
+    if (touch.touchType == "stylus" && currentStroke == undefined) {
         return;
     }
     if (touch.touchType == "stylus" && currentStroke != undefined) { //Stylus
