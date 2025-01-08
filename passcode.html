@@ -41,7 +41,7 @@
     document.getElementById("submit").onclick = () => {
         let pw = document.getElementById("procterPassword").value
         if (pw == getPassword()) {
-            document.getElementById("score").textContent = "Participant Score: " + JSON.parse(sessionStorage.myObject);
+            document.getElementById("score").textContent = "Participant Score: " + JSON.parse(sessionStorage.scoreObject);
         }
     };
 </script>
