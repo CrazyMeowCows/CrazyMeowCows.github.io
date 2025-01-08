@@ -566,7 +566,6 @@ function endTest() {
 
     //Drawing strokes using one continuous line
     scoreCtx.strokeStyle = "red";
-    scoreCtx.fillStyle = "red";
     scoreCtx.lineCap = "round";
     scoreCtx.lineJoin = "round";
 
@@ -584,7 +583,9 @@ function endTest() {
         }
         scoreCtx.stroke();
     });
-    scoreCtx.fillRect(0, 0, 100, 100);
+
+    drawCtx.fillStyle = "red";
+    drawCtx.fillRect(0, 0, 100, 100);
 
     let scoreInc = 0;
     let max = 0;
