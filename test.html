@@ -588,7 +588,7 @@ function endTest() {
 
     let scoreInc = 0;
     let max = 0;
-    imgData = scoreCtx.getImageData(0, 0, SCORE_AREA_SIZE, SCORE_AREA_SIZE);
+    imgData = drawCtx.getImageData(0, 0, SCORE_AREA_SIZE, SCORE_AREA_SIZE);
     for (let i = 0; i < imgData.data.length; i += 4) {
         max = Math.max(max, imgData.data[i]);
         max = Math.max(max, imgData.data[i+1]);
