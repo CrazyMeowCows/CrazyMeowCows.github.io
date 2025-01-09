@@ -23,6 +23,12 @@
         display: inline-block;
         margin-bottom: 15px;
     }
+    p {
+        margin: 0px;
+        padding: 0px;
+        color: red;
+        display: none;
+    }
     #home {
         font-family: 'Times New Roman', Times, serif;
         color: black;
@@ -49,6 +55,7 @@
         <div id = "inputField">
             <label for="timerLength">Timer Length (Minutes):</label>
             <input id="timerLength" type="number" autocomplete="off" style='font-size: 1em; max-width: 200px;'/>
+            <p id = "timerLengthError">*</p>
         </div>
         <div id = "inputField">
             <label for="grid">Gird Lines:</label>
@@ -60,16 +67,19 @@
         <div id = "inputField">
             <label for="maxBrush">Max Brush Size (px):</label>
             <input id="maxBrush" type="number" autocomplete="off" style='font-size: 1em; max-width: 200px;'/>
+            <p id = "maxBrushError">*</p>
         </div>
         <div id = "inputField">
             <label for="minBrush">Min Brush Size (px):</label>
             <input id="minBrush" type="number" autocomplete="off" style='font-size: 1em; max-width: 200px;'/>
+            <p id = "minBrushError">*</p>
         </div>
         <div id = "inputField">
             <label for="defaultBrush">Default Brush Size (0-100%):</label>
             <input id="defaultBrush" type="number" autocomplete="off" style='font-size: 1em; max-width: 200px;'/>
+            <p id = "defaultBrushError">*</p>
         </div>
-        <button id="changePasscode" style='font-size: 1em; width: fit-content;' onclick="">Change Passcode</button>
+        <button id="changePasscode" style='font-size: 1em; width: fit-content; color: darkred' onclick="">Change Passcode</button>
     </div>
     <button id="home" style='font-size: 2em;'>Save and Exit</button>
 </body>
@@ -97,23 +107,34 @@
 
         if (!isNumeric(timerLengthMinutes)) {
             document.getElementById("timerLength").value = "";
+            document.getElementById("timerLengthError").style.display = "inline-block";
             error = true;
+        } else {
+            document.getElementById("timerLengthError").style.display = "none";
         }
+
         if (!isNumeric(maxBrushSize)) {
             document.getElementById("maxBrush").value = "";
+            document.getElementById("maxBrushError").style.display = "inline-block";
             error = true;
+        } else {
+            document.getElementById("maxBrushError").style.display = "none";
         }
+        
         if (!isNumeric(minBrushSize)) {
             document.getElementById("minBrush").value = "";
+            document.getElementById("minBrushError").style.display = "inline-block";
             error = true;
+        } else {
+            document.getElementById("minBrushError").style.display = "none";
         }
-        if (!isNumeric(defaultBrushPercentage)) {
+        
+        if (!isNumeric(defaultBrushPercentage) || parseInt(defaultBrushPercentage) > 100) {
             document.getElementById("defaultBrush").value = "";
+            document.getElementById("defaultBrushError").style.display = "inline-block";
             error = true;
-        }
-        if (parseInt(defaultBrushPercentage) > 100) {
-            document.getElementById("defaultBrush").value = "";
-            error = true;
+        } else {
+            document.getElementById("defaultBrushError").style.display = "none";
         }
 
         if (!error) {
