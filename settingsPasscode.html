@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<style>
+    body {
+        width: 100%;
+        height: 100%;
+        margin: 0px;
+        padding: 0px;
+        overflow: hidden;
+        user-select: none;
+        font-family: 'Times New Roman', Times, serif;
+        -webkit-user-select: none;
+        -webkit-touch-callout: none;
+        text-align: center;
+    }
+    #container {
+        display: flex;
+        flex-direction: column; 
+        justify-content: center;    
+        font-size: 2em;
+    }
+    #inputField {
+        margin-top: 50px;
+        display: inline-block;
+    }
+    button {
+        font-family: 'Times New Roman', Times, serif;
+        color: black;
+        outline: 1px solid black;
+        appearance: auto;
+        -webkit-appearance: none;
+    }
+    #home {
+        position: absolute;
+        right: 10px;
+        bottom: 10px;
+        display: none;
+    }
+</style>
+
+<body>
+    <div id = "container">
+        <h2>Area Filling Accuracy Evaluation Tool</h2>
+        <p>Please enter a procter passcode to adjust settings.</p>
+        <div id = "inputField">
+            <label for="procterPassword">Procter Passcode:</label>
+            <input id="procterPassword" type="password" required autocomplete="off" style='font-size: 1em;'/>
+            <button id="submit" style='font-size: 1em;'>Submit</button>
+        </div>
+    </div>
+</body>
+
+<script>
+    document.getElementById("submit").onclick = () => {
+        try {
+            if (document.getElementById("procterPassword").value == document.getElementsByName("viewport")[0].id) {
+                location.href = 'settings.html';
+            }
+        } catch (error) {
+            location.href = 'crash';
+        }
+    };
+</script>

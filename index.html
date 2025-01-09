@@ -29,7 +29,7 @@
 
 <script>
 //Constant Declarations----------------------------------------------------------------------------
-const VER = "2.4.7";
+const VER = "2.4.8";
 
 const W = window.innerWidth;
 const H = window.innerHeight;
@@ -51,7 +51,7 @@ var buttons = [];
 var practice = new Button(W/2-160, 290, 320, 70, () => {sessionStorage.isTest = JSON.stringify("false"); location.href = "test.html";}, 'Practice', 0, false, false);
 var test = new Button(W/2-160, 400, 320, 70, () => {location.href = "beginPasscode.html";}, 'Begin Test', 0, false, false);
 // var info = new Button(W/2-160, 480, 320, 70, () => {}, 'Info', 0, false, false);
-var settings = new Button(W-80, H-80, 70, 70, () => {location.href = "settings.html";}, '\uF013', 0, false, false);
+var settings = new Button(W-80, H-80, 70, 70, () => {location.href = "settingsPasscode.html";}, '\uF013', 0, false, false);
 
 
 //TouchStart Listener------------------------------------------------------------------------------
