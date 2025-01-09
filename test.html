@@ -55,18 +55,20 @@ const THETA_RESOLUTION = 0.01;
 const FIGURE_SCALE = 0.8*H;
 const SCORE_AREA_SIZE = 4000; //CANNOT EXCEED 4096px by 4096px DUE TO iOS/SAFARI LIMITATIONS
 
-const MAX_BRUSH_SIZE = 5/768*H; //5 pixels on 1024x768
-const MIN_BRUSH_SIZE = 1/768*H;
+const MAX_BRUSH_SIZE = parseInt(JSON.parse(localStorage.maxBrushSize))/768*H; //5 pixels on 1024x768
+const MIN_BRUSH_SIZE = parseInt(JSON.parse(localStorage.minBrushSize))/768*H;
 const UI_BRUSH_RAD = 18;
 const BRUSH_DELTA = (MAX_BRUSH_SIZE-MIN_BRUSH_SIZE)/6;
 const DRAW_COLOR = "#4F3564";
 const ERASE_COLOR = "#FFFFFF";
 
+const RENDER_GRID = JSON.parse(localStorage.grid) == "true";
+
 const SLIDER_Y1 = 110;
 const SLIDER_Y2 = 280;
 
 var COMP_TESTING = false;
-var isTest = JSON.parse(sessionStorage.isTest) == "true";
+const isTest = JSON.parse(sessionStorage.isTest) == "true";
 
 //Canvas Setup and Styling-------------------------------------------------------------------------
 var gridCanvas = document.getElementById('gridCanvas')
@@ -114,13 +116,13 @@ var panX;
 var panY;
 var dynamicGridSize;
 
-var brushSize = MAX_BRUSH_SIZE;
+var brushSize = lerp(MIN_BRUSH_SIZE, MAX_BRUSH_SIZE, parseFloat(JSON.parse(localStorage.minBrushSize))/100);
 var currentStroke;
 var lastStrokeX;
 var lastStrokeY;
 var brushColor = DRAW_COLOR;
 
-var maxTimeSeconds = 0.5*60;
+var maxTimeSeconds = parseFloat(JSON.parse(localStorage.timerLengthMinutes))*60;
 var timerSeconds = maxTimeSeconds;
 var activePrompt = "none";
 if (isTest) {activePrompt = "start";}
@@ -311,6 +313,9 @@ mainRedraw();
 
 //Drawing the content of the grid canvas-----------------------------------------------------------
 function gridCtxRedraw() {
+    if (!RENDER_GRID) {
+        return;
+    }
     gridCtx.clearRect(0, 0, W, H);
 
     //Drawing only the gridlines that are visible on screen
