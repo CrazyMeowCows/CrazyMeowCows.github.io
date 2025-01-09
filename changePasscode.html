@@ -10,7 +10,8 @@
         font-family: 'Times New Roman', Times, serif;
         -webkit-user-select: none;
         -webkit-touch-callout: none;
-        text-align: center;
+        text-align: left;
+        margin-left: 20px;
     }
     #container {
         display: flex;
@@ -19,7 +20,7 @@
         font-size: 2em;
     }
     #inputField {
-        margin-top: 50px;
+        margin-bottom: 15px;
         display: inline-block;
     }
     button {
@@ -29,7 +30,7 @@
         appearance: auto;
         -webkit-appearance: none;
     }
-    #home {
+    #settings {
         position: absolute;
         right: 10px;
         bottom: 10px;
@@ -39,23 +40,28 @@
 <body>
     <div id = "container">
         <h2>Area Filling Accuracy Evaluation Tool</h2>
-        <p>Please enter a procter passcode to adjust settings.</p>
+        <p>Please enter the admin passcode to set a new procter passcode.</p>
+        <br></br>
         <div id = "inputField">
-            <label for="procterPassword">Procter Passcode:</label>
-            <input id="procterPassword" type="password" required autocomplete="off" style='font-size: 1em;'/>
-            <button id="submit" style='font-size: 1em;'>Submit</button>
+            <label for="adminPassword">Admin Passcode:</label>
+            <input id="adminPassword" type="password" required autocomplete="off" style='font-size: 1em;'/>
         </div>
+        <div id = "inputField">
+            <label for="procterPassword">New Procter Passcode:</label>
+            <input id="procterPassword" type="text" required autocomplete="off" style='font-size: 1em;'/>
+        </div>
+        <button id="submit" style='font-size: 1em; width: fit-content;'>Submit</button>
     </div>
-    <button id="home" style='font-size: 2em;' onclick="location.href = 'index.html';">Return To Homepage</button>
+    <button id="settings" style='font-size: 2em;' onclick="location.href = 'settings.html';">Return To Settings</button>
 </body>
 
 <script>
     document.getElementById("submit").onclick = () => {
         try {
-            if (document.getElementById("procterPassword").value == document.getElementsByName("viewport")[0].id.split("|")[0]) {
-                location.href = 'settings.html';
+            if (document.getElementById("adminPassword").value == document.getElementsByName("viewport")[0].id.split("|")[1]) {
+                // location.href = 'settings.html';
             } else {
-                document.getElementById("procterPassword").value = "";
+                document.getElementById("adminPassword").value = "";
             }
         } catch (error) {
             location.href = 'crash';

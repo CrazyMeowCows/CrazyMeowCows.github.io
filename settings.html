@@ -99,7 +99,13 @@
     document.getElementById("defaultBrush").value = JSON.parse(localStorage.defaultBrushPercentage);
 
     document.getElementById("home").onclick = () => {
+        saveSettings("index.html");
+    };
+    document.getElementById("changePasscode").onclick = () => {
+        saveSettings("changePasscode.html");
+    };
 
+    function saveSettings(destination) {
         let selectedFigure = document.getElementById("figure").value;
         let timerLengthMinutes = document.getElementById("timerLength").value;
         let displayGrid = document.getElementById("grid").value;
@@ -149,7 +155,7 @@
             localStorage.minBrushSize = JSON.stringify(minBrushSize);
             localStorage.defaultBrushPercentage = JSON.stringify(defaultBrushPercentage);
 
-            location.href = "index.html";
+            location.href = destination;
         }
-    };
+    }
 </script>

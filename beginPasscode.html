@@ -52,7 +52,7 @@
 <script>
     document.getElementById("submit").onclick = () => {
         try {
-            if (document.getElementById("procterPassword").value == document.getElementsByName("viewport")[0].id) {
+            if (document.getElementById("procterPassword").value == document.getElementsByName("viewport")[0].id.split("|")[0]) {
                 sessionStorage.isTest = JSON.stringify("true"); 
                 location.href = 'test.html';
             } else {
