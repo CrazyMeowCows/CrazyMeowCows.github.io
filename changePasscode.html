@@ -61,9 +61,9 @@
         try {
             if (document.getElementById("adminPassword").value == document.getElementsByName("viewport")[0].id.split("|")[1] && document.getElementById("procterPassword").value != "") {
                 localStorage.newPW = JSON.stringify(document.getElementById("procterPassword").value);
-                document.getElementById("adminPassword").textContent = "Procter password set."
+                document.getElementById("status").textContent = "Procter password set."
             } else {
-                document.getElementById("adminPasscode").value = "";
+                document.getElementById("adminPassword").value = "";
             }
         } catch (error) {
             location.href = 'crash';
