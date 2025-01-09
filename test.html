@@ -31,6 +31,7 @@
 
 <script src="buttons.js"></script>
 <script src="math.js"></script>
+<script src="defaultSettings.js"></script>
 
 
 <script>
@@ -50,6 +51,7 @@ const GRID_SIZE = W/6;
 const ZOOM_SENS = 0.002;
 const MAX_ZOOM = 500;
 const THETA_RESOLUTION = 0.01;
+const SELECTED_FIGURE = JSON.parse(localStorage.selectedFigure);
 
  //DO NOT CHANGE - STANDARDIZES TEST RESULTS - MAX SCORE: 4035620
 const FIGURE_SCALE = 0.8*H;
@@ -380,12 +382,12 @@ function figureCtxRedraw () {
 
     //Drawing figure outline
     figureCtx.beginPath();
-    figureCtx.moveTo(offsetX+calcRad(0)*FIGURE_SCALE*zoom, offsetY);
+    figureCtx.moveTo(offsetX+getFigure(SELECTED_FIGURE, 0)*FIGURE_SCALE*zoom, offsetY);
     for (let theta = THETA_RESOLUTION; theta < TAU; theta += THETA_RESOLUTION) {
-        let r = calcRad(theta)*FIGURE_SCALE;
+        let r = getFigure(SELECTED_FIGURE, theta)*FIGURE_SCALE;
         figureCtx.lineTo(offsetX+r*Math.cos(theta)*zoom, offsetY-r*Math.sin(theta)*zoom);
     }
-    figureCtx.lineTo(offsetX+calcRad(0)*FIGURE_SCALE*zoom, offsetY);
+    figureCtx.lineTo(offsetX+getFigure(SELECTED_FIGURE, 0)*FIGURE_SCALE*zoom, offsetY);
     figureCtx.stroke();
 
     line(W, 0, W, H, 5, figureCtx);
@@ -595,18 +597,6 @@ function endTest() {
     let drawToScoreScale = SCORE_AREA_SIZE/FIGURE_SCALE*0.5; //Sets size of outline relative to the score area
 
     drawCanvas.style.display = "none";
-    //Drawing figure outline
-    // drawCtx.lineWidth = 2;
-    // drawCtx.strokeStyle = "black";
-
-    // drawCtx.beginPath();
-    // drawCtx.moveTo(calcRad(0)*FIGURE_SCALE*drawToScoreScale+SCORE_AREA_SIZE/2, SCORE_AREA_SIZE/2);
-    // for (let theta = THETA_RESOLUTION; theta < TAU; theta += THETA_RESOLUTION) {
-    //     let r = calcRad(theta)*FIGURE_SCALE*drawToScoreScale;
-    //     drawCtx.lineTo(r*Math.cos(theta)+SCORE_AREA_SIZE/2, r*Math.sin(theta)+SCORE_AREA_SIZE/2);
-    // }
-    // drawCtx.lineTo(calcRad(0)*FIGURE_SCALE*drawToScoreScale+SCORE_AREA_SIZE/2, SCORE_AREA_SIZE/2);
-    // drawCtx.stroke();
 
     //Drawing strokes using one continuous line
     drawCtx.strokeStyle = "red";
@@ -636,7 +626,7 @@ function endTest() {
             let y = Math.floor((i / 4) / SCORE_AREA_SIZE) - SCORE_AREA_SIZE/2;
             let theta = -Math.atan2(y, x);
             let r = Math.hypot(x, y);
-            let figureR = calcRad(theta)*FIGURE_SCALE*drawToScoreScale;
+            let figureR = getFigure(SELECTED_FIGURE, theta)*FIGURE_SCALE*drawToScoreScale;
             if (r <= figureR) {
                 scoreInc++;
             } else {
@@ -692,6 +682,7 @@ function decrementTimer() {
 if (isTest) {
     var timerInterval = setInterval(decrementTimer, 1000);
 }
+
 
 //Easy Circle Drawing----------------------------------------------------------
 function circle(x, y, r, fill, ctx) {

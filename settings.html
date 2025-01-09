@@ -49,7 +49,6 @@
             <select name="figure" id="figure" style='font-size: 1em;'>
                 <option value="1">Figure 1</option>
                 <option value="2">Figure 2</option>
-                <option value="3">Figure 3</option>
             </select>
         </div>
         <div id = "inputField">
@@ -128,7 +127,7 @@
         } else {
             document.getElementById("minBrushError").style.display = "none";
         }
-        
+
         if (!isNumeric(defaultBrushPercentage) || parseInt(defaultBrushPercentage) > 100) {
             document.getElementById("defaultBrush").value = "";
             document.getElementById("defaultBrushError").style.display = "inline-block";
