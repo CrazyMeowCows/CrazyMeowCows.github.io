@@ -12,3 +12,8 @@ function clamp(x, min, max) {
 function lerp(a, b, alpha) {
     return a + clamp(alpha, 0, 1)*(b-a);
 }
+
+//Return true if given number/string is a positive whole number
+function isNumeric(value) {
+    return /^\d+$/.test(value);
+}

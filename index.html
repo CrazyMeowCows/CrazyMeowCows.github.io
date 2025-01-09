@@ -26,6 +26,7 @@
 <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css">
 
 <script src="buttons.js"></script>
+<script src="defaultSettings.js"></script>
 
 <script>
 //Constant Declarations----------------------------------------------------------------------------
@@ -52,6 +53,17 @@ var practice = new Button(W/2-160, 290, 320, 70, () => {sessionStorage.isTest = 
 var test = new Button(W/2-160, 400, 320, 70, () => {location.href = "beginPasscode.html";}, 'Begin Test', 0, false, false);
 // var info = new Button(W/2-160, 480, 320, 70, () => {}, 'Info', 0, false, false);
 var settings = new Button(W-80, H-80, 70, 70, () => {location.href = "settingsPasscode.html";}, '\uF013', 0, false, false);
+
+
+//Initialize Settings------------------------------------------------------------------------------
+if (localStorage.length == 0) {
+    localStorage.selectedFigure = JSON.stringify(selectedFigure);
+    localStorage.timerLengthMinutes = JSON.stringify(timerLengthMinutes);
+    localStorage.displayGrid = JSON.stringify(displayGrid);
+    localStorage.maxBrushSize = JSON.stringify(maxBrushSize);
+    localStorage.minBrushSize = JSON.stringify(minBrushSize);
+    localStorage.defaultBrushPercentage = JSON.stringify(defaultBrushPercentage);
+}
 
 
 //TouchStart Listener------------------------------------------------------------------------------

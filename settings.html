@@ -58,30 +58,73 @@
             </select>
         </div>
         <div id = "inputField">
-            <label for="timerLength">Max Brush Size (px):</label>
-            <input id="timerLength" type="number" autocomplete="off" style='font-size: 1em; max-width: 200px;'/>
+            <label for="maxBrush">Max Brush Size (px):</label>
+            <input id="maxBrush" type="number" autocomplete="off" style='font-size: 1em; max-width: 200px;'/>
         </div>
         <div id = "inputField">
-            <label for="timerLength">Min Brush Size (px):</label>
-            <input id="timerLength" type="number" autocomplete="off" style='font-size: 1em; max-width: 200px;'/>
+            <label for="minBrush">Min Brush Size (px):</label>
+            <input id="minBrush" type="number" autocomplete="off" style='font-size: 1em; max-width: 200px;'/>
         </div>
         <div id = "inputField">
-            <label for="timerLength">Default Brush Size (0-100%):</label>
-            <input id="timerLength" type="number" autocomplete="off" style='font-size: 1em; max-width: 200px;'/>
+            <label for="defaultBrush">Default Brush Size (0-100%):</label>
+            <input id="defaultBrush" type="number" autocomplete="off" style='font-size: 1em; max-width: 200px;'/>
         </div>
         <button id="changePasscode" style='font-size: 1em; width: fit-content;' onclick="">Change Passcode</button>
     </div>
-    <button id="home" style='font-size: 2em;' onclick="location.href = 'index.html';">Return To Homepage</button>
+    <button id="home" style='font-size: 2em;'>Save and Exit</button>
 </body>
 
+<script src="math.js"></script>
+
 <script>
-    document.getElementById("timerSubmit").onclick = () => {
-        alert(document.getElementById("timerLength").value)
-    };
-    document.getElementById("figureSubmit").onclick = () => {
-        alert(document.getElementById("figure").value)
-    };
-    document.getElementById("gridSubmit").onclick = () => {
-        alert(document.getElementById("figure").value)
+    document.getElementById("figure").value = JSON.parse(localStorage.selectedFigure);
+    document.getElementById("timerLength").value = JSON.parse(localStorage.timerLengthMinutes);
+    document.getElementById("grid").value = JSON.parse(localStorage.displayGrid);
+    document.getElementById("maxBrush").value = JSON.parse(localStorage.maxBrushSize);
+    document.getElementById("minBrush").value = JSON.parse(localStorage.minBrushSize);
+    document.getElementById("defaultBrush").value = JSON.parse(localStorage.defaultBrushPercentage);
+
+    document.getElementById("home").onclick = () => {
+
+        let selectedFigure = document.getElementById("figure").value;
+        let timerLengthMinutes = document.getElementById("timerLength").value;
+        let displayGrid = document.getElementById("grid").value;
+        let maxBrushSize = document.getElementById("maxBrush").value;
+        let minBrushSize = document.getElementById("minBrush").value;
+        let defaultBrushPercentage = document.getElementById("defaultBrush").value;
+
+        let error = false;
+
+        if (!isNumeric(timerLengthMinutes)) {
+            document.getElementById("timerLength").value = "";
+            error = true;
+        }
+        if (!isNumeric(maxBrushSize)) {
+            document.getElementById("maxBrush").value = "";
+            error = true;
+        }
+        if (!isNumeric(minBrushSize)) {
+            document.getElementById("minBrush").value = "";
+            error = true;
+        }
+        if (!isNumeric(defaultBrushPercentage)) {
+            document.getElementById("defaultBrush").value = "";
+            error = true;
+        }
+        if (parseInt(defaultBrushPercentage) > 100) {
+            document.getElementById("defaultBrush").value = "";
+            error = true;
+        }
+
+        if (!error) {
+            localStorage.selectedFigure = JSON.stringify(selectedFigure);
+            localStorage.timerLengthMinutes = JSON.stringify(timerLengthMinutes);
+            localStorage.displayGrid = JSON.stringify(displayGrid);
+            localStorage.maxBrushSize = JSON.stringify(maxBrushSize);
+            localStorage.minBrushSize = JSON.stringify(minBrushSize);
+            localStorage.defaultBrushPercentage = JSON.stringify(defaultBrushPercentage);
+
+            location.href = "index.html";
+        }
     };
 </script>
