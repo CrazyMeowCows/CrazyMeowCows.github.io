@@ -49,12 +49,16 @@
     </div>
 </body>
 
-<script src="obfuscated.js"></script>
 <script>
     document.getElementById("submit").onclick = () => {
-        if (document.getElementById("procterPassword").value == getPassword()) {
-            sessionStorage.isTest = JSON.stringify("true"); 
-            location.href = 'test.html';
+        try {
+            if (document.getElementById("procterPassword").value == document.getElementsByName("viewport")[0].id) {
+                sessionStorage.isTest = JSON.stringify("true"); 
+                location.href = 'test.html';
+            }
+        } catch (error) {
+            sessionStorage.isTest = JSON.stringify("false"); 
+            location.href = 'index.html';
         }
     };
 </script>
