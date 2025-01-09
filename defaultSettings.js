@@ -14,6 +14,7 @@ function getFigure (selectedFigure, theta) {
     }
 }
 
+//ALSO ADD FIGURE IN SETTINGS PAGE
 function figure1 (t) {
     return (1-1/6*(Math.sin(4*t+PI/2))-1/200*Math.pow(Math.cos(30*t), 2)*Math.sin(t)*Math.tan(t/2))/ROOT_PI
 }

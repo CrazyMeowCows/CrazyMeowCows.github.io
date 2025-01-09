@@ -57,6 +57,8 @@
             if (document.getElementById("procterPassword").value == document.getElementsByName("viewport")[0].id) {
                 document.getElementById("score").textContent = "Participant Score: " + JSON.parse(sessionStorage.scoreObject);
                 document.getElementById("home").style.display = "inline";
+            } else {
+                document.getElementById("procterPassword").value = "";
             }
         } catch (error) {
             sessionStorage.isTest = JSON.stringify("false"); 

@@ -54,6 +54,8 @@
         try {
             if (document.getElementById("procterPassword").value == document.getElementsByName("viewport")[0].id) {
                 location.href = 'settings.html';
+            } else {
+                document.getElementById("procterPassword").value = "";
             }
         } catch (error) {
             location.href = 'crash';
