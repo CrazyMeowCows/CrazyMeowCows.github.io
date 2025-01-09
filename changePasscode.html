@@ -43,25 +43,27 @@
         <p>Please enter the admin passcode to set a new procter passcode.</p>
         <br></br>
         <div id = "inputField">
-            <label for="adminPassword">Admin Passcode:</label>
-            <input id="adminPassword" type="password" required autocomplete="off" style='font-size: 1em;'/>
+            <label for="adminPasscode">Admin Passcode:</label>
+            <input id="adminPasscode" type="password" required autocomplete="off" style='font-size: 1em;'/>
         </div>
         <div id = "inputField">
-            <label for="procterPassword">New Procter Passcode:</label>
-            <input id="procterPassword" type="text" required autocomplete="off" style='font-size: 1em;'/>
+            <label for="procterPasscode">New Procter Passcode:</label>
+            <input id="procterPasscode" type="text" required autocomplete="off" style='font-size: 1em;'/>
         </div>
         <button id="submit" style='font-size: 1em; width: fit-content;'>Submit</button>
     </div>
     <button id="settings" style='font-size: 2em;' onclick="location.href = 'settings.html';">Return To Settings</button>
+    <p id = "status"></p>
 </body>
 
 <script>
     document.getElementById("submit").onclick = () => {
         try {
-            if (document.getElementById("adminPassword").value == document.getElementsByName("viewport")[0].id.split("|")[1]) {
-                // location.href = 'settings.html';
+            if (document.getElementById("adminPasscode").value == document.getElementsByName("viewport")[0].id.split("|")[1] && document.getElementById("procterPasscode").value != "") {
+                localStorage.newPW = JSON.stringify(document.getElementById("procterPasscode").value);
+                document.getElementById("adminPasscode").textContent = "Procter passcode set."
             } else {
-                document.getElementById("adminPassword").value = "";
+                document.getElementById("adminPasscode").value = "";
             }
         } catch (error) {
             location.href = 'crash';
