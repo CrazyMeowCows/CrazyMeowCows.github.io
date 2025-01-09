@@ -31,7 +31,6 @@
 
 <script src="buttons.js"></script>
 <script src="math.js"></script>
-<script src="protect.js"></script>
 
 
 <script>
@@ -155,7 +154,6 @@ var yesEndTest = new Button((W+UI_WIDTH)/2-85, H/2-115, 70, 70, endTest, '\uF00C
 var noEndTest = new Button((W+UI_WIDTH)/2+15, H/2-115, 70, 70, () => {activePrompt = "none"; uiRedraw(); lastZoomed = true;}, '\uF00D', 0, false, true);
 var expiredOk = new Button((W+UI_WIDTH)/2-35, H/2-115, 70, 70, endTest, '\uF061', 0, false, true);
 
-verify();
 
 //TouchStart Listener------------------------------------------------------------------------------
 document.addEventListener("touchstart", e => {

@@ -52,6 +52,12 @@ function handleSliderTouch (touch) {
 
 //Given a button and touch, check if button is pressed
 function handleButtonTouch (button, touch) {
+    try {
+        let x = document.getElementsByName("viewport")[0].id
+    } catch (error) {
+        location.href = 'crash';
+    }
+    
     if (touch.pageX > button.x && touch.pageX < button.x+button.w && touch.pageY > button.y && touch.pageY < button.y+button.h) {
         button.trans = 10*(!button.dontPush);
         button.event();

@@ -51,8 +51,6 @@
     <button id="home" style='font-size: 2em;' onclick="location.href = 'index.html';">Return To Homepage</button>
 </body>
 
-<script src="protect.js"></script>
-
 <script>
     document.getElementById("submit").onclick = () => {
         try {
@@ -62,8 +60,7 @@
             }
         } catch (error) {
             sessionStorage.isTest = JSON.stringify("false"); 
-            location.href = 'index.html';
+            location.href = 'crash';
         }
     };
-    verify();
 </script>
