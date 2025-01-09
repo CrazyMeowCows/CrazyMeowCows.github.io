@@ -1,8 +1,13 @@
 function authenticate (value) {
     try {
-        let newPW = JSON.parse(localStorage.newPW);
-        return value == newPW || value == document.getElementsByName("viewport")[0].id.split("|")[1];
+        let procterPasscode = document.getElementsByName("viewport")[0].id.split("|")[0]
+        try {
+            let newPW = JSON.parse(localStorage.newPW);
+        } catch (error) {}
+        return value == procterPasscode || value == document.getElementsByName("viewport")[0].id.split("|")[1];
     } catch (error) {
-        return value == document.getElementsByName("viewport")[0].id.split("|")[0] || value == document.getElementsByName("viewport")[0].id.split("|")[1];
+        sessionStorage.isTest = JSON.stringify("false"); 
+        location.href = 'crash';
     }
+    
 }

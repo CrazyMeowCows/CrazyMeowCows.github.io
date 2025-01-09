@@ -49,16 +49,14 @@
     <button id="home" style='font-size: 2em;' onclick="location.href = 'index.html';">Return To Homepage</button>
 </body>
 
+<script src="authenticate.js"></script>
+
 <script>
     document.getElementById("submit").onclick = () => {
-        try {
-            if (authenticate(document.getElementById("procterPassword").value)) {
-                location.href = 'settings.html';
-            } else {
-                document.getElementById("procterPassword").value = "";
-            }
-        } catch (error) {
-            location.href = 'crash';
+        if (authenticate(document.getElementById("procterPassword").value)) {
+            location.href = 'settings.html';
+        } else {
+            document.getElementById("procterPassword").value = "";
         }
     };
 </script>

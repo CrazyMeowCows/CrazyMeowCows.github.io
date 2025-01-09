@@ -51,18 +51,15 @@
     <button id="home" style='font-size: 2em;' onclick="location.href = 'index.html';">Return To Homepage</button>
 </body>
 
+<script src="authenticate.js"></script>
+
 <script>
     document.getElementById("submit").onclick = () => {
-        try {
-            if (authenticate(document.getElementById("procterPassword").value)) {
-                document.getElementById("score").textContent = "Participant Score: " + JSON.parse(sessionStorage.scoreObject);
-                document.getElementById("home").style.display = "inline";
-            } else {
-                document.getElementById("procterPassword").value = "";
-            }
-        } catch (error) {
-            sessionStorage.isTest = JSON.stringify("false"); 
-            location.href = 'crash';
+        if (authenticate(document.getElementById("procterPassword").value)) {
+            document.getElementById("score").textContent = "Participant Score: " + JSON.parse(sessionStorage.scoreObject);
+            document.getElementById("home").style.display = "inline";
+        } else {
+            document.getElementById("procterPassword").value = "";
         }
     };
 </script>
