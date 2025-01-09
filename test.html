@@ -116,7 +116,7 @@ var panX;
 var panY;
 var dynamicGridSize;
 
-var brushSize = lerp(MIN_BRUSH_SIZE, MAX_BRUSH_SIZE, parseFloat(JSON.parse(localStorage.minBrushSize))/100);
+var brushSize = lerp(MIN_BRUSH_SIZE, MAX_BRUSH_SIZE, parseFloat(JSON.parse(localStorage.defaultBrushPercentage))/100);
 var currentStroke;
 var lastStrokeX;
 var lastStrokeY;
@@ -313,10 +313,10 @@ mainRedraw();
 
 //Drawing the content of the grid canvas-----------------------------------------------------------
 function gridCtxRedraw() {
+    gridCtx.clearRect(0, 0, W, H);
     if (!RENDER_GRID) {
         return;
     }
-    gridCtx.clearRect(0, 0, W, H);
 
     //Drawing only the gridlines that are visible on screen
     let subGridSize = dynamicGridSize/4;
