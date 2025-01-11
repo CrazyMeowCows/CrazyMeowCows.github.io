@@ -283,10 +283,10 @@ document.addEventListener("touchmove", e => {
         handleSliderTouch(touch);
         return;
     }
-    if (touches.length <= 1 && currentStroke == undefined) {
-        return;
-    }
     if (drawWithFinger) {
+        if (touches.length <= 1 && currentStroke == undefined) {
+            return;
+        }
         if (touches.length == 1 && currentStroke != undefined && touchType == 1) { //Stylus
             gridCtxRedraw();
             
@@ -323,6 +323,9 @@ document.addEventListener("touchmove", e => {
             mainRedraw();
         }
     } else {
+        if (touch.touchType == "stylus" && currentStroke == undefined) {
+            return;
+        }
         if (touch.touchType == "stylus" && currentStroke != undefined) { //Stylus
             gridCtxRedraw();
             
