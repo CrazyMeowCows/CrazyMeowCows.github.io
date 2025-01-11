@@ -122,6 +122,7 @@ var brushSize = lerp(MIN_BRUSH_SIZE, MAX_BRUSH_SIZE, parseFloat(JSON.parse(local
 var currentStroke;
 var lastStrokeX;
 var lastStrokeY;
+var touchType = 0;
 var brushColor = DRAW_COLOR;
 
 var maxTimeSeconds = parseFloat(JSON.parse(localStorage.timerLengthMinutes))*60;
@@ -220,6 +221,8 @@ document.addEventListener("touchstart", e => {
     //     zoomY = (touches[0].pageY + touches[1].pageY)/2;
     // }
     if (touches.length == 1) { //Stylus or 1 Finger Touch
+        touchType = 1;
+
         currentStroke = new PenStroke(touch.pageX, touch.pageY, brushColor);
         strokes.push(currentStroke);
 
@@ -236,6 +239,8 @@ document.addEventListener("touchstart", e => {
         circle(touch.pageX, touch.pageY, brushSize, true, drawCtx);
     } 
     else if (touches.length >= 2) { //2 Finger Pan/Zoom
+        touchType = 2;
+
         let centerX = (touches[0].pageX + touches[1].pageX)/2;
         let centerY = (touches[0].pageY + touches[1].pageY)/2;
 
@@ -266,7 +271,7 @@ document.addEventListener("touchmove", e => {
     if (touches.length <= 1 && currentStroke == undefined) {
         return;
     }
-    if (touches.length == 1 && currentStroke != undefined) { //Stylus
+    if (touches.length == 1 && currentStroke != undefined && touchType == 1) { //Stylus
         gridCtxRedraw();
         
         line(lastStrokeX, lastStrokeY, touchX, touchY, brushSize*2, drawCtx);
@@ -278,7 +283,7 @@ document.addEventListener("touchmove", e => {
         }
         return;
     }
-    if (touches.length >= 2) { //2 Finger Pan/Zoom
+    if (touches.length >= 2 && touchType == 2) { //2 Finger Pan/Zoom
         let centerX = (touches[0].pageX + touches[1].pageX)/2;
         let centerY = (touches[0].pageY + touches[1].pageY)/2;
 
@@ -306,6 +311,7 @@ document.addEventListener("touchmove", e => {
 //TouchEnd Listener--------------------------------------------------------------------------------
 document.addEventListener("touchend", e => { //Clear the Eraser Outline
     gridCtxRedraw();
+    touchType = 0;
 });
 
 //Wheel Listener-----------------------------------------------------------------------------------
