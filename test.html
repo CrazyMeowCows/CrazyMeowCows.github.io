@@ -531,6 +531,11 @@ function uiRedraw () {
     circle(UI_CENTER, sliderHeight, brushSize/MAX_BRUSH_SIZE*UI_BRUSH_RAD+5, true, uiCtx);
     uiCtx.stroke();
 
+    uiCtx.fillStyle = "white";
+    uiCtx.beginPath();
+    uiCtx.roundRect(touchModePrompt.x, touchModePrompt.y, touchModePrompt.w, touchModePrompt.h, [10]);
+    uiCtx.fill();
+
     //Draw icon buttons
     uiCtx.lineWidth = 1.5;
     uiCtx.fillStyle = "#4F3564";
