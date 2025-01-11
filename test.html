@@ -278,7 +278,7 @@ document.addEventListener("touchmove", e => {
         }
         return;
     }
-    if (touches.length <= 1) { //2 Finger Pan/Zoom
+    if (touches.length >= 2) { //2 Finger Pan/Zoom
         let centerX = (touches[0].pageX + touches[1].pageX)/2;
         let centerY = (touches[0].pageY + touches[1].pageY)/2;
 
