@@ -154,7 +154,7 @@ var brushMinus = new Button(15+W, 310, 70, 70, () => {brushSize = Math.max(brush
 var pencil = new Button(15+W, H-250, 70, 70, () => {brushColor = DRAW_COLOR}, '\uF040', 0, true, false);
 var eraser = new Button(15+W, pencil.y+70, 70, 70, () => {brushColor = ERASE_COLOR}, '\uF12d', 0, true, false);
 var resetZoom = new Button(15+W, H-80, 70, 70, () => {zoomOut(true)}, '\uF066', 0, false, false);
-var touchModePrompt = new Button(10, 10, 70, 70, () => {activePrompt = "touch"; uiRedraw();}, '\uF25A', 0, false, false);
+var touchModePrompt = new Button(10, 10, 70, 70, () => {activePrompt = "touch"; uiRedraw();}, '\uF25A', 0, false, !isTest);
 var touchModeToggle = new Button((W+UI_WIDTH)/2-35, H/2-115, 70, 70, () => {drawWithFinger = !drawWithFinger; uiRedraw();}, '\uF0DC', 0, false, true);
 var touchModeExit = new Button((W+UI_WIDTH)/2+170, H/2-185, 70, 70, () => {activePrompt = "none"; uiRedraw(); lastZoomed = true;}, '\uF00D', 0, false, true);
 
