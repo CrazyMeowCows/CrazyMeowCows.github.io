@@ -194,7 +194,32 @@ document.addEventListener("touchstart", e => {
         uiRedraw();
         return;
     }
-    if (touch.touchType == "stylus") { //Stylus
+    // if (touch.touchType == "stylus") { //Stylus
+    //     currentStroke = new PenStroke(touch.pageX, touch.pageY, brushColor);
+    //     strokes.push(currentStroke);
+
+    //     drawCtx.fillStyle = brushColor;
+    //     drawCtx.strokeStyle = brushColor;
+    //     if (brushColor == ERASE_COLOR) {
+    //         drawCtx.globalCompositeOperation = "destination-out";
+    //         gridCtx.lineWidth = 1.5;
+    //         circle(touchX, touchY, brushSize, false, gridCtx);
+    //     } else {
+    //         drawCtx.globalCompositeOperation = "source-over";
+    //     }
+
+    //     circle(touch.pageX, touch.pageY, brushSize, true, drawCtx);
+    // } 
+    // else if (touches.length <= 1) { //Single Finger Pan
+    //     panX = touch.pageX;
+    //     panY = touch.pageY;
+    // } 
+    // else { //Multi finger zoom
+    //     zoomGestureDist = Math.hypot(touches[0].pageX - touches[1].pageX, touches[0].pageY - touches[1].pageY);
+    //     zoomX = (touches[0].pageX + touches[1].pageX)/2;
+    //     zoomY = (touches[0].pageY + touches[1].pageY)/2;
+    // }
+    if (touches.length == 1) { //Stylus or 1 Finger Touch
         currentStroke = new PenStroke(touch.pageX, touch.pageY, brushColor);
         strokes.push(currentStroke);
 
@@ -210,14 +235,16 @@ document.addEventListener("touchstart", e => {
 
         circle(touch.pageX, touch.pageY, brushSize, true, drawCtx);
     } 
-    else if (touches.length <= 1) { //Single Finger Pan
-        panX = touch.pageX;
-        panY = touch.pageY;
-    } 
-    else { //Multi finger zoom
+    else if (touches.length >= 2) { //2 Finger Pan/Zoom
+        let centerX = (touches[0].pageX + touches[1].pageX)/2;
+        let centerY = (touches[0].pageY + touches[1].pageY)/2;
+
+        panX = centerX;
+        panY = centerY;
+
         zoomGestureDist = Math.hypot(touches[0].pageX - touches[1].pageX, touches[0].pageY - touches[1].pageY);
-        zoomX = (touches[0].pageX + touches[1].pageX)/2;
-        zoomY = (touches[0].pageY + touches[1].pageY)/2;
+        zoomX = centerX;
+        zoomY = centerY;
     }
 })
 
@@ -236,10 +263,10 @@ document.addEventListener("touchmove", e => {
         handleSliderTouch(touch);
         return;
     }
-    if (touch.touchType == "stylus" && currentStroke == undefined) {
+    if (touches.length <= 1 && currentStroke == undefined) {
         return;
     }
-    if (touch.touchType == "stylus" && currentStroke != undefined) { //Stylus
+    if (touches.length == 1 && currentStroke != undefined) { //Stylus
         gridCtxRedraw();
         
         line(lastStrokeX, lastStrokeY, touchX, touchY, brushSize*2, drawCtx);
@@ -251,27 +278,27 @@ document.addEventListener("touchmove", e => {
         }
         return;
     }
-    if (touches.length <= 1) { //Single Finger Pan
+    if (touches.length <= 1) { //2 Finger Pan/Zoom
+        let centerX = (touches[0].pageX + touches[1].pageX)/2;
+        let centerY = (touches[0].pageY + touches[1].pageY)/2;
+
         if (lastZoomed) {
-            panX = touchX;
-            panY = touchY;
+            panX = centerX;
+            panY = centerY;
             lastZoomed = false
         }
 
-        offsetX += touchX-panX;
-        offsetY += touchY-panY;
+        offsetX += centerX-panX;
+        offsetY += centerY-panY;
 
-        panX = touchX;
-        panY = touchY;
+        panX = centerX;
+        panY = centerY;
 
-        mainRedraw();
-    } 
-    else if (touches.length > 1) { //Multi finger zoom
         let newZoomDistance = Math.hypot(touches[0].pageX-touches[1].pageX, touches[0].pageY-touches[1].pageY);
         zoom = clamp(zoom - (zoomGestureDist-newZoomDistance)*ZOOM_SENS*Math.abs(zoom), 1, MAX_ZOOM);
         zoomGestureDist = newZoomDistance;
 
-        lastZoomed = true;
+        // lastZoomed = true;
         mainRedraw();
     }
 })
