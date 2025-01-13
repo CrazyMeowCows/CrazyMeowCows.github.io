@@ -32,8 +32,8 @@
 //Constant Declarations----------------------------------------------------------------------------
 const VER = "2.5.6";
 
-const W = window.innerWidth;
-const H = window.innerHeight;
+const W = screen.height;
+const H = screen.width;
 
 const YEAR = new Date().getFullYear();
 
@@ -98,8 +98,6 @@ function redraw() {
     ctx.font = 'normal 500 65px Times New Roman';
     ctx.fillText("Area Filling", W/2, 150);
     ctx.fillText("Accuracy Evaluation Tool", W/2, 220);
-
-    ctx.fillText(":3 " + document.documentElement.clientHeight + "| "+screen.width+"|"+window.innerHeight, W/2, 600);
 
     //Draw icon buttons
     ctx.lineWidth = 1.5;
