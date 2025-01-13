@@ -30,10 +30,10 @@
 
 <script>
 //Constant Declarations----------------------------------------------------------------------------
-const VER = "2.5.6";
+const VER = "2.5.7";
 
 const W = screen.height;
-const H = screen.width;
+const H = screen.width-20;
 
 const YEAR = new Date().getFullYear();
 
@@ -42,7 +42,7 @@ var canvas = document.getElementById('canvas')
 var ctx = canvas.getContext("2d", { willReadFrequently: false, aplha: false });
 
 canvas.width = W;
-canvas.height = H-20;
+canvas.height = H;
 
 ctx.textAlign = "center";
 ctx.textBaseline = "middle";
