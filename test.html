@@ -50,7 +50,7 @@ const UI_CENTER = UI_WIDTH/2+W;
 const GRID_SIZE = W/6;
 const ZOOM_SENS = 0.002;
 const MAX_ZOOM = 500;
-const THETA_RESOLUTION = 0.01;
+const THETA_RESOLUTION = 400;
 const SELECTED_FIGURE = JSON.parse(localStorage.selectedFigure);
 
  //DO NOT CHANGE - STANDARDIZES TEST RESULTS - MAX SCORE: 4035620
@@ -123,7 +123,9 @@ var currentStroke;
 var lastStrokeX;
 var lastStrokeY;
 var drawWithFinger = false;
-var drawMode = "stylus";
+if (!isTest && JSON.parse(localStorage.practiceDrawMode) == "finger") {
+    drawWithFinger = true;
+}
 var brushColor = DRAW_COLOR;
 
 var maxTimeSeconds = parseFloat(JSON.parse(localStorage.timerLengthMinutes))*60;
@@ -154,9 +156,6 @@ var brushMinus = new Button(15+W, 310, 70, 70, () => {brushSize = Math.max(brush
 var pencil = new Button(15+W, H-250, 70, 70, () => {brushColor = DRAW_COLOR}, '\uF040', 0, true, false);
 var eraser = new Button(15+W, pencil.y+70, 70, 70, () => {brushColor = ERASE_COLOR}, '\uF12d', 0, true, false);
 var resetZoom = new Button(15+W, H-80, 70, 70, () => {zoomOut(true)}, '\uF066', 0, false, false);
-var touchModePrompt = new Button(10, 10, 70, 70, () => {activePrompt = "touch"; uiRedraw();}, '\uF25A', 0, false, false);
-var touchModeToggle = new Button((W+UI_WIDTH)/2-35, H/2-115, 70, 70, () => {drawWithFinger = !drawWithFinger; uiRedraw();}, '\uF0DC', 0, false, true);
-var touchModeExit = new Button((W+UI_WIDTH)/2+170, H/2-185, 70, 70, () => {activePrompt = "none"; uiRedraw(); lastZoomed = true;}, '\uF00D', 0, false, true);
 
 var startTest = new Button((W+UI_WIDTH)/2-35, H/2-115, 70, 70, () => {activePrompt = "none"; uiRedraw(); lastZoomed = true;}, '\uF0DA', 0, false, true);
 var yesEndTest = new Button((W+UI_WIDTH)/2-85, H/2-115, 70, 70, endTest, '\uF00C', 0, false, true);
@@ -186,17 +185,9 @@ document.addEventListener("touchstart", e => {
     } else if (activePrompt == "start") {
         handleButtonTouch(startTest, touch);
         return;
-    } else if (activePrompt == "touch") {
-        handleButtonTouch(touchModeToggle, touch);
-        handleButtonTouch(touchModeExit, touch);
-        return;
     }
     if (touchX <= 80 && touchY >= H-80) { //Check for EndTest Button
         endTestPrompt();
-        return;
-    }
-    if (touchX <= 80 && touchY <= 80) { //Check for touchModePrompt Button
-        handleButtonTouch(touchModePrompt, touch);
         return;
     }
     if (touchX > W) { //Touch is on UI Bar
@@ -276,7 +267,7 @@ document.addEventListener("touchmove", e => {
     let touchY = touch.pageY;
     if (COMP_TESTING) {touch.touchType = "stylus";}
 
-    if (activePrompt != "none") { //End Test Promt is Active
+    if (activePrompt != "none") { //Any Promt is Active
         return;
     }
     if (touch.pageX > W) { //Touch is on UI Bar
@@ -469,15 +460,41 @@ function figureCtxRedraw () {
     figureCtx.clearRect(0, 0, W, H);
     figureCtx.lineWidth = 2;
 
-    //Drawing figure outline
+    
+    let minAngle = PI;
+    let maxAngle = -PI;
+    if (offsetX > 0 && (offsetX-W)*zoom < 0 && offsetY > 0 && (offsetY-H)*zoom < 0) { //If center of figure is visible set visible angle to -PI->PI
+        minAngle = -PI;
+        maxAngle = PI;
+    } else {
+        let cornerAngles = [ //Otherwise find the corners of the screen with the min and max angles
+            Math.atan2(-offsetY*zoom, -offsetX*zoom),
+            Math.atan2((-offsetY+H)*zoom, -offsetX*zoom),
+            Math.atan2((-offsetY+H)*zoom, (-offsetX+W)*zoom),
+            Math.atan2(-offsetY*zoom, (-offsetX+W)*zoom)
+        ];
+        for (let i = 0; i < 4; i++) {
+            minAngle = Math.min(minAngle, -cornerAngles[i]);
+            maxAngle = Math.max(maxAngle, -cornerAngles[i]);
+        }
+        if (offsetX > 0 && Math.sign(minAngle) != Math.sign(maxAngle)) { //Handle the -180->180 discontinuity
+            maxAngle = -cornerAngles[2]+TAU;
+            minAngle = -cornerAngles[3]; 
+        }
+    }
+    
+    let i = 0;
+    //Drawing the visible part of the figure outline
     figureCtx.beginPath();
-    figureCtx.moveTo(offsetX+getFigure(SELECTED_FIGURE, 0)*FIGURE_SCALE*zoom, offsetY);
-    for (let theta = THETA_RESOLUTION; theta < TAU; theta += THETA_RESOLUTION) {
-        let r = getFigure(SELECTED_FIGURE, theta)*FIGURE_SCALE;
+    let r = getFigure(SELECTED_FIGURE, minAngle)*FIGURE_SCALE;
+    figureCtx.lineTo(offsetX+r*Math.cos(minAngle)*zoom, offsetY-r*Math.sin(minAngle)*zoom);
+    for (let theta = minAngle; theta <= maxAngle; theta += (maxAngle-minAngle)/THETA_RESOLUTION) {
+        i++;
+        r = getFigure(SELECTED_FIGURE, theta)*FIGURE_SCALE;
         figureCtx.lineTo(offsetX+r*Math.cos(theta)*zoom, offsetY-r*Math.sin(theta)*zoom);
     }
-    figureCtx.lineTo(offsetX+getFigure(SELECTED_FIGURE, 0)*FIGURE_SCALE*zoom, offsetY);
     figureCtx.stroke();
+    console.log(i);
 
     line(W, 0, W, H, 5, figureCtx);
 }
@@ -531,11 +548,6 @@ function uiRedraw () {
     circle(UI_CENTER, sliderHeight, brushSize/MAX_BRUSH_SIZE*UI_BRUSH_RAD+5, true, uiCtx);
     uiCtx.stroke();
 
-    uiCtx.fillStyle = "white";
-    uiCtx.beginPath();
-    uiCtx.roundRect(touchModePrompt.x, touchModePrompt.y, touchModePrompt.w, touchModePrompt.h, [10]);
-    uiCtx.fill();
-
     //Draw icon buttons
     uiCtx.lineWidth = 1.5;
     uiCtx.fillStyle = "#4F3564";
@@ -584,56 +596,6 @@ function uiRedraw () {
         uiCtx.lineWidth = 1.5;
     }
     uiCtx.stroke();
-    
-    if (activePrompt == "touch") {
-        uiCtx.fillStyle = 'rgba(0,0,0,0.3)';
-        uiCtx.fillRect(0, 0, W+UI_WIDTH, H);
-
-        uiCtx.fillStyle = 'white';
-        uiCtx.strokeStyle = 'black';
-        uiCtx.lineWidth = 2;
-        uiCtx.beginPath();
-        uiCtx.roundRect((W+UI_WIDTH)/2-160, H/2-185, 320, 205, [10]);
-        uiCtx.fill();
-        uiCtx.stroke();
-
-        uiCtx.font = 'normal 500 30px Times New Roman';
-        uiCtx.fillStyle = "black";
-        uiCtx.fillText("Draw with Stylus", (W+UI_WIDTH)/2, H/2-150);
-        uiCtx.fillText("Draw with Finger", (W+UI_WIDTH)/2, H/2-10);
-
-        uiCtx.fillStyle = "white";
-        uiCtx.beginPath();
-        uiCtx.roundRect(touchModeExit.x, touchModeExit.y, touchModeExit.w, touchModeExit.h, [10]);
-        uiCtx.fill();
-
-        uiCtx.lineWidth = 2;
-        uiCtx.fillStyle = "#4F3564";
-        drawIconButton(touchModeToggle, uiCtx);
-        drawIconButton(touchModeExit, uiCtx);
-
-        uiCtx.fillStyle = 'rgba(0,0,0,0.1)';
-        uiCtx.beginPath();
-        uiCtx.roundRect((W+UI_WIDTH)/2-150, H/2-175, 300, 45, [10]);
-        if (!drawWithFinger) {
-            uiCtx.lineWidth = 3;
-        } else {
-            uiCtx.lineWidth = 1.5;
-            uiCtx.fill();
-        }
-        uiCtx.stroke();
-
-        uiCtx.beginPath();
-        uiCtx.roundRect((W+UI_WIDTH)/2-150, H/2-35, 300, 45, [10]);
-        if (drawWithFinger) {
-            uiCtx.lineWidth = 3;
-        } else {
-            uiCtx.fill();
-            uiCtx.lineWidth = 1.5;
-        }
-        uiCtx.stroke();
-    }
-    
 }
 uiRedraw(); //Call uiRedraw to start loading the used fonts
 function load () { 

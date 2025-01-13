@@ -57,13 +57,14 @@ var settings = new Button(W-80, H-80, 70, 70, () => {location.href = "settingsPa
 
 
 //Initialize Settings------------------------------------------------------------------------------
-if (localStorage.length == 0) {
-    localStorage.selectedFigure = JSON.stringify(selectedFigure);
-    localStorage.timerLengthMinutes = JSON.stringify(timerLengthMinutes);
-    localStorage.displayGrid = JSON.stringify(displayGrid);
-    localStorage.maxBrushSize = JSON.stringify(maxBrushSize);
-    localStorage.minBrushSize = JSON.stringify(minBrushSize);
-    localStorage.defaultBrushPercentage = JSON.stringify(defaultBrushPercentage);
+if (localStorage.length < Object.keys(defaultSettings).length) {
+    localStorage.selectedFigure = JSON.stringify(defaultSettings.selectedFigure);
+    localStorage.timerLengthMinutes = JSON.stringify(defaultSettings.timerLengthMinutes);
+    localStorage.displayGrid = JSON.stringify(defaultSettings.displayGrid);
+    localStorage.maxBrushSize = JSON.stringify(defaultSettings.maxBrushSize);
+    localStorage.minBrushSize = JSON.stringify(defaultSettings.minBrushSize);
+    localStorage.defaultBrushPercentage = JSON.stringify(defaultSettings.defaultBrushPercentage);
+    localStorage.practiceDrawMode = JSON.stringify(defaultSettings.practiceDrawMode);
 }
 
 

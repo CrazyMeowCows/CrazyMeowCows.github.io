@@ -1,9 +1,12 @@
-const selectedFigure = "1";
-const timerLengthMinutes = "5";
-const displayGrid = "true";
-const maxBrushSize = "5";
-const minBrushSize = "1";
-const defaultBrushPercentage = "100";
+const defaultSettings = {
+    selectedFigure: "1",
+    timerLengthMinutes: "5",
+    displayGrid: "true",
+    maxBrushSize: "5",
+    minBrushSize: "1",
+    defaultBrushPercentage: "100",
+    practiceDrawMode: "finger"
+}
 
 //ALSO ADD FIGURE IN SETTINGS PAGE
 function getFigure (selectedFigure, theta) {

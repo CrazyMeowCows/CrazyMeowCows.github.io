@@ -62,7 +62,7 @@
             <p id = "timerLengthError">*</p>
         </div>
         <div id = "inputField">
-            <label for="grid">Gird Lines:</label>
+            <label for="grid">Grid Lines:</label>
             <select name="grid" id="grid" style='font-size: 1em;'>
                 <option value="true">On</option>
                 <option value="false">Off</option>
@@ -83,6 +83,13 @@
             <input id="defaultBrush" type="number" autocomplete="off" style='font-size: 1em; max-width: 200px;'/>
             <p id = "defaultBrushError">*</p>
         </div>
+        <div id = "inputField">
+            <label for="drawMode">Draw Mode for Practice:</label>
+            <select name="drawMode" id="drawMode" style='font-size: 1em;'>
+                <option value="finger">Finger</option>
+                <option value="stylus">Stylus</option> 
+            </select>
+        </div>
         <button id="changePasscode" style='font-size: 1em; width: fit-content; color: darkred' onclick="">Change Passcode</button>
     </div>
     <button id="home" style='font-size: 2em;'>Save and Exit</button>
@@ -97,6 +104,7 @@
     document.getElementById("maxBrush").value = JSON.parse(localStorage.maxBrushSize);
     document.getElementById("minBrush").value = JSON.parse(localStorage.minBrushSize);
     document.getElementById("defaultBrush").value = JSON.parse(localStorage.defaultBrushPercentage);
+    document.getElementById("drawMode").value = JSON.parse(localStorage.practiceDrawMode);
 
     document.getElementById("home").onclick = () => {
         saveSettings("index.html");
@@ -112,6 +120,7 @@
         let maxBrushSize = document.getElementById("maxBrush").value;
         let minBrushSize = document.getElementById("minBrush").value;
         let defaultBrushPercentage = document.getElementById("defaultBrush").value;
+        let practiceDrawMode = document.getElementById("drawMode").value;
 
         let error = false;
 
@@ -154,6 +163,7 @@
             localStorage.maxBrushSize = JSON.stringify(maxBrushSize);
             localStorage.minBrushSize = JSON.stringify(minBrushSize);
             localStorage.defaultBrushPercentage = JSON.stringify(defaultBrushPercentage);
+            localStorage.practiceDrawMode = JSON.stringify(practiceDrawMode);
 
             location.href = destination;
         }
