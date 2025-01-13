@@ -53,7 +53,8 @@ const MAX_ZOOM = 500;
 const THETA_RESOLUTION = 400;
 const SELECTED_FIGURE = JSON.parse(localStorage.selectedFigure);
 
- //DO NOT CHANGE - STANDARDIZES TEST RESULTS - MAX SCORE: 4035620
+ //DO NOT CHANGE - STANDARDIZES TEST RESULTS
+const MAX_SCORE = 4035620;
 const FIGURE_SCALE = 0.8*H;
 const SCORE_AREA_SIZE = 4000; //CANNOT EXCEED 4096px by 4096px DUE TO iOS/SAFARI LIMITATIONS
 
@@ -739,7 +740,8 @@ function endTest() {
             }
         }
     }
-    sessionStorage.scoreObject = JSON.stringify(scoreInc.toLocaleString()); //Stores drawing score in the session storages
+    let scoreStr = Math.round(scoreInc/MAX_SCORE*100*100000)/100000
+    sessionStorage.scoreObject = JSON.stringify(scoreStr+"%"); //Stores drawing score in the session storages
 
     location.href = "endPasscode.html";
 }
