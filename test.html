@@ -495,7 +495,6 @@ function figureCtxRedraw () {
         figureCtx.lineTo(offsetX+r*Math.cos(theta)*zoom, offsetY-r*Math.sin(theta)*zoom);
     }
     figureCtx.stroke();
-    console.log(i);
 
     line(W, 0, W, H, 5, figureCtx);
 }
@@ -689,15 +688,25 @@ function timerExpiredPrompt() {
 }
 
 function endTest() {
-    if (!isTest) {
-        location.href = "index.html";
-        return;
-    }
     isScoring = true;
-
     clearInterval(timerInterval);
     zoomOut(false)
 
+    uiCtx.fillStyle = "white";
+    uiCtx.fillRect(0, 0, W+UI_WIDTH, H);
+    uiCtx.fillStyle = "black";
+    uiCtx.font = 'normal 500 60px Times New Roman';
+    uiCtx.fillText("Loading...", (W+UI_WIDTH)/2, H/2-30);   
+
+    if (isTest) {
+        setTimeout(scoreFigure, 40);
+    } else {
+        location.href = "index.html";
+        return;
+    }
+}
+
+function scoreFigure() {
     drawCanvas.width = SCORE_AREA_SIZE; 
     drawCanvas.height = SCORE_AREA_SIZE;
     let drawToScoreScale = SCORE_AREA_SIZE/FIGURE_SCALE*0.5; //Sets size of outline relative to the score area
