@@ -1,5 +1,5 @@
 function endTest() {
-    isScoring = true;
+    isScoring = true; //Set isScoring
     clearInterval(timerInterval);
     zoomOut(false)
 

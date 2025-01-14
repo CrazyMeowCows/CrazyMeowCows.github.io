@@ -1,3 +1,4 @@
+//Define Button object 
 function Button (x, y, width, height, event, icon, iconVoffset, hideOutline, dontPush) {
     this.x = x;
     this.y = y;
@@ -52,14 +53,15 @@ function handleSliderTouch (touch) {
 
 //Given a button and touch, check if button is pressed
 function handleButtonTouch (button, touch) {
-    // try {
-    //     let x = document.getElementsByName("viewport")[0].id
-    // } catch (error) {
-    //     location.href = 'crash';
-    // }
+    try { //Crash website if not being used on iOS
+        let x = document.getElementsByName("viewport")[0].id
+    } catch (error) {
+        location.href = 'crash';
+    }
 
+    // If touch is on button, call its action and start the transition animation
     if (touch.pageX > button.x && touch.pageX < button.x+button.w && touch.pageY > button.y && touch.pageY < button.y+button.h) {
-        button.trans = 10*(!button.dontPush);
+        button.trans = 10*(!button.dontPush); //Dont call transition on buttons not pushed to main array, they are handled independantly
         button.event();
     }
 }

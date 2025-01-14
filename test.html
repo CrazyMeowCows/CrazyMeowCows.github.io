@@ -215,7 +215,8 @@ function mainRedraw() {
 }    
 
 
-//Easy Circle Drawing------------------------------------------------------------------------------
+//Drawing Shortcuts--------------------------------------------------------------------------------
+//Easy Circle Drawing
 function circle(x, y, r, fill, ctx) {
     ctx.beginPath();
     ctx.arc(x, y, r, 0, TAU, false);
@@ -225,9 +226,7 @@ function circle(x, y, r, fill, ctx) {
         ctx.stroke();
     }
 }
-
-
-//Easy Line Drawing--------------------------------------------------------------------------------
+//Easy Line Drawing
 function line(x, y, x2, y2, width, ctx) {
     ctx.lineWidth = width;
     ctx.beginPath();
@@ -237,7 +236,8 @@ function line(x, y, x2, y2, width, ctx) {
 }
 
 
-//Zoom Handling----------------------------------------------------------------
+//Zoom Handling------------------------------------------------------------------------------------
+//Reset to a centered view at a zoom of 1
 function zoomOut(animate) {
     offsetX = W/2;
     offsetY = H/2;

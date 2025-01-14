@@ -1,3 +1,4 @@
+//Define Figure object 
 var figures = [];
 function Figure (maxScore, calcRad) {
     this.maxScore = maxScore;

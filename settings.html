@@ -98,6 +98,7 @@
 <script src="gen-math.js"></script>
 
 <script>
+    //On initialization set all settings to their previously saved values
     document.getElementById("figure").value = JSON.parse(localStorage.selectedFigure);
     document.getElementById("timerLength").value = JSON.parse(localStorage.timerLengthMinutes);
     document.getElementById("grid").value = JSON.parse(localStorage.displayGrid);
@@ -106,6 +107,7 @@
     document.getElementById("defaultBrush").value = JSON.parse(localStorage.defaultBrushPercentage);
     document.getElementById("drawMode").value = JSON.parse(localStorage.practiceDrawMode);
 
+    //Save settings when navigating off the page
     document.getElementById("home").onclick = () => {
         saveSettings("index.html");
     };
@@ -114,6 +116,7 @@
     };
 
     function saveSettings(destination) {
+        //Get current setting values
         let selectedFigure = document.getElementById("figure").value;
         let timerLengthMinutes = document.getElementById("timerLength").value;
         let displayGrid = document.getElementById("grid").value;
@@ -124,6 +127,7 @@
 
         let error = false;
 
+        //Verify all settings have valid inputs
         if (!isNumeric(timerLengthMinutes)) {
             document.getElementById("timerLength").value = "";
             document.getElementById("timerLengthError").style.display = "inline-block";
@@ -156,7 +160,7 @@
             document.getElementById("defaultBrushError").style.display = "none";
         }
 
-        if (!error) {
+        if (!error) { //Save settings if no error is thrown
             localStorage.selectedFigure = JSON.stringify(selectedFigure);
             localStorage.timerLengthMinutes = JSON.stringify(timerLengthMinutes);
             localStorage.displayGrid = JSON.stringify(displayGrid);

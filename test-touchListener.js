@@ -5,22 +5,21 @@ document.addEventListener("touchstart", e => {
     let touchX = touch.pageX; 
     let touchY = touch.pageY;
 
-    if (activePrompt == "timerExpired") { //End Test Promt is Active
-        if (!isScoring) {
-            handleButtonTouch(expiredOk, touch);
-        }
+    if (isScoring) { //Test is being scored
+        return;
+    }
+    if (activePrompt == "timerExpired") { //Various prompts and their associated buttons
+        handleButtonTouch(expiredOk, touch);
         return;
     } else if (activePrompt == "endEarly") {
-        if (!isScoring) {
-            handleButtonTouch(yesEndTest, touch);
-            handleButtonTouch(noEndTest, touch);
-        }
+        handleButtonTouch(yesEndTest, touch);
+        handleButtonTouch(noEndTest, touch);
         return;
     } else if (activePrompt == "start") {
         handleButtonTouch(startTest, touch);
         return;
     }
-    if (touchX <= 80 && touchY >= H-80) { //Check for EndTest Button
+    if (touchX <= 80 && touchY >= H-80) { //Check for EndTest Button in bottom left corner
         endTestPrompt();
         return;
     }
@@ -32,7 +31,7 @@ document.addEventListener("touchstart", e => {
         uiRedraw();
         return;
     }
-    if (!drawWithFinger) {
+    if (!drawWithFinger) { //Change input modes dependant on the drawWithFinger TODO: Clean up this code (Need access to iOS device)
         if (touch.touchType == "stylus") { //Stylus
             currentStroke = new PenStroke(touch.pageX, touch.pageY, brushColor);
             strokes.push(currentStroke);
@@ -107,8 +106,8 @@ document.addEventListener("touchmove", e => {
         handleSliderTouch(touch);
         return;
     }
-    if (drawWithFinger) {
-        if (touches.length <= 1 && currentStroke == undefined) {
+    if (drawWithFinger) { //Change input modes dependant on the drawWithFinger TODO: Clean up this code (Need access to iOS device)
+        if (touches.length <= 1 && currentStroke == undefined) { //Trying to draw but no currentStroke
             return;
         }
         if (touches.length == 1 && currentStroke != undefined && touchType == 1) { //Stylus
@@ -143,11 +142,10 @@ document.addEventListener("touchmove", e => {
             zoom = clamp(zoom - (zoomGestureDist-newZoomDistance)*ZOOM_SENS*Math.abs(zoom), 1, MAX_ZOOM);
             zoomGestureDist = newZoomDistance;
 
-            // lastZoomed = true;
             mainRedraw();
         }
     } else {
-        if (touch.touchType == "stylus" && currentStroke == undefined) {
+        if (touch.touchType == "stylus" && currentStroke == undefined) { //Trying to draw but no currentStroke
             return;
         }
         if (touch.touchType == "stylus" && currentStroke != undefined) { //Stylus

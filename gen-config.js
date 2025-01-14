@@ -1,3 +1,4 @@
+//Default settings for initialization
 const defaultSettings = {
     selectedFigure: "0",
     timerLengthMinutes: "5",

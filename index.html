@@ -57,7 +57,7 @@ var settings = new Button(W-80, H-80, 70, 70, () => {location.href = "passcode-s
 
 
 //Initialize Settings------------------------------------------------------------------------------
-if (localStorage.length < Object.keys(defaultSettings).length) {
+if (localStorage.length < Object.keys(defaultSettings).length) { //Only initialize settings if not already present
     localStorage.selectedFigure = JSON.stringify(defaultSettings.selectedFigure);
     localStorage.timerLengthMinutes = JSON.stringify(defaultSettings.timerLengthMinutes);
     localStorage.displayGrid = JSON.stringify(defaultSettings.displayGrid);
