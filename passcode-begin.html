@@ -39,7 +39,7 @@
 <body>
     <div id = "container">
         <h2>Area Filling Accuracy Evaluation Tool</h2>
-        <p>Please enter a procter passcode to adjust settings.</p>
+        <p>Please enter a procter passcode to begin the test.</p>
         <div id = "inputField">
             <label for="procterPassword">Procter Passcode:</label>
             <input id="procterPassword" type="password" required autocomplete="off" style='font-size: 1em;'/>
@@ -49,12 +49,13 @@
     <button id="home" style='font-size: 2em;' onclick="location.href = 'index.html';">Return To Homepage</button>
 </body>
 
-<script src="authenticate.js"></script>
+<script src="gen-authenticate.js"></script>
 
 <script>
     document.getElementById("submit").onclick = () => {
         if (authenticate(document.getElementById("procterPassword").value)) {
-            location.href = 'settings.html';
+            sessionStorage.isTest = JSON.stringify("true"); 
+            location.href = 'test.html';
         } else {
             document.getElementById("procterPassword").value = "";
         }

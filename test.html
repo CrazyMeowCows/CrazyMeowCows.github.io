@@ -29,49 +29,53 @@
 <!-- Font Awesome by Dave Gandy - http://fontawesome.io -->    
 <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css">
 
-<script src="buttons.js"></script>
-<script src="math.js"></script>
-<script src="defaultSettings.js"></script>
+<script src="gen-buttons.js"></script>
+<script src="gen-math.js"></script>
+<script src="gen-figure.js"></script>
+<script src="test-prompt.js"></script>
+<script src="test-redraw.js"></script>
+<script src="test-end.js"></script>
+<script src="test-touchListener.js"></script>
 
 
 <script>
 //Constant Declarations----------------------------------------------------------------------------
 const PI = Math.PI;
 const TAU = 2*Math.PI;
-const ROOT_PI = Math.sqrt(Math.PI);
 
 const UI_WIDTH = 100;
 
-const W = screen.height-UI_WIDTH;
-const H = screen.width-20;
+const W = window.innerWidth-UI_WIDTH;
+const H = window.innerHeight;
+// const W = screen.height-UI_WIDTH;
+// const H = screen.availWidth;
+// const H = screen.width-20;
 
-const UI_CENTER = UI_WIDTH/2+W;
+const UI_CENTER = W+UI_WIDTH/2;
 
 const GRID_SIZE = W/6;
 const ZOOM_SENS = 0.002;
 const MAX_ZOOM = 500;
 const THETA_RESOLUTION = 400;
-const SELECTED_FIGURE = JSON.parse(localStorage.selectedFigure);
 
- //DO NOT CHANGE - STANDARDIZES TEST RESULTS
-const MAX_SCORE = 4035620;
-const FIGURE_SCALE = 0.8*H;
-const SCORE_AREA_SIZE = 4000; //CANNOT EXCEED 4096px by 4096px DUE TO iOS/SAFARI LIMITATIONS
-
+const SLIDER_Y1 = 110;
+const SLIDER_Y2 = 280;
+const UI_BRUSH_RAD = 18;
 const MAX_BRUSH_SIZE = parseInt(JSON.parse(localStorage.maxBrushSize))/768*H; //5 pixels on 1024x768
 const MIN_BRUSH_SIZE = parseInt(JSON.parse(localStorage.minBrushSize))/768*H;
-const UI_BRUSH_RAD = 18;
 const BRUSH_DELTA = (MAX_BRUSH_SIZE-MIN_BRUSH_SIZE)/6;
+
 const DRAW_COLOR = "#4F3564";
 const ERASE_COLOR = "#FFFFFF";
 
 const RENDER_GRID = JSON.parse(localStorage.displayGrid) == "true";
+const SELECTED_FIGURE = figures[parseInt(JSON.parse(localStorage.selectedFigure))];
+const IS_TEST = JSON.parse(sessionStorage.isTest) == "true";
 
-const SLIDER_Y1 = 110;
-const SLIDER_Y2 = 280;
+//DO NOT CHANGE - STANDARDIZES TEST RESULTS
+const FIGURE_SCALE = 0.8*H;
+const SCORE_AREA_SIZE = 4000; //CANNOT EXCEED 4096px by 4096px DUE TO iOS/SAFARI LIMITATIONS
 
-var COMP_TESTING = false;
-const isTest = JSON.parse(sessionStorage.isTest) == "true";
 
 //Canvas Setup and Styling-------------------------------------------------------------------------
 var gridCanvas = document.getElementById('gridCanvas')
@@ -120,19 +124,17 @@ var panY;
 var dynamicGridSize;
 
 var brushSize = lerp(MIN_BRUSH_SIZE, MAX_BRUSH_SIZE, parseFloat(JSON.parse(localStorage.defaultBrushPercentage))/100);
+var drawWithFinger = !IS_TEST && JSON.parse(localStorage.practiceDrawMode) == "finger"; //Draw with finger only if in practice mode and the setting is selected
+var timeLimitSeconds = parseFloat(JSON.parse(localStorage.timerLengthMinutes))*60;
+
+var timerSeconds = timeLimitSeconds;
+
 var currentStroke;
 var lastStrokeX;
 var lastStrokeY;
-var drawWithFinger = false;
-if (!isTest && JSON.parse(localStorage.practiceDrawMode) == "finger") {
-    drawWithFinger = true;
-}
 var brushColor = DRAW_COLOR;
 
-var maxTimeSeconds = parseFloat(JSON.parse(localStorage.timerLengthMinutes))*60;
-var timerSeconds = maxTimeSeconds;
 var activePrompt = "none";
-if (isTest) {activePrompt = "start";}
 var isScoring = false;
 
 var strokes = [];
@@ -164,214 +166,36 @@ var noEndTest = new Button((W+UI_WIDTH)/2+15, H/2-115, 70, 70, () => {activeProm
 var expiredOk = new Button((W+UI_WIDTH)/2-35, H/2-115, 70, 70, endTest, '\uF061', 0, false, true);
 
 
-//TouchStart Listener------------------------------------------------------------------------------
-document.addEventListener("touchstart", e => {
-    touches = e.touches;
-    touch = touches[0];
-    let touchX = touch.pageX; 
-    let touchY = touch.pageY;
-    if (COMP_TESTING) {touch.touchType = "stylus";}
-
-    if (activePrompt == "timerExpired") { //End Test Promt is Active
-        if (!isScoring) {
-            handleButtonTouch(expiredOk, touch);
-        }
-        return;
-    } else if (activePrompt == "endEarly") {
-        if (!isScoring) {
-            handleButtonTouch(yesEndTest, touch);
-            handleButtonTouch(noEndTest, touch);
-        }
-        return;
-    } else if (activePrompt == "start") {
-        handleButtonTouch(startTest, touch);
+//Program Initialization---------------------------------------------------------------------------
+function decrementTimer() {
+    if (activePrompt != "none") { //Dont decrement timer if a prompt is active
         return;
     }
-    if (touchX <= 80 && touchY >= H-80) { //Check for EndTest Button
-        endTestPrompt();
-        return;
-    }
-    if (touchX > W) { //Touch is on UI Bar
-        handleSliderTouch(touch);
-        buttons.forEach(button => {
-            handleButtonTouch(button, touch)
-        });
+    if (timerSeconds > 0) { //Decrement if >0, otherwise call timerExpiredPrompt
+        timerSeconds--;
         uiRedraw();
-        return;
+    } else {
+        timerExpiredPrompt();
     }
-    if (!drawWithFinger) {
-        if (touch.touchType == "stylus") { //Stylus
-            currentStroke = new PenStroke(touch.pageX, touch.pageY, brushColor);
-            strokes.push(currentStroke);
+}
+if (IS_TEST) { //If in test mode activate the start prompt and begin the timer
+    activePrompt = "start";
+    var timerInterval = setInterval(decrementTimer, 1000);
+}
 
-            drawCtx.fillStyle = brushColor;
-            drawCtx.strokeStyle = brushColor;
-            if (brushColor == ERASE_COLOR) {
-                drawCtx.globalCompositeOperation = "destination-out";
-                gridCtx.lineWidth = 1.5;
-                circle(touchX, touchY, brushSize, false, gridCtx);
-            } else {
-                drawCtx.globalCompositeOperation = "source-over";
-            }
-
-            circle(touch.pageX, touch.pageY, brushSize, true, drawCtx);
-        } 
-        else if (touches.length <= 1) { //Single Finger Pan
-            panX = touch.pageX;
-            panY = touch.pageY;
-        } 
-        else { //Multi finger zoom
-            zoomGestureDist = Math.hypot(touches[0].pageX - touches[1].pageX, touches[0].pageY - touches[1].pageY);
-            zoomX = (touches[0].pageX + touches[1].pageX)/2;
-            zoomY = (touches[0].pageY + touches[1].pageY)/2;
+function load () { 
+    if (document.fonts.check('1px FontAwesome')) { //Check if font is loaded
+        uiRedraw(); //Call uiRedraw once fonts are loaded to display everything correctly
+        if (IS_TEST) {
+            beginTestPrompt()
         }
     } else {
-        if (touches.length == 1) { //Stylus or 1 Finger Touch
-            touchType = 1;
-
-            currentStroke = new PenStroke(touchX, touchY, brushColor);
-            strokes.push(currentStroke);
-
-            drawCtx.fillStyle = brushColor;
-            drawCtx.strokeStyle = brushColor;
-            if (brushColor == ERASE_COLOR) {
-                drawCtx.globalCompositeOperation = "destination-out";
-                gridCtx.lineWidth = 1.5;
-                circle(touchX, touchY, brushSize, false, gridCtx);
-            } else {
-                drawCtx.globalCompositeOperation = "source-over";
-            }
-
-            circle(touchX, touchY, brushSize, true, drawCtx);
-        } 
-        else if (touches.length >= 2) { //2 Finger Pan/Zoom
-            touchType = 2;
-
-            let centerX = (touches[0].pageX + touches[1].pageX)/2;
-            let centerY = (touches[0].pageY + touches[1].pageY)/2;
-
-            panX = centerX;
-            panY = centerY;
-
-            zoomGestureDist = Math.hypot(touches[0].pageX - touches[1].pageX, touches[0].pageY - touches[1].pageY);
-            zoomX = centerX;
-            zoomY = centerY;
-        }
+        setTimeout(load, 20); //Recursively check every 20ms until font loads
     }
-})
-
-//TouchMove Listener-------------------------------------------------------------------------------
-document.addEventListener("touchmove", e => {
-    let touches = e.touches;
-    let touch = touches[0];
-    let touchX = touch.pageX; 
-    let touchY = touch.pageY;
-    if (COMP_TESTING) {touch.touchType = "stylus";}
-
-    if (activePrompt != "none") { //Any Promt is Active
-        return;
-    }
-    if (touch.pageX > W) { //Touch is on UI Bar
-        handleSliderTouch(touch);
-        return;
-    }
-    if (drawWithFinger) {
-        if (touches.length <= 1 && currentStroke == undefined) {
-            return;
-        }
-        if (touches.length == 1 && currentStroke != undefined && touchType == 1) { //Stylus
-            gridCtxRedraw();
-            
-            line(lastStrokeX, lastStrokeY, touchX, touchY, brushSize*2, drawCtx);
-            extendCurrentStroke(touchX, touchY);
-            
-            if (brushColor == ERASE_COLOR) {
-                gridCtx.lineWidth = 1.5;
-                circle(touchX, touchY, brushSize, false, gridCtx);
-            }
-            return;
-        }
-        if (touches.length >= 2 && touchType == 2) { //2 Finger Pan/Zoom
-            let centerX = (touches[0].pageX + touches[1].pageX)/2;
-            let centerY = (touches[0].pageY + touches[1].pageY)/2;
-
-            if (lastZoomed) {
-                panX = centerX;
-                panY = centerY;
-                lastZoomed = false
-            }
-
-            offsetX += centerX-panX;
-            offsetY += centerY-panY;
-
-            panX = centerX;
-            panY = centerY;
-
-            let newZoomDistance = Math.hypot(touches[0].pageX-touches[1].pageX, touches[0].pageY-touches[1].pageY);
-            zoom = clamp(zoom - (zoomGestureDist-newZoomDistance)*ZOOM_SENS*Math.abs(zoom), 1, MAX_ZOOM);
-            zoomGestureDist = newZoomDistance;
-
-            // lastZoomed = true;
-            mainRedraw();
-        }
-    } else {
-        if (touch.touchType == "stylus" && currentStroke == undefined) {
-            return;
-        }
-        if (touch.touchType == "stylus" && currentStroke != undefined) { //Stylus
-            gridCtxRedraw();
-            
-            line(lastStrokeX, lastStrokeY, touchX, touchY, brushSize*2, drawCtx);
-            extendCurrentStroke(touchX, touchY);
-            
-            if (brushColor == ERASE_COLOR) {
-                gridCtx.lineWidth = 1.5;
-                circle(touchX, touchY, brushSize, false, gridCtx);
-            }
-            return;
-        }
-        if (touches.length <= 1) { //Single Finger Pan
-            if (lastZoomed) {
-                panX = touchX;
-                panY = touchY;
-                lastZoomed = false
-            }
-
-            offsetX += touchX-panX;
-            offsetY += touchY-panY;
-
-            panX = touchX;
-            panY = touchY;
-
-            mainRedraw();
-        } 
-        else if (touches.length > 1) { //Multi finger zoom
-            let newZoomDistance = Math.hypot(touches[0].pageX-touches[1].pageX, touches[0].pageY-touches[1].pageY);
-            zoom = clamp(zoom - (zoomGestureDist-newZoomDistance)*ZOOM_SENS*Math.abs(zoom), 1, MAX_ZOOM);
-            zoomGestureDist = newZoomDistance;
-
-            lastZoomed = true;
-            mainRedraw();
-        }
-    }
-})
-
-//TouchEnd Listener--------------------------------------------------------------------------------
-document.addEventListener("touchend", e => { //Clear the Eraser Outline
-    gridCtxRedraw();
-    touchType = 0;
-});
-
-//Wheel Listener-----------------------------------------------------------------------------------
-document.addEventListener("wheel", e => { //TODO: REMOVE
-    if (activePrompt == "none") {
-        zoom = clamp(zoom-e.deltaY*ZOOM_SENS*Math.abs(zoom)/2, 1, MAX_ZOOM);
-
-        zoomX = e.pageX;
-        zoomY = e.pageY;
-        mainRedraw();
-    }
-});
+}
+uiRedraw(); //Call uiRedraw to start loading the used fonts
+load(); //Begin loading loop
+mainRedraw(); //Draw main content
 
 
 //Drawing the content of the main canvas-----------------------------------------------------------
@@ -383,7 +207,7 @@ function mainRedraw() {
     offsetY -= gridDelta*(zoomY-offsetY)/oldGridSize;
     oldGridSize = dynamicGridSize;
 
-    //Limits panning
+    //Limit panning
     offsetX = clamp(offsetX, -W*0.55*zoom+W, W*0.55*zoom);
     offsetY = clamp(offsetY, -H*0.55*zoom+H, H*0.55*zoom);
 
@@ -392,415 +216,9 @@ function mainRedraw() {
     drawCtxRedraw();
     figureCtxRedraw();
 }    
-mainRedraw();
-
-//Drawing the content of the grid canvas-----------------------------------------------------------
-function gridCtxRedraw() {
-    gridCtx.clearRect(0, 0, W, H);
-    if (!RENDER_GRID) {
-        return;
-    }
-
-    //Drawing only the gridlines that are visible on screen
-    let subGridSize = dynamicGridSize/4;
-    xStart = -offsetX/dynamicGridSize;
-    yStart = -offsetY/dynamicGridSize;
-
-    let i = 0;
-    for (var x = Math.floor(xStart)*dynamicGridSize; x < W+Math.ceil(xStart)*dynamicGridSize; x += subGridSize) {
-        if (i%4 == 0) {
-            gridCtx.lineWidth = 1;
-        } else {
-            gridCtx.lineWidth = 0.5;
-        }
-        gridCtx.beginPath();
-        gridCtx.moveTo(x+offsetX, 0);
-        gridCtx.lineTo(x+offsetX, H);
-        gridCtx.stroke();
-        i++;
-    }
-    i = 0;
-    for (var y = Math.floor(yStart)*dynamicGridSize; y < H+Math.ceil(yStart)*dynamicGridSize; y += subGridSize) {
-        if (i%4 == 0) {
-            gridCtx.lineWidth = 1;
-        } else {
-            gridCtx.lineWidth = 0.5;
-        }
-        gridCtx.beginPath();
-        gridCtx.moveTo(0, y+offsetY);
-        gridCtx.lineTo(W, y+offsetY);
-        gridCtx.stroke();
-        i++;
-    }
-}
-
-//Drawing the content of the draw canvas-----------------------------------------------------------
-function drawCtxRedraw() {
-    drawCtx.clearRect(0, 0, W, H);
-
-    //Drawing strokes using one continuous line
-    strokes.forEach(stroke => {
-        if (stroke.strokeColor == DRAW_COLOR) {
-            drawCtx.globalCompositeOperation = "source-over";
-        } else {
-            drawCtx.globalCompositeOperation = "destination-out";
-        }
-        drawCtx.strokeStyle = stroke.strokeColor;
-        drawCtx.lineWidth = stroke.brushSize*zoom*2;
-        drawCtx.beginPath();
-        drawCtx.moveTo(stroke.x[0]*zoom+offsetX, stroke.y[0]*zoom+offsetY)
-        for (let i = 0; i < stroke.x.length; i++) {
-            drawCtx.lineTo(stroke.x[i]*zoom+offsetX, stroke.y[i]*zoom+offsetY);
-        }
-        drawCtx.stroke();
-    });
-}
-
-//Drawing the content of the figure canvas---------------------------------------------------------
-function figureCtxRedraw () {
-    figureCtx.clearRect(0, 0, W, H);
-    figureCtx.lineWidth = 2;
-
-    
-    let minAngle = PI;
-    let maxAngle = -PI;
-    if (offsetX > 0 && (offsetX-W)*zoom < 0 && offsetY > 0 && (offsetY-H)*zoom < 0) { //If center of figure is visible set visible angle to -PI->PI
-        minAngle = -PI;
-        maxAngle = PI;
-    } else {
-        let cornerAngles = [ //Otherwise find the corners of the screen with the min and max angles
-            Math.atan2(-offsetY*zoom, -offsetX*zoom),
-            Math.atan2((-offsetY+H)*zoom, -offsetX*zoom),
-            Math.atan2((-offsetY+H)*zoom, (-offsetX+W)*zoom),
-            Math.atan2(-offsetY*zoom, (-offsetX+W)*zoom)
-        ];
-        for (let i = 0; i < 4; i++) {
-            minAngle = Math.min(minAngle, -cornerAngles[i]);
-            maxAngle = Math.max(maxAngle, -cornerAngles[i]);
-        }
-        if (offsetX > 0 && Math.sign(minAngle) != Math.sign(maxAngle)) { //Handle the -180->180 discontinuity
-            maxAngle = -cornerAngles[2]+TAU;
-            minAngle = -cornerAngles[3]; 
-        }
-    }
-    
-    let i = 0;
-    //Drawing the visible part of the figure outline
-    figureCtx.beginPath();
-    let r = getFigure(SELECTED_FIGURE, minAngle)*FIGURE_SCALE;
-    figureCtx.lineTo(offsetX+r*Math.cos(minAngle)*zoom, offsetY-r*Math.sin(minAngle)*zoom);
-    for (let theta = minAngle; theta <= maxAngle; theta += (maxAngle-minAngle)/THETA_RESOLUTION) {
-        i++;
-        r = getFigure(SELECTED_FIGURE, theta)*FIGURE_SCALE;
-        figureCtx.lineTo(offsetX+r*Math.cos(theta)*zoom, offsetY-r*Math.sin(theta)*zoom);
-    }
-    figureCtx.stroke();
-
-    line(W, 0, W, H, 5, figureCtx);
-}
 
 
-//Drawing the content of the UI canvas-------------------------------------------------------------
-function uiRedraw () {
-    //Clear the canvas every redraw
-    uiCtx.clearRect(0, 0, W+UI_WIDTH, H);
-
-    // Draw Timer
-    if (isTest) {
-        uiCtx.fillStyle = "white";
-        uiCtx.strokeStyle = "black";
-        uiCtx.lineWidth = 2;
-        uiCtx.beginPath();
-        uiCtx.roundRect(W/2-85, -2, 170, 57, [0, 0, 10, 10]);
-        uiCtx.fill();
-        uiCtx.stroke();
-
-        let mins = "" + Math.floor(timerSeconds/60);
-        if (mins.length <= 1) {
-            mins = "0"+mins;
-        }
-        let secs = "" + timerSeconds%60;
-        if (secs.length <= 1) {
-            secs = "0"+secs;
-        }
-        uiCtx.fillStyle = "black";
-        uiCtx.font = "normal 500 60px Times New Roman";
-        uiCtx.fillText(mins+":"+secs, W/2, 27);
-    }
-
-    //Draw brush size slider
-    let sliderHeight = SLIDER_Y2-(brushSize-MIN_BRUSH_SIZE)/(MAX_BRUSH_SIZE-MIN_BRUSH_SIZE)*(SLIDER_Y2-SLIDER_Y1);
-
-    line(UI_CENTER, SLIDER_Y1, UI_CENTER, SLIDER_Y2, 10, uiCtx)
-    uiCtx.strokeStyle = "#d6d6d6";
-    line(UI_CENTER, SLIDER_Y1, UI_CENTER, SLIDER_Y2, 6, uiCtx)
-    uiCtx.strokeStyle = "#a1a1a1";
-    line(UI_CENTER, sliderHeight, UI_CENTER, SLIDER_Y2, 6, uiCtx)
-
-    //Draw current brush size
-    uiCtx.strokeStyle = "black";
-    uiCtx.lineWidth = 2;
-    if (brushColor == ERASE_COLOR) {
-        uiCtx.fillStyle = "#f2f2f2";
-    } else {
-        uiCtx.fillStyle = DRAW_COLOR;
-    }
-    circle(UI_CENTER, sliderHeight, brushSize/MAX_BRUSH_SIZE*UI_BRUSH_RAD+5, true, uiCtx);
-    uiCtx.stroke();
-
-    //Draw icon buttons
-    uiCtx.lineWidth = 1.5;
-    uiCtx.fillStyle = "#4F3564";
-    let recurse = false;
-    buttons.forEach(button => {
-        drawIconButton(button, uiCtx);
-        if (button.trans-- > 0) {
-            recurse = true;
-        }
-    });
-    if (recurse) {
-        requestAnimationFrame(uiRedraw);
-    }
-
-    //Draw end test button
-    uiCtx.fillStyle = "#f2f2f2";
-    uiCtx.lineWidth = 4;
-    uiCtx.beginPath();
-    uiCtx.roundRect(10, H-80, 70, 70, [10]);
-    uiCtx.stroke();
-    uiCtx.fill();
-
-    uiCtx.font = 'normal 500 30px Times New Roman';
-    uiCtx.fillStyle = "#6b0000";
-    uiCtx.fillText("End", 45, H-59.5);
-    uiCtx.fillText("Test", 45, H-29.5);
-
-    //Draw Eraser/Pencil Toggle
-    uiCtx.fillStyle = 'rgba(0,0,0,0.1)';
-    uiCtx.beginPath();
-    uiCtx.roundRect(pencil.x, pencil.y, pencil.w, pencil.h, [10, 10, 0, 0]);
-    if (brushColor == DRAW_COLOR) {
-        uiCtx.lineWidth = 3;
-    } else {
-        uiCtx.lineWidth = 1.5;
-        uiCtx.fill();
-    }
-    uiCtx.stroke();
-
-    uiCtx.beginPath();
-    uiCtx.roundRect(eraser.x, eraser.y, eraser.w, eraser.h, [0, 0, 10, 10]);
-    if (brushColor == ERASE_COLOR) {
-        uiCtx.lineWidth = 3;
-    } else {
-        uiCtx.fill();
-        uiCtx.lineWidth = 1.5;
-    }
-    uiCtx.stroke();
-}
-uiRedraw(); //Call uiRedraw to start loading the used fonts
-function load () { 
-    if (document.fonts.check('1px FontAwesome')) {
-        uiRedraw(); //Call uiRedraw once fonts are loaded to display everything correctly
-        if (isTest) {
-            beginTestPrompt()
-        }
-    } else {
-        setTimeout(load, 20); //Recursively check every 20ms until font loads
-    }
-}
-load(); //Begin loading loop
-
-function beginTestPrompt() {
-    uiCtx.fillStyle = 'rgba(0,0,0,0.3)';
-    uiCtx.fillRect(0, 0, W+UI_WIDTH, H);
-
-    uiCtx.fillStyle = 'white';
-    uiCtx.strokeStyle = 'black';
-    uiCtx.lineWidth = 3;
-    uiCtx.beginPath();
-    uiCtx.roundRect((W+UI_WIDTH)/2-180, H/2-190, 360, 170, [10]);
-    uiCtx.fill();
-    uiCtx.stroke();
-
-    uiCtx.font = 'normal 500 30px Times New Roman';
-    uiCtx.fillStyle = "black";
-    uiCtx.fillText("Begin Test When Ready", (W+UI_WIDTH)/2, H/2-150);
-
-    uiCtx.lineWidth = 2;
-    uiCtx.fillStyle = "Green";
-    drawIconButton(startTest, uiCtx);
-}
-
-function endTestPrompt() {
-    activePrompt = "endEarly";
-
-    uiCtx.fillStyle = 'rgba(0,0,0,0.3)';
-    uiCtx.fillRect(0, 0, W+UI_WIDTH, H);
-
-    uiCtx.fillStyle = 'white';
-    uiCtx.strokeStyle = 'black';
-    uiCtx.lineWidth = 3;
-    uiCtx.beginPath();
-    if (isTest) {
-        uiCtx.roundRect((W+UI_WIDTH)/2-220, H/2-190, 440, 170, [10]);
-    } else {
-        uiCtx.roundRect((W+UI_WIDTH)/2-180, H/2-190, 360, 170, [10]);
-    }
-    uiCtx.fill();
-    uiCtx.stroke();
-
-    uiCtx.font = 'normal 500 30px Times New Roman';
-    uiCtx.fillStyle = "black";
-    if (isTest) {
-        uiCtx.fillText("End Test Before Timer Expires?", (W+UI_WIDTH)/2, H/2-150);
-    } else {
-        uiCtx.fillText("End Practice Session?", (W+UI_WIDTH)/2, H/2-150);
-    }
-
-    uiCtx.lineWidth = 2;
-    uiCtx.fillStyle = "Green";
-    drawIconButton(yesEndTest, uiCtx);
-    uiCtx.fillStyle = "#6b0000";
-    drawIconButton(noEndTest, uiCtx);
-}
-
-function timerExpiredPrompt() {
-    activePrompt = "timerExpired";
-
-    uiCtx.fillStyle = 'rgba(0,0,0,0.3)';
-    uiCtx.fillRect(0, 0, W+UI_WIDTH, H);
-
-    uiCtx.fillStyle = 'white';
-    uiCtx.strokeStyle = 'black';
-    uiCtx.lineWidth = 3;
-    uiCtx.beginPath();
-    uiCtx.roundRect((W+UI_WIDTH)/2-140, H/2-190, 280, 170, [10]);
-    uiCtx.fill();
-    uiCtx.stroke();
-
-    uiCtx.font = 'normal 500 30px Times New Roman';
-    uiCtx.fillStyle = "black";
-    uiCtx.fillText("Timer Expired", (W+UI_WIDTH)/2, H/2-150);
-
-    uiCtx.lineWidth = 2;
-    uiCtx.fillStyle = "Green";
-    drawIconButton(expiredOk, uiCtx);
-}
-
-function endTest() {
-    isScoring = true;
-    clearInterval(timerInterval);
-    zoomOut(false)
-
-    uiCtx.fillStyle = "white";
-    uiCtx.fillRect(0, 0, W+UI_WIDTH, H);
-    uiCtx.fillStyle = "black";
-    uiCtx.font = 'normal 500 60px Times New Roman';
-    uiCtx.fillText("Loading...", (W+UI_WIDTH)/2, H/2-30);   
-
-    if (isTest) {
-        setTimeout(scoreFigure, 40);
-    } else {
-        location.href = "index.html";
-        return;
-    }
-}
-
-function scoreFigure() {
-    drawCanvas.width = SCORE_AREA_SIZE; 
-    drawCanvas.height = SCORE_AREA_SIZE;
-    let drawToScoreScale = SCORE_AREA_SIZE/FIGURE_SCALE*0.5; //Sets size of outline relative to the score area
-
-    drawCanvas.style.display = "none";
-
-    //Drawing strokes using one continuous line
-    drawCtx.strokeStyle = "red";
-    drawCtx.lineCap = "round";
-    drawCtx.lineJoin = "round";
-
-    strokes.forEach(stroke => {
-        if (stroke.strokeColor == DRAW_COLOR) {
-            drawCtx.globalCompositeOperation = "source-over";
-        } else {
-            drawCtx.globalCompositeOperation = "destination-out";
-        }
-        drawCtx.lineWidth = stroke.brushSize*2*drawToScoreScale;
-        drawCtx.beginPath();
-        drawCtx.moveTo(stroke.x[0]*drawToScoreScale+SCORE_AREA_SIZE/2, stroke.y[0]*drawToScoreScale+SCORE_AREA_SIZE/2)
-        for (let i = 0; i < stroke.x.length; i++) {
-            drawCtx.lineTo(stroke.x[i]*drawToScoreScale+SCORE_AREA_SIZE/2, stroke.y[i]*drawToScoreScale+SCORE_AREA_SIZE/2);
-        }
-        drawCtx.stroke();
-    });
-
-    let scoreInc = 0;
-    imgData = drawCtx.getImageData(0, 0, SCORE_AREA_SIZE, SCORE_AREA_SIZE);
-    for (let i = 0; i < imgData.data.length; i += 4) {
-        if (imgData.data[i] != 0) {
-            let x = (i / 4) % SCORE_AREA_SIZE - SCORE_AREA_SIZE/2;
-            let y = Math.floor((i / 4) / SCORE_AREA_SIZE) - SCORE_AREA_SIZE/2;
-            let theta = -Math.atan2(y, x);
-            let r = Math.hypot(x, y);
-            let figureR = getFigure(SELECTED_FIGURE, theta)*FIGURE_SCALE*drawToScoreScale;
-            if (r <= figureR) {
-                scoreInc++;
-            } else {
-                scoreInc--;
-            }
-        }
-    }
-    let scoreStr = Math.round(scoreInc/MAX_SCORE*100*100000)/100000
-    sessionStorage.scoreObject = JSON.stringify(scoreStr+"%"); //Stores drawing score in the session storages
-
-    location.href = "endPasscode.html";
-}
-
-//Helper Functions---------------------------------------------------------------------------------
-function zoomOut(animate) {
-    offsetX = W/2;
-    offsetY = H/2;
-    zoomX = W/2;
-    zoomY = H/2;
-    zoom = 1;
-    oldGridSize = GRID_SIZE;
-    mainRedraw();
-
-    if (animate) {
-        animInc = 0;
-        zoomOutAnimation();
-    }
-}
-
-var animInc = 0;
-
-//Bump zoom out then back in
-function zoomOutAnimation() {
-    zoom -= 0.007*Math.sign(10-animInc);
-    mainRedraw();
-
-    if (animInc < 20) {
-        animInc++;    
-        requestAnimationFrame(zoomOutAnimation);
-    }
-}
-
-function decrementTimer() {
-    if (activePrompt != "none" || !isTest) {
-        return;
-    }
-    if (timerSeconds > 0) {
-        timerSeconds--;
-        uiRedraw();
-    } else {
-        timerExpiredPrompt();
-    }
-}
-if (isTest) {
-    var timerInterval = setInterval(decrementTimer, 1000);
-}
-
-
-//Easy Circle Drawing----------------------------------------------------------
+//Easy Circle Drawing------------------------------------------------------------------------------
 function circle(x, y, r, fill, ctx) {
     ctx.beginPath();
     ctx.arc(x, y, r, 0, TAU, false);
@@ -811,13 +229,40 @@ function circle(x, y, r, fill, ctx) {
     }
 }
 
-//Easy Line Drawing------------------------------------------------------------
+
+//Easy Line Drawing--------------------------------------------------------------------------------
 function line(x, y, x2, y2, width, ctx) {
     ctx.lineWidth = width;
     ctx.beginPath();
     ctx.moveTo(x, y);
     ctx.lineTo(x2, y2);
     ctx.stroke();
+}
+
+
+//Zoom Handling----------------------------------------------------------------
+function zoomOut(animate) {
+    offsetX = W/2;
+    offsetY = H/2;
+    zoomX = W/2;
+    zoomY = H/2;
+    zoom = 1;
+    oldGridSize = GRID_SIZE;
+    mainRedraw();
+
+    if (animate) {
+        zoomOutAnimation(0);
+    }
+}
+
+//Bump zoom out then back in
+function zoomOutAnimation(inc) {
+    zoom -= 0.007*Math.sign(10-inc);
+    mainRedraw();
+
+    if (inc < 20) {
+        requestAnimationFrame(() => {zoomOutAnimation(inc+1)});
+    }
 }
 </script>
 </html>

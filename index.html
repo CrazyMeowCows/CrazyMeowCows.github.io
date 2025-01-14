@@ -25,15 +25,18 @@
 <!-- Font Awesome by Dave Gandy - http://fontawesome.io  -->
 <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css">
 
-<script src="buttons.js"></script>
-<script src="defaultSettings.js"></script>
+<script src="gen-buttons.js"></script>
+<script src="gen-config.js"></script>
 
 <script>
 //Constant Declarations----------------------------------------------------------------------------
 const VER = "2.5.7";
 
-const W = screen.height;
-const H = screen.width-20;
+const W = window.innerWidth;
+const H = window.innerHeight;
+// const W = screen.height-UI_WIDTH;
+// const H = screen.availWidth;
+// const H = screen.width-20;
 
 const YEAR = new Date().getFullYear();
 
@@ -51,9 +54,9 @@ ctx.textBaseline = "middle";
 //Variable Declarations----------------------------------------------------------------------------
 var buttons = [];
 var practice = new Button(W/2-160, 290, 320, 70, () => {sessionStorage.isTest = JSON.stringify("false"); location.href = "test.html";}, 'Practice', 0, false, false);
-var test = new Button(W/2-160, 400, 320, 70, () => {location.href = "beginPasscode.html";}, 'Begin Test', 0, false, false);
+var test = new Button(W/2-160, 400, 320, 70, () => {location.href = "passcode-begin.html";}, 'Begin Test', 0, false, false);
 // var info = new Button(W/2-160, 480, 320, 70, () => {}, 'Info', 0, false, false);
-var settings = new Button(W-80, H-80, 70, 70, () => {location.href = "settingsPasscode.html";}, '\uF013', 0, false, false);
+var settings = new Button(W-80, H-80, 70, 70, () => {location.href = "passcode-settings.html";}, '\uF013', 0, false, false);
 
 
 //Initialize Settings------------------------------------------------------------------------------

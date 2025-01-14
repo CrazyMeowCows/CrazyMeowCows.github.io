@@ -52,8 +52,8 @@
         <div id = "inputField">
             <label for="figure">Select Figure:</label> <!-- ALSO ADD FIGURE IN defaultSettings -->
             <select name="figure" id="figure" style='font-size: 1em;'>
-                <option value="1">Figure 1</option>
-                <option value="2">Figure 2</option> 
+                <option value="0">Figure 1</option>
+                <option value="1">Figure 2</option> 
             </select>
         </div>
         <div id = "inputField">
@@ -95,7 +95,7 @@
     <button id="home" style='font-size: 2em;'>Save and Exit</button>
 </body>
 
-<script src="math.js"></script>
+<script src="gen-math.js"></script>
 
 <script>
     document.getElementById("figure").value = JSON.parse(localStorage.selectedFigure);
@@ -110,7 +110,7 @@
         saveSettings("index.html");
     };
     document.getElementById("changePasscode").onclick = () => {
-        saveSettings("changePasscode.html");
+        saveSettings("passcode-change.html");
     };
 
     function saveSettings(destination) {
