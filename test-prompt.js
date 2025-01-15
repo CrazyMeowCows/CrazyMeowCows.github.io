@@ -1,6 +1,6 @@
 //Prompt to begin test when ready, shows at start of test
 function beginTestPrompt() {
-    uiCtx.fillStyle = 'rgba(0,0,0,0.3)'; //Gray out background
+    uiCtx.fillStyle = 'rgba(240,240,240,1)'; //Gray out background
     uiCtx.fillRect(0, 0, W+UI_WIDTH, H);
 
     uiCtx.fillStyle = 'white'; //Draw background box
