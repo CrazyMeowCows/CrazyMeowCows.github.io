@@ -90,7 +90,7 @@
                 <option value="stylus">Stylus</option> 
             </select>
         </div>
-        <button id="changePasscode" style='font-size: 1em; width: fit-content; color: darkred' onclick="">Change Passcode</button>
+        <button id="changePassword" style='font-size: 1em; width: fit-content; color: darkred' onclick="">Change Password</button>
     </div>
     <button id="home" style='font-size: 2em;'>Save and Exit</button>
 </body>
@@ -111,8 +111,8 @@
     document.getElementById("home").onclick = () => {
         saveSettings("index.html");
     };
-    document.getElementById("changePasscode").onclick = () => {
-        saveSettings("passcode-change.html");
+    document.getElementById("changePassword").onclick = () => {
+        saveSettings("password-change.html");
     };
 
     function saveSettings(destination) {

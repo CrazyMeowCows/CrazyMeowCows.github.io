@@ -53,11 +53,11 @@ function handleSliderTouch (touch) {
 
 //Given a button and touch, check if button is pressed
 function handleButtonTouch (button, touch) {
-    try { //Crash website if not being used on iOS
-        let x = document.getElementsByName("viewport")[0].id
-    } catch (error) {
-        location.href = 'crash';
-    }
+    // try { //Crash website if not being used on iOS
+    //     let x = document.getElementsByName("viewport")[0].id
+    // } catch (error) {
+    //     location.href = 'crash';
+    // }
 
     // If touch is on button, call its action and start the transition animation
     if (touch.pageX > button.x && touch.pageX < button.x+button.w && touch.pageY > button.y && touch.pageY < button.y+button.h) {

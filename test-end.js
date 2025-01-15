@@ -64,5 +64,5 @@ function scoreFigure() {
     let scoreStr = Math.round(scoreInc/SELECTED_FIGURE.maxScore*100*100000)/100000
     sessionStorage.scoreObject = JSON.stringify(scoreStr+"%"); //Stores drawing score in the session storages
 
-    location.href = "passcode-end.html";
+    location.href = "password-end.html";
 }

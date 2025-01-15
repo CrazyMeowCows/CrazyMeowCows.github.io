@@ -1,17 +1,17 @@
 function authenticate (value) {
-    let procterPasscode;
+    let proctorPassword;
     try {
-        procterPasscode = JSON.parse(localStorage.newPW); //Check if a alternate procter passcode is set
+        proctorPassword = JSON.parse(localStorage.newPW); //Check if a alternate proctor password is set
     } catch (error) {}
 
     try {
-        if (procterPasscode == undefined) {
-            procterPasscode = document.getElementsByName("viewport")[0].id.split("|")[0] //If no alternate is set, pull from passcode location
+        if (proctorPassword == undefined) {
+            proctorPassword = document.getElementsByName("viewport")[0].id.split("|")[0] //If no alternate is set, pull from password location
         }
-        return value == procterPasscode || value == document.getElementsByName("viewport")[0].id.split("|")[1]; //Return authentication
+        return value == proctorPassword || value == document.getElementsByName("viewport")[0].id.split("|")[1]; //Return authentication
     } catch (error) {
         sessionStorage.isTest = JSON.stringify("false"); 
-        location.href = 'crash'; //Crash website it passcodes are not present
+        location.href = 'crash'; //Crash website it passwords are not present
     }
     
 }
