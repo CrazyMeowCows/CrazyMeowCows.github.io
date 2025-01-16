@@ -30,7 +30,7 @@
 
 <script>
 //Constant Declarations----------------------------------------------------------------------------
-const VER = "3.0.5";
+const VER = "3.0.6";
 
 // const W = window.innerWidth;
 // const H = window.innerHeight;
@@ -43,14 +43,8 @@ const YEAR = new Date().getFullYear();
 var canvas = document.getElementById('canvas')
 var ctx = canvas.getContext("2d", { willReadFrequently: false, aplha: false });
 
-// Set actual size in memory (scaled to account for extra pixel density).
-// const scale = window.devicePixelRatio; // Change to 1 on retina screens to see blurry canvas.
-const scale = 1; // Change to 1 on retina screens to see blurry canvas.
-canvas.width = Math.floor(W * scale);
-canvas.height = Math.floor(H * scale);
-
-// Normalize coordinate system to use CSS pixels.
-// ctx.scale(1/scale, 1/scale);
+canvas.width = W;
+canvas.height = H;
 
 ctx.textAlign = "center";
 ctx.textBaseline = "middle";
@@ -96,10 +90,8 @@ function redraw() {
 
     //Copyright Text
     ctx.textAlign = "left";
-    ctx.fillText(YEAR + ' McPhail Patents and Research LLC', 35, H-25);
+    ctx.fillText(YEAR + ' McPhail Patents and Research LLC', 40, H-25);
     ctx.fillText(canvas.width, 35, H-100);
-
-    ctx.font = 'normal 500 25px Times New Roman';
 
     //Version Number
     ctx.textAlign = "center";
@@ -118,7 +110,7 @@ function redraw() {
     });
 
     //Copyright Icon
-    ctx.font = '20px FontAwesome';
+    ctx.font = '30px FontAwesome';
     ctx.fillStyle = "black";
     ctx.fillText('\uF1F9', 20, H-25);
 }    
