@@ -127,6 +127,7 @@ var dynamicGridSize;
 
 var brushSize = lerp(MIN_BRUSH_SIZE, MAX_BRUSH_SIZE, parseFloat(JSON.parse(localStorage.defaultBrushPercentage))/100);
 var drawWithFinger = !IS_TEST && JSON.parse(localStorage.practiceDrawMode) == "finger"; //Draw with finger only if in practice mode and the setting is selected
+drawWithFinger = true; //TODO: FOR TESTING - REMOVE
 var timeLimitSeconds = parseFloat(JSON.parse(localStorage.timerLengthMinutes))*60;
 
 var timerSeconds = timeLimitSeconds;
