@@ -7,13 +7,13 @@ function beginTestPrompt() {
     uiCtx.strokeStyle = 'black';
     uiCtx.lineWidth = 3;
     uiCtx.beginPath();
-    uiCtx.roundRect((W+UI_WIDTH)/2-180, H/2-190, 360, 170, [10]);
+    uiCtx.roundRect((W+UI_WIDTH)/2-180, H/2-85, 360, 170, [10]);
     uiCtx.fill();
     uiCtx.stroke();
 
     uiCtx.font = 'normal 500 30px Times New Roman'; //Draw text
     uiCtx.fillStyle = "black";
-    uiCtx.fillText("Begin Test When Ready", (W+UI_WIDTH)/2, H/2-150);
+    uiCtx.fillText("Begin Test When Ready", (W+UI_WIDTH)/2, H/2-45);
 
     uiCtx.lineWidth = 2; //Draw startTest button
     uiCtx.fillStyle = "Green";

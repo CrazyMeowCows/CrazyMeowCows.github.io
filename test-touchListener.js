@@ -1,3 +1,14 @@
+//Wheel Listener-----------------------------------------------------------------------------------
+document.addEventListener("wheel", e => { //TODO: REMOVE
+    if (activePrompt == "none") {
+        zoom = clamp(zoom-e.deltaY*ZOOM_SENS*Math.abs(zoom)/2, 1, MAX_ZOOM);
+
+        zoomX = e.pageX;
+        zoomY = e.pageY;
+        mainRedraw();
+    }
+});
+
 //TouchStart Listener------------------------------------------------------------------------------
 document.addEventListener("touchstart", e => {
     touches = e.touches;

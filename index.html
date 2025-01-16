@@ -30,8 +30,10 @@
 
 <script>
 //Constant Declarations----------------------------------------------------------------------------
-const VER = "3.0.1";
+const VER = "3.0.2";
 
+// const W = window.innerWidth;
+// const H = window.innerHeight;
 const W = screen.height;
 const H = screen.width-20;
 
@@ -41,8 +43,13 @@ const YEAR = new Date().getFullYear();
 var canvas = document.getElementById('canvas')
 var ctx = canvas.getContext("2d", { willReadFrequently: false, aplha: false });
 
-canvas.width = W;
-canvas.height = H;
+// Set actual size in memory (scaled to account for extra pixel density).
+const scale = window.devicePixelRatio; // Change to 1 on retina screens to see blurry canvas.
+canvas.width = Math.floor(W * scale);
+canvas.height = Math.floor(H * scale);
+
+// Normalize coordinate system to use CSS pixels.
+ctx.scale(scale, scale);
 
 ctx.textAlign = "center";
 ctx.textBaseline = "middle";
