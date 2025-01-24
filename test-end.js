@@ -9,7 +9,7 @@ function endTest() {
     uiCtx.font = 'normal 500 60px Times New Roman';
     uiCtx.fillText("Loading...", (W+UI_WIDTH)/2, H/2-30);   
 
-    if (IS_TEST) {
+    if (ENABLE_SCORING) {
         setTimeout(scoreFigure, 40);
     } else {
         location.href = "index.html";
@@ -86,5 +86,7 @@ function scoreFigure() {
     let scoreStr = Math.round(scoreInc/SELECTED_FIGURE.maxScore*100*10000)/10000
     sessionStorage.scoreObject = JSON.stringify(scoreStr+"%"); //Stores drawing score in the session storages
 
-    location.href = "password-end.html";
+    if (IS_TEST) {
+        location.href = "password-end.html";
+    }
 }

@@ -118,7 +118,7 @@ function uiRedraw () {
     uiCtx.clearRect(0, 0, W+UI_WIDTH, H);
 
     // Draw Timer
-    if (IS_TEST) {
+    if (ENABLE_TIMER) {
         uiCtx.fillStyle = "white";
         uiCtx.strokeStyle = "black";
         uiCtx.lineWidth = 2;

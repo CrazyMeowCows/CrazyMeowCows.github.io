@@ -71,6 +71,8 @@ const ERASE_COLOR = "#FFFFFF";
 const RENDER_GRID = JSON.parse(localStorage.displayGrid) == "true";
 const SELECTED_FIGURE = figures[parseInt(JSON.parse(localStorage.selectedFigure))];
 const IS_TEST = JSON.parse(sessionStorage.isTest) == "true";
+const ENABLE_TIMER = IS_TEST || JSON.parse(localStorage.practiceTimer) == "true";
+const ENABLE_SCORING = IS_TEST || JSON.parse(localStorage.practiceScore) == "true";
 
 //DO NOT CHANGE - STANDARDIZES TEST RESULTS
 const FIGURE_SCALE = 0.8*H;
@@ -182,6 +184,8 @@ function decrementTimer() {
 }
 if (IS_TEST) { //If in test mode activate the start prompt and begin the timer
     activePrompt = "start";
+}
+if (ENABLE_TIMER) {
     var timerInterval = setInterval(decrementTimer, 1000);
 }
 

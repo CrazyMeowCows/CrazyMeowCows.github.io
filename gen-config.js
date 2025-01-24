@@ -6,5 +6,7 @@ const defaultSettings = {
     maxBrushSize: "5",
     minBrushSize: "1",
     defaultBrushPercentage: "100",
-    practiceDrawMode: "finger"
+    practiceDrawMode: "finger",
+    practiceTimer: "false",
+    practiceScore: "false"
 }
