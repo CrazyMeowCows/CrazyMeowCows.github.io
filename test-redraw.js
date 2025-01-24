@@ -63,7 +63,7 @@ function drawCtxRedraw() {
 //Drawing the content of the figure canvas---------------------------------------------------------
 function figureCtxRedraw () {
     figureCtx.clearRect(0, 0, W, H);
-    let resolution = THETA_RESOLUTION_LOW_LOD
+    let resolution = THETA_RESOLUTION_LOW_LOD;
 
     //Get the theta range of the part of the outline visible on screen
     let minAngle = PI;
@@ -92,16 +92,20 @@ function figureCtxRedraw () {
     //Drawing the visible part of the figure outline
     figureCtx.lineWidth = 2;
     figureCtx.beginPath();
+    let scale = FIGURE_SCALE*SELECTED_FIGURE.scaleFactor*zoom;
 
-    let r = SELECTED_FIGURE.calcRad(minAngle)*FIGURE_SCALE;
-    figureCtx.lineTo(offsetX+r*Math.cos(minAngle)*zoom, offsetY-r*Math.sin(minAngle)*zoom);
+    for (let i = 0; i < SELECTED_FIGURE.calcRad.length; i++) {
+        let calcRad = SELECTED_FIGURE.calcRad[i];
+        let r = calcRad(minAngle)*scale;
+        figureCtx.moveTo(offsetX+r*Math.cos(minAngle), offsetY-r*Math.sin(minAngle));
 
-    for (let theta = minAngle; theta <= maxAngle; theta += (maxAngle-minAngle)/resolution) {
-        r = SELECTED_FIGURE.calcRad(theta)*FIGURE_SCALE;
+        for (let theta = minAngle; theta <= maxAngle; theta += (maxAngle-minAngle)/resolution) {
+            r = calcRad(theta)*scale;
 
-        figureCtx.lineTo(offsetX+r*Math.cos(theta)*zoom, offsetY-r*Math.sin(theta)*zoom);
+            figureCtx.lineTo(offsetX+r*Math.cos(theta), offsetY-r*Math.sin(theta));
+        }
+        figureCtx.stroke();
     }
-    figureCtx.stroke();
 
     //Add a line on the right side of canvas to seperate UI Bar
     line(W, 0, W, H, 5, figureCtx);

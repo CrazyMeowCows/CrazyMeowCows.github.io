@@ -191,3 +191,14 @@ document.addEventListener("touchend", e => { //Clear the Eraser Outline
     gridCtxRedraw();
     touchType = 0;
 });
+
+//Wheel Listener-----------------------------------------------------------------------------------
+document.addEventListener("wheel", e => { //TODO: REMOVE
+    if (activePrompt == "none") {
+        zoom = clamp(zoom-e.deltaY*ZOOM_SENS*Math.abs(zoom)/2, 1, MAX_ZOOM);
+
+        zoomX = e.pageX;
+        zoomY = e.pageY;
+        mainRedraw();
+    }
+});
