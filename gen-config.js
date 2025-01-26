@@ -8,5 +8,6 @@ const defaultSettings = {
     defaultBrushPercentage: "100",
     practiceDrawMode: "finger",
     practiceTimer: "false",
+    practiceTimerLengthMinutes: "5",
     practiceScore: "false"
 }

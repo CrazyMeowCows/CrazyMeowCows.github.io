@@ -3,20 +3,29 @@
     <link rel="stylesheet" href="settings-stylesheet.css">
 </head>
 
+<style>
+p {
+    margin: 0px;
+    padding: 0px;
+    color: red;
+    display: none;
+}
+</style>
+
 <body>
     <div class="sidenav">
         <a onclick="updateSettings('settings.html');">General</a>
-        <a onclick="updateSettings('settings-practice.html');">Practice</a>
+        <a onclick="updateSettings('settings-practice.html');"  style="background-color: #383838;">Practice</a>
         <a onclick="updateSettings('settings-pwChange.html');">Password</a>
     </div>
 
     <div id = "main">
         <div id = "break"></div>
         <div id = "inputField">
-            <label for="practiceTimer">Practice Timer:</label>
-            <select id="practiceTimer" style='font-size: 1em;'>
-                <option value="false">Disabled</option> 
-                <option value="true">Enabled</option>
+            <label for="practiceDrawMode">Draw Mode for Practice:</label>
+            <select id="practiceDrawMode" style='font-size: 1em;'>
+                <option value="finger">Finger</option>
+                <option value="stylus">Stylus</option> 
             </select>
         </div>
         <div id = "inputField">
@@ -28,14 +37,19 @@
         </div>
         <div id = "break"></div>
         <div id = "inputField">
-            <label for="practiceDrawMode">Draw Mode for Practice:</label>
-            <select id="practiceDrawMode" style='font-size: 1em;'>
-                <option value="finger">Finger</option>
-                <option value="stylus">Stylus</option> 
+            <label for="practiceTimer">Practice Timer:</label>
+            <select id="practiceTimer" style='font-size: 1em;'>
+                <option value="false">Disabled</option> 
+                <option value="true">Enabled</option>
             </select>
         </div>
+        <div id = "inputField">
+            <label for="practiceTimerLengthMinutes" id="practiceLengthMinutesLabel">Practice Length (Minutes):</label>
+            <input id="practiceTimerLengthMinutes" type="number" autocomplete="off" style='font-size: 1em; max-width: 100px;'/>
+            <p id="practiceTimerLengthMinutesError">*</p>
+        </div>
     </div>
-    <button id="home" style='font-size: 2em;'>Save and Exit</button>
+    <button id="home" style='font-size: 2em;' onclick="updateSettings('index.html');">Save and Exit</button>
 </body>
 
 <script src="settings-main.js"></script>

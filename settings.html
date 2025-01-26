@@ -4,17 +4,17 @@
 </head>
 
 <style>
-    p {
-        margin: 0px;
-        padding: 0px;
-        color: red;
-        display: none;
-    }
+p {
+    margin: 0px;
+    padding: 0px;
+    color: red;
+    display: none;
+}
 </style>
 
 <body>
     <div class="sidenav">
-        <a onclick="updateSettings('settings.html');">General</a>
+        <a onclick="updateSettings('settings.html');" style="background-color: #383838;">General</a>
         <a onclick="updateSettings('settings-practice.html');">Practice</a>
         <a onclick="updateSettings('settings-pwChange.html');">Password</a>
     </div>
@@ -52,7 +52,7 @@
         </div>
         <div id = "break"></div>
         <div id = "inputField">
-            <label for="timerLengthMinutes">Timer Length (Minutes):</label>
+            <label for="timerLengthMinutes">Test Length (Minutes):</label>
             <input id="timerLengthMinutes" type="number" autocomplete="off" style='font-size: 1em; max-width: 100px;'/>
             <p id="timerLengthMinutesError">*</p>
         </div>
