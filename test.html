@@ -45,10 +45,10 @@ const TAU = 2*Math.PI;
 
 const UI_WIDTH = 100;
 
-// const W = window.innerWidth-UI_WIDTH;
-// const H = window.innerHeight;
-const W = screen.height-UI_WIDTH;
-const H = screen.width-20;
+const W = window.innerWidth-UI_WIDTH;
+const H = window.innerHeight;
+// const W = screen.height-UI_WIDTH;
+// const H = screen.width-20;
 
 const UI_CENTER = W+UI_WIDTH/2;
 
@@ -116,7 +116,7 @@ uiCtx.lineCap = "round";
 var oldGridSize = GRID_SIZE;
 
 var offsetX = W/2;
-var offsetY = H/2;
+var offsetY = H/2+GRID_SIZE/3;
 var zoomX = 0;
 var zoomY = 0;
 var zoom = 1;
@@ -163,8 +163,9 @@ var brushMinus = new Button(15+W, 310, 70, 70, () => {brushSize = Math.max(brush
 var pencil = new Button(15+W, H-250, 70, 70, () => {brushColor = DRAW_COLOR}, '\uF040', 0, true, false);
 var eraser = new Button(15+W, pencil.y+70, 70, 70, () => {brushColor = ERASE_COLOR}, '\uF12d', 0, true, false);
 var resetZoom = new Button(15+W, H-80, 70, 70, () => {zoomOut(true)}, '\uF066', 0, false, false);
+var endEarly = new Button(10, H-80, 70, 70, () => {endTestPrompt(); endEarly.trans = 0;}, '', 0, false, false); //Text is rendered in uiRedraw
 
-var startTest = new Button((W+UI_WIDTH)/2-35, H/2-10, 70, 70, () => {activePrompt = "none"; uiRedraw(); lastZoomed = true;}, '\uF0DA', 0, false, true);
+var startTest = new Button((W+UI_WIDTH)/2-35, H/2+13, 70, 70, () => {activePrompt = "none"; uiRedraw(); lastZoomed = true;}, '\uF0DA', 0, false, true);
 var yesEndTest = new Button((W+UI_WIDTH)/2-85, H/2-115, 70, 70, endTest, '\uF00C', 0, false, true);
 var noEndTest = new Button((W+UI_WIDTH)/2+15, H/2-115, 70, 70, () => {activePrompt = "none"; uiRedraw(); lastZoomed = true;}, '\uF00D', 0, false, true);
 var expiredOk = new Button((W+UI_WIDTH)/2-35, H/2-115, 70, 70, endTest, '\uF061', 0, false, true);
@@ -215,7 +216,7 @@ function mainRedraw() {
 
     //Limit panning
     offsetX = clamp(offsetX, -W*0.55*zoom+W, W*0.55*zoom);
-    offsetY = clamp(offsetY, -H*0.55*zoom+H, H*0.55*zoom);
+    offsetY = clamp(offsetY, -H*0.65*zoom+H, H*0.65*zoom);
 
     //Call each canvas' redraw functions
     gridCtxRedraw();
@@ -249,9 +250,9 @@ function line(x, y, x2, y2, width, ctx) {
 //Reset to a centered view at a zoom of 1
 function zoomOut(animate) {
     offsetX = W/2;
-    offsetY = H/2;
+    offsetY = H/2+GRID_SIZE/3;
     zoomX = W/2;
-    zoomY = H/2;
+    zoomY = 0;
     zoom = 1;
     oldGridSize = GRID_SIZE;
     mainRedraw();

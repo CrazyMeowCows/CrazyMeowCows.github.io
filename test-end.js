@@ -88,5 +88,7 @@ function scoreFigure() {
 
     if (IS_TEST) {
         location.href = "password-end.html";
+    } else {
+        location.href = "test-practiceEnd.html";
     }
 }

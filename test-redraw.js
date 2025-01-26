@@ -175,17 +175,9 @@ function uiRedraw () {
     }
 
     //Draw end test button
-    uiCtx.fillStyle = "#f2f2f2";
-    uiCtx.lineWidth = 4;
-    uiCtx.beginPath();
-    uiCtx.roundRect(10, H-80, 70, 70, [10]);
-    uiCtx.stroke();
-    uiCtx.fill();
-
-    uiCtx.font = 'normal 500 30px Times New Roman';
+    uiCtx.font = 'normal 500 37px Times New Roman';
     uiCtx.fillStyle = "#6b0000";
-    uiCtx.fillText("End", 45, H-59.5);
-    uiCtx.fillText("Test", 45, H-29.5);
+    uiCtx.fillText("End", 45, H-80+35);
 
     //Draw Eraser/Pencil Toggle
     uiCtx.fillStyle = 'rgba(0,0,0,0.1)';

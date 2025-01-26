@@ -7,13 +7,14 @@ function beginTestPrompt() {
     uiCtx.strokeStyle = 'black';
     uiCtx.lineWidth = 3;
     uiCtx.beginPath();
-    uiCtx.roundRect((W+UI_WIDTH)/2-180, H/2-85, 360, 170, [10]);
+    uiCtx.roundRect((W+UI_WIDTH)/2-270, H/2-100, 540, 200, [10]);
     uiCtx.fill();
     uiCtx.stroke();
 
     uiCtx.font = 'normal 500 30px Times New Roman'; //Draw text
     uiCtx.fillStyle = "black";
-    uiCtx.fillText("Begin Test When Ready", (W+UI_WIDTH)/2, H/2-45);
+    uiCtx.fillText("Press play to begin test.", (W+UI_WIDTH)/2, H/2-65);
+    uiCtx.fillText("Timer countdown will begin immediately.", (W+UI_WIDTH)/2, H/2-20);
 
     uiCtx.lineWidth = 2; //Draw startTest button
     uiCtx.fillStyle = "Green";
@@ -32,7 +33,7 @@ function endTestPrompt() {
     uiCtx.lineWidth = 3;
     uiCtx.beginPath();
     if (IS_TEST) {
-        uiCtx.roundRect((W+UI_WIDTH)/2-220, H/2-190, 440, 170, [10]);
+        uiCtx.roundRect((W+UI_WIDTH)/2-210, H/2-190, 420, 170, [10]);
     } else {
         uiCtx.roundRect((W+UI_WIDTH)/2-180, H/2-190, 360, 170, [10]);
     }
@@ -42,7 +43,7 @@ function endTestPrompt() {
     uiCtx.font = 'normal 500 30px Times New Roman'; //Draw text (change text depending on IS_TEST?)
     uiCtx.fillStyle = "black";
     if (IS_TEST) {
-        uiCtx.fillText("End Test Before Timer Expires?", (W+UI_WIDTH)/2, H/2-150);
+        uiCtx.fillText("End Test Before Timer Ends?", (W+UI_WIDTH)/2, H/2-150);
     } else {
         uiCtx.fillText("End Practice Session?", (W+UI_WIDTH)/2, H/2-150);
     }

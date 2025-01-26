@@ -19,18 +19,18 @@ document.addEventListener("touchstart", e => {
         handleButtonTouch(startTest, touch);
         return;
     }
-    if (touchX <= 80 && touchY >= H-80) { //Check for EndTest Button in bottom left corner
-        endTestPrompt();
+    //Test for UI elements
+    let uiTouch = handleSliderTouch(touch);
+    buttons.forEach(button => {
+        uiTouch = uiTouch || handleButtonTouch(button, touch)
+    });
+    if (uiTouch) {
+        if (activePrompt == "none") {
+            uiRedraw();
+        }
         return;
     }
-    if (touchX > W) { //Touch is on UI Bar
-        handleSliderTouch(touch);
-        buttons.forEach(button => {
-            handleButtonTouch(button, touch)
-        });
-        uiRedraw();
-        return;
-    }
+
     if (!drawWithFinger) { //Change input modes dependant on the drawWithFinger TODO: Clean up this code (Need access to iOS device)
         if (touch.touchType == "stylus") { //Stylus
             currentStroke = new PenStroke(touch.pageX, touch.pageY, brushColor);

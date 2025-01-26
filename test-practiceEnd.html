@@ -16,11 +16,8 @@
         display: flex;
         flex-direction: column; 
         justify-content: center;    
+        align-items: center;
         font-size: 2em;
-    }
-    #inputField {
-        margin-top: 50px;
-        display: inline-block;
     }
     button {
         font-family: 'Times New Roman', Times, serif;
@@ -38,25 +35,13 @@
 
 <body>
     <div id = "container">
-        <h2>Area Filling Accuracy Evaluator</h2>
-        <p>Please enter a proctor password to adjust settings.</p>
-        <div id = "inputField">
-            <label for="proctorPassword">Password:</label>
-            <input id="proctorPassword" type="password" required autocomplete="off" style='font-size: 1em;'/>
-            <button id="submit" style='font-size: 1em;'>Submit</button>
-        </div>
+        <h1>Area Filling Accuracy Evaluator</h1>
+        <h2 id="score"></h2>
     </div>
     <button id="home" style='font-size: 2em;' onclick="location.href = 'index.html';">Return Home</button>
 </body>
 
-<script src="gen-authenticate.js"></script>
-
 <script>
-    document.getElementById("submit").onclick = () => {
-        if (authenticate(document.getElementById("proctorPassword").value)) {
-            location.href = 'settings.html';
-        } else {
-            document.getElementById("proctorPassword").value = "";
-        }
-    };
+    document.getElementById("score").textContent = "Practice Score: " + JSON.parse(sessionStorage.scoreObject);
+    sessionStorage.scoreObject = JSON.stringify(""); //Clears drawing score from session storages
 </script>

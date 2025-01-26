@@ -32,10 +32,10 @@
 //Constant Declarations----------------------------------------------------------------------------
 const VER = "4.0.1";
 
-// const W = window.innerWidth;
-// const H = window.innerHeight;
-const W = screen.height;
-const H = screen.width-20;
+const W = window.innerWidth;
+const H = window.innerHeight;
+// const W = screen.height;
+// const H = screen.width-20;
 
 const YEAR = new Date().getFullYear();
 
@@ -54,7 +54,6 @@ ctx.textBaseline = "middle";
 var buttons = [];
 var practice = new Button(W/2-160, 290, 320, 70, () => {sessionStorage.isTest = JSON.stringify("false"); location.href = "test.html";}, 'Practice', 0, false, false);
 var test = new Button(W/2-160, 400, 320, 70, () => {location.href = "password-begin.html";}, 'Begin Test', 0, false, false);
-// var info = new Button(W/2-160, 480, 320, 70, () => {}, 'Info', 0, false, false);
 var settings = new Button(W-80, H-80, 70, 70, () => {location.href = "password-settings.html";}, '\uF013', 0, false, false);
 
 
@@ -101,7 +100,7 @@ function redraw() {
     //Title
     ctx.font = 'normal 500 65px Times New Roman';
     ctx.fillText("Area Filling", W/2, 150);
-    ctx.fillText("Accuracy Evaluation Tool", W/2, 220);
+    ctx.fillText("Accuracy Evaluator", W/2, 220);
 
     //Draw icon buttons
     ctx.lineWidth = 1.5;
