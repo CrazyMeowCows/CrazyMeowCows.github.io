@@ -1,71 +1,31 @@
 <!DOCTYPE html>
+<head>
+    <link rel="stylesheet" href="settings-stylesheet.css">
+</head>
+
 <style>
-    body {
-        width: 100%;
-        height: 100%;
-        margin: 0px;
-        padding: 0px;
-        overflow: hidden;
-        user-select: none;
-        font-family: 'Times New Roman', Times, serif;
-        -webkit-user-select: none;
-        -webkit-touch-callout: none;
-        text-align: left;
-    }
-    #container {
-        display: flex;
-        margin-top: 20px;
-        margin-left: 20px;
-        flex-direction: column; 
-        justify-content: center;    
-        font-size: 2em;
-    }
-    #inputField {
-        display: inline-block;
-        margin-bottom: 15px;
-    }
     p {
         margin: 0px;
         padding: 0px;
         color: red;
         display: none;
     }
-    select {
-        font-family: 'Times New Roman', Times, serif;
-    }
-    button {
-        font-family: 'Times New Roman', Times, serif;
-    }
-    #home {
-        color: black;
-        outline: 1px solid black;
-        appearance: auto;
-        -webkit-appearance: none;
-        position: absolute;
-        right: 10px;
-        bottom: 10px;
-    }
-    #title {
-        position: absolute;
-        margin-top: 0px;
-        right: 20px;
-        top: 20px;
-    }
 </style>
 
 <body>
-    <h1 id = "title" style="font-size: 3em">Settings</h1>
-    <div id = "container">
+    <div class="sidenav">
+        <a onclick="updateSettings('settings.html');">General</a>
+        <a onclick="updateSettings('settings-practice.html');">Practice</a>
+        <a onclick="updateSettings('settings-pwChange.html');">Password</a>
+    </div>
+
+    <div id = "main">
+        <br></br>
         <div id = "inputField">
-            <label for="selectedFigure">Select Figure:</label> <!-- ALSO ADD FIGURE IN defaultSettings -->
+            <label for="selectedFigure">Selected Figure:</label> <!-- ALSO ADD FIGURE IN defaultSettings -->
             <select id="selectedFigure" style='font-size: 1em;'>
                 <option value="0">The Ring</option>
             </select>
-        </div>
-        <div id = "inputField">
-            <label for="timerLengthMinutes">Timer Length (Minutes):</label>
-            <input id="timerLengthMinutes" type="number" autocomplete="off" style='font-size: 1em; max-width: 100px;'/>
-            <p id = "timerLengthMinutesError">*</p>
         </div>
         <div id = "inputField">
             <label for="displayGrid">Grid Lines:</label>
@@ -74,89 +34,30 @@
                 <option value="false">Off</option>
             </select>
         </div>
+        <br></br>
         <div id = "inputField">
             <label for="maxBrushSize">Max Brush Size (px):</label>
             <input id="maxBrushSize" type="number" autocomplete="off" style='font-size: 1em; max-width: 100px;'/>
-            <p id = "maxBrushSizeError">*</p>
+            <p id="maxBrushSizeError">*</p>
         </div>
         <div id = "inputField">
             <label for="minBrushSize">Min Brush Size (px):</label>
             <input id="minBrushSize" type="number" autocomplete="off" style='font-size: 1em; max-width: 100px;'/>
-            <p id = "minBrushSizeError">*</p>
+            <p id="minBrushSizeError">*</p>
         </div>
         <div id = "inputField">
             <label for="defaultBrushPercentage">Default Brush Size (%):</label>
             <input id="defaultBrushPercentage" type="number" autocomplete="off" style='font-size: 1em; max-width: 100px;'/>
-            <p id = "defaultBrushPercentageError">*</p>
+            <p id="defaultBrushPercentageError">*</p>
         </div>
+        <br></br>
         <div id = "inputField">
-            <label for="practiceDrawMode">Draw Mode for Practice:</label>
-            <select id="practiceDrawMode" style='font-size: 1em;'>
-                <option value="finger">Finger</option>
-                <option value="stylus">Stylus</option> 
-            </select>
+            <label for="timerLengthMinutes">Timer Length (Minutes):</label>
+            <input id="timerLengthMinutes" type="number" autocomplete="off" style='font-size: 1em; max-width: 100px;'/>
+            <p id="timerLengthMinutesError">*</p>
         </div>
-        <div id = "inputField">
-            <label for="practiceTimer">Practice Timer:</label>
-            <select id="practiceTimer" style='font-size: 1em;'>
-                <option value="false">Disabled</option> 
-                <option value="true">Enabled</option>
-            </select>
-        </div>
-        <div id = "inputField">
-            <label for="practiceScore">Practice Scoring:</label>
-            <select id="practiceScore" style='font-size: 1em;'>
-                <option value="false">Disabled</option> 
-                <option value="true">Enabled</option>
-            </select>
-        </div>
-        <button id="changePassword" style='font-size: 1em; width: fit-content; color: darkred' onclick="">Change Password</button>
     </div>
-    <button id="home" style='font-size: 2em;'>Save and Exit</button>
+    <button id="home" style='font-size: 2em;' onclick="updateSettings('index.html');">Save and Exit</button>
 </body>
 
-<script src="gen-math.js"></script>
-
-<script>
-    //On initialization set all settings to their previously saved values
-    for (const [key, value] of Object.entries(localStorage)) {
-        if (key == "newPW") {continue;}
-        document.getElementById(key).value = JSON.parse(value);
-    };
-
-    //Save settings when navigating off the page
-    document.getElementById("home").onclick = () => {
-        saveSettings("index.html");
-    };
-    document.getElementById("changePassword").onclick = () => {
-        saveSettings("password-change.html");
-    };
-
-    function saveSettings(destination) {
-        let errorFlag = false;
-
-        //Verify all settings have valid inputs
-        for (const [key, value] of Object.entries(localStorage)) {
-            if (key == "newPW") {continue;}
-            let element = document.getElementById(key);
-            if (element.type == "number") {
-                if (!isNumeric(element.value*10) || (element.id.includes("Percentage") && parseInt(element.value) > 100) || element.value == "") {
-                    document.getElementById(key + "Error").style.display = "inline-block";
-                    element.value = "";
-                    errorFlag = true;
-                } else {
-                    document.getElementById(key + "Error").style.display = "none";
-                }
-            }
-        };
-
-        if (!errorFlag) { //Save settings if no error is thrown
-            for (const [key, value] of Object.entries(localStorage)) {
-                if (key == "newPW") {continue;}
-                localStorage[key] = JSON.stringify(document.getElementById(key).value);
-            };
-            
-            location.href = destination;
-        }
-    }
-</script>
+<script src="settings-main.js"></script>
