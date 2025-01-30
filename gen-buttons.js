@@ -41,20 +41,6 @@ function drawIconButton(button, ctx) {
     ctx.fillText(button.icon, button.x+button.w/2, button.y+button.h/2+button.iconVoffset);
 }
 
-//Given a touch, adjust the brush size slider
-function handleSliderTouch (touch) {
-    gridCtxRedraw();
-    currentStroke = undefined;
-    lastZoomed = true;
-
-    if (touch.pageX > W && touch.pageY >= SLIDER_Y1-10 && touch.pageY <= SLIDER_Y2+10) {
-        brushSize = lerp(MIN_BRUSH_SIZE, MAX_BRUSH_SIZE, (SLIDER_Y2-touch.pageY)/(SLIDER_Y2-SLIDER_Y1));
-        uiRedraw();
-        return true;
-    }
-    return false;
-}
-
 //Given a button and touch, check if button is pressed
 function handleButtonTouch (button, touch) {
     // try { //Crash website if not being used on iOS

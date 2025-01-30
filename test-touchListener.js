@@ -19,8 +19,8 @@ document.addEventListener("touchstart", e => {
         handleButtonTouch(startTest, touch);
         return;
     }
-    //Test for UI elements
-    let uiTouch = handleSliderTouch(touch);
+
+    let uiTouch = handleSliderTouch(touch); //Test for UI elements
     buttons.forEach(button => {
         uiTouch = uiTouch || handleButtonTouch(button, touch)
     });
@@ -202,3 +202,17 @@ document.addEventListener("wheel", e => { //TODO: REMOVE
         mainRedraw();
     }
 });
+
+//Given a touch, adjust the brush size slider
+function handleSliderTouch (touch) {
+    gridCtxRedraw();
+    currentStroke = undefined;
+    lastZoomed = true;
+
+    if (touch.pageX > W && touch.pageY >= SLIDER_Y1-10 && touch.pageY <= SLIDER_Y2+10) {
+        brushSize = lerp(MIN_BRUSH_SIZE, MAX_BRUSH_SIZE, (SLIDER_Y2-touch.pageY)/(SLIDER_Y2-SLIDER_Y1));
+        uiRedraw();
+        return true;
+    }
+    return false;
+}

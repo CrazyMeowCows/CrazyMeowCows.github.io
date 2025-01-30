@@ -4,60 +4,241 @@
 </head>
 
 <style>
-p {
+.navbar {
+    height: 100%;
+    width: 160px;
+    position: fixed;
+    z-index: 1;
+    top: 0;
+    left: 0;
+    background-color: #111;
+    overflow-x: hidden;
+    padding-top: 20px;
+}
+.navbar a {
+    padding: 6px 8px 6px 16px;
+    text-decoration: none;
+    margin-top: 15px;
+    font-size: 30px;
+    color: #acacac;
+    display: block;
+}
+.navbar a:hover {
+    color: #f1f1f1;
+}
+.page {
+    display: flex;
+    margin-top: 20px;
+    flex-direction: column; 
+    justify-content: center;    
+    font-size: 2em;    
+    margin-left: 160px; /* Same as the width of the sidenav */
+    padding: 0px 20px;
+}
+.inputField a {
     margin: 0px;
     padding: 0px;
     color: red;
     display: none;
 }
+.inputField {
+    display: inline-block;
+    margin-bottom: 15px;
+}
+.break {
+    margin: 15px;
+}
+
+body {
+    width: 100%;
+    height: 100%;
+    margin: 0px;
+    padding: 0px;
+    overflow: hidden;
+    user-select: none;
+    font-family: 'Times New Roman', Times, serif;
+    -webkit-user-select: none;
+    -webkit-touch-callout: none;
+}
+select {
+    font-family: 'Times New Roman', Times, serif;
+}
+button {
+    font-family: 'Times New Roman', Times, serif;
+}
+p {
+    margin-top: 0px;
+    margin-bottom: 0px;
+}
+
+#home {
+    color: black;
+    outline: 1px solid black;
+    appearance: auto;
+    -webkit-appearance: none;
+    position: absolute;
+    right: 10px;
+    bottom: 10px;
+}
 </style>
 
 <body>
-    <div class="sidenav">
-        <a onclick="updateSettings('settings.html');" style="background-color: #383838;">General</a>
-        <a onclick="updateSettings('settings-practice.html');">Practice</a>
-        <a onclick="updateSettings('settings-pwChange.html');">Password</a>
-    </div>
+<!-- Setup the navbar on the side with all the settings pages -->
+<div class="navbar">
+    <a id="mainNav" onclick="changePage('main');" style="background-color: #383838;">General</a>
+    <a id="practiceNav" onclick="changePage('practice');">Practice</a>
+    <a id="pwChangeNav" onclick="changePage('pwChange');">Password</a>
+</div>
 
-    <div id = "main">
-        <div id = "break"></div>
-        <div id = "inputField">
-            <label for="selectedFigure">Selected Figure:</label> <!-- ALSO ADD FIGURE IN defaultSettings -->
-            <select id="selectedFigure" style='font-size: 1em;'>
-                <option value="0">The Ring</option>
-            </select>
-        </div>
-        <div id = "inputField">
-            <label for="displayGrid">Grid Lines:</label>
-            <select id="displayGrid" style='font-size: 1em;'>
-                <option value="true">On</option>
-                <option value="false">Off</option>
-            </select>
-        </div>
-        <div id = "break"></div>
-        <div id = "inputField">
-            <label for="maxBrushSize">Max Brush Size (px):</label>
-            <input id="maxBrushSize" type="number" autocomplete="off" style='font-size: 1em; max-width: 100px;'/>
-            <p id="maxBrushSizeError">*</p>
-        </div>
-        <div id = "inputField">
-            <label for="minBrushSize">Min Brush Size (px):</label>
-            <input id="minBrushSize" type="number" autocomplete="off" style='font-size: 1em; max-width: 100px;'/>
-            <p id="minBrushSizeError">*</p>
-        </div>
-        <div id = "inputField">
-            <label for="defaultBrushPercentage">Default Brush Size (%):</label>
-            <input id="defaultBrushPercentage" type="number" autocomplete="off" style='font-size: 1em; max-width: 100px;'/>
-            <p id="defaultBrushPercentageError">*</p>
-        </div>
-        <div id = "break"></div>
-        <div id = "inputField">
-            <label for="timerLengthMinutes">Test Length (Minutes):</label>
-            <input id="timerLengthMinutes" type="number" autocomplete="off" style='font-size: 1em; max-width: 100px;'/>
-            <p id="timerLengthMinutesError">*</p>
-        </div>
+<!-- The main settings page the user lands on -->
+<div class="page" id="main">
+    <div class="break"></div>
+    <div class="inputField">
+        <label for="selectedFigure">Selected Figure:</label> <!-- ALSO ADD FIGURE IN defaultSettings -->
+        <select id="selectedFigure" style='font-size: 1em;'>
+            <option value="0">The Ring</option>
+        </select>
     </div>
-    <button id="home" style='font-size: 2em;' onclick="updateSettings('index.html');">Save and Exit</button>
+    <div class="inputField">
+        <label for="displayGrid">Grid Lines:</label>
+        <select id="displayGrid" style='font-size: 1em;'>
+            <option value="true">On</option>
+            <option value="false">Off</option>
+        </select>
+    </div>
+    <div class="break"></div>
+    <div class="inputField">
+        <label for="maxBrushSize">Max Brush Size (px):</label>
+        <input id="maxBrushSize" type="number" autocomplete="off" style='font-size: 1em; max-width: 100px;'/>
+        <a id="maxBrushSizeError">*</a>
+    </div>
+    <div class="inputField">
+        <label for="minBrushSize">Min Brush Size (px):</label>
+        <input id="minBrushSize" type="number" autocomplete="off" style='font-size: 1em; max-width: 100px;'/>
+        <a id="minBrushSizeError">*</a>
+    </div>
+    <div class="inputField">
+        <label for="defaultBrushPercentage">Default Brush Size (%):</label>
+        <input id="defaultBrushPercentage" type="number" autocomplete="off" style='font-size: 1em; max-width: 100px;'/>
+        <a id="defaultBrushPercentageError">*</a>
+    </div>
+    <div class="break"></div>
+    <div class="inputField">
+        <label for="timerLengthMinutes">Test Length (Minutes):</label>
+        <input id="timerLengthMinutes" type="number" autocomplete="off" style='font-size: 1em; max-width: 100px;'/>
+        <a id="timerLengthMinutesError">*</a>
+    </div>
+</div>
+
+<!-- Settings relevant to practice mode -->
+<div class="page" id="practice" style="display: none;">
+    <div class="break"></div>
+    <div class="inputField">
+        <label for="practiceDrawMode">Draw Mode for Practice:</label>
+        <select id="practiceDrawMode" style='font-size: 1em;'>
+            <option value="finger">Finger</option>
+            <option value="stylus">Stylus</option> 
+        </select>
+    </div>
+    <div class="inputField">
+        <label for="practiceScore">Practice Scoring:</label>
+        <select id="practiceScore" style='font-size: 1em;'>
+            <option value="false">Disabled</option> 
+            <option value="true">Enabled</option>
+        </select>
+    </div>
+    <div class="break"></div>
+    <div class="inputField">
+        <label for="practiceTimer">Practice Timer:</label>
+        <select id="practiceTimer" style='font-size: 1em;'>
+            <option value="false">Disabled</option> 
+            <option value="true">Enabled</option>
+        </select>
+    </div>
+    <div class="inputField">
+        <label for="practiceTimerLengthMinutes" id="practiceLengthMinutesLabel">Practice Length (Minutes):</label>
+        <input id="practiceTimerLengthMinutes" type="number" autocomplete="off" style='font-size: 1em; max-width: 100px;'/>
+        <a id="practiceTimerLengthMinutesError">*</a>
+    </div>
+</div>
+
+<!-- Page to change the prcotor password -->
+<div class="page" id="pwChange" style="display: none;">
+    <div class="break"></div>
+    <p>Please enter the admin password to set a new proctor password.</p>
+    <div class="break"></div>
+    <div class="break"></div>
+    <div class="inputField">
+        <label for="adminPassword">Admin Password:</label>
+        <input id="adminPassword" type="password" required autocomplete="off" style='font-size: 1em;'/>
+    </div>
+    <div class="inputField">
+        <label for="proctorPassword">New Proctor Password:</label>
+        <input id="proctorPassword" type="text" required autocomplete="off" style='font-size: 1em;'/>
+    </div>
+    <button id="submit" style='font-size: 1em; width: fit-content;'>Change Password</button>
+    <h6 id="status"></h6>
+</div>
+
+<button id="home" style='font-size: 2em;' onclick="saveAndExit();">Save and Exit</button>
 </body>
 
-<script src="settings-main.js"></script>
+<script src="gen-config.js"></script>
+<script>
+//On initialization set all settings to their previously saved values
+for (const [key, value] of Object.entries(defaultSettings)) {
+    document.getElementById(key).value = JSON.parse(localStorage[key]);
+};
+
+function changePage(destination) {
+    if (!checkValidEntries()) { //Check for any invalid entries
+        return;
+    }
+
+    pages = document.getElementsByClassName("page"); //array of all settings pages
+    for (let i = 0; i < pages.length; i++) {
+        let page = pages[i];
+        if (page.id == destination) { //Show the destination page and highlight that sidebar
+            page.style.display = "flex";
+            document.getElementById(page.id+"Nav").style.backgroundColor = "#383838";
+        } else { //Hide the non-destination pages and un-highlight those sidebars
+            page.style.display = "none";
+            document.getElementById(page.id+"Nav").style.backgroundColor = "#00000000";
+        }
+    }
+}
+
+function saveAndExit() {    
+    if (checkValidEntries()) { //Save settings if no error is thrown
+        for (const [key, value] of Object.entries(defaultSettings)) {
+            localStorage[key] = JSON.stringify(document.getElementById(key).value);
+        };
+
+        location.href = "index.html"; //Return to the homepage
+    }
+}
+
+function checkValidEntries() {
+    let errorFlag = false;
+    for (const [key, value] of Object.entries(defaultSettings)) {
+        element = document.getElementById(key);
+
+        if (element.type != "number") continue; //Only number fields allow for bad inputs
+
+        //Check if a number field contains a valid number (percentage inputs must be <= 100)
+        if (!isNumeric(element.value) || (element.id.includes("Percentage") && parseInt(element.value) > 100) || element.value == "") {
+            document.getElementById(element.id + "Error").style.display = "inline-block";
+            element.value = "";
+            errorFlag = true;
+        } else {
+            document.getElementById(element.id + "Error").style.display = "none";
+        }
+    }
+    return !errorFlag; //Return true if all entries are valid
+}
+
+function isNumeric(value) {
+    //Return true if given number/string is a positive whole number
+    return /^[+]?([.]\d+|\d+([.]\d+)?)$/.test(value);
+}
+</script>
