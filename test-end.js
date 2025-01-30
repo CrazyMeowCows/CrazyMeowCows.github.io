@@ -13,7 +13,6 @@ function endTest() {
         setTimeout(scoreFigure, 40);
     } else {
         location.href = "index.html";
-        return;
     }
 }
 
