@@ -87,8 +87,8 @@ function scoreFigure() {
     sessionStorage.scoreObject = JSON.stringify(scoreStr+"%"); //Stores drawing score in the session storages
 
     if (IS_TEST) {
-        location.href = "password-end.html";
+        location.href = "testEnd_auth.html";
     } else {
-        location.href = "test-practiceEnd.html";
+        location.href = "testPracticeEnd.html";
     }
 }

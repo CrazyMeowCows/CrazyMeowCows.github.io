@@ -1,8 +1,5 @@
 <!DOCTYPE html>
-<html>
-<head>
-<title>DPAA Testing Software</title>
-</head>
+<head><title>DPAA Testing Software</title></head>
 
 <!-- Font Awesome by Dave Gandy - http://fontawesome.io  -->
 <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css">
@@ -82,8 +79,8 @@ button {
     font-size: 60px;
     color: #4F3564;
 }
-
 </style>
+
 
 <body>
 <p id="vers"></p>
@@ -92,10 +89,10 @@ button {
 <div id="main">
     <h1 id="title">Area Filling <br> Accuracy Evaluator</h1>
     <button class="navButton" onclick="location.href = 'test.html'">Practice</button>
-    <button class="navButton" onclick="location.href = 'password-begin.html'">Begin Test</button>
+    <button class="navButton" onclick="location.href = 'testBegin_auth.html'">Begin Test</button>
 </div>
 
-<button id="settings" onclick="location.href = 'password-settings.html'"><i id="settingsIcon" class="fa fa-cog"></i></button>
+<button id="settings" onclick="location.href = 'settings_auth.html'"><i id="settingsIcon" class="fa fa-cog"></i></button>
 </body>
 
 
@@ -111,10 +108,10 @@ document.getElementById("copyright").textContent = "© " + YEAR + " McPhail Pate
 //Initialize Settings------------------------------------------------------------------------------
 sessionStorage.isTest = JSON.stringify("false");
 
+//For each settings option, initialize it to the default value if it is undefined
 for (const [key, value] of Object.entries(defaultSettings)) {
     if (localStorage[key] == undefined) {
         localStorage[key] = JSON.stringify(defaultSettings[key]);
     }
 };
 </script>
-</html>

@@ -1,8 +1,4 @@
 <!DOCTYPE html>
-<head>
-    <link rel="stylesheet" href="settings-stylesheet.css">
-</head>
-
 <style>
 .navbar {
     height: 100%;
@@ -80,7 +76,11 @@ p {
     right: 10px;
     bottom: 10px;
 }
+#status {
+    margin-top: 35px;
+}
 </style>
+
 
 <body>
 <!-- Setup the navbar on the side with all the settings pages -->
@@ -94,10 +94,8 @@ p {
 <div class="page" id="main">
     <div class="break"></div>
     <div class="inputField">
-        <label for="selectedFigure">Selected Figure:</label> <!-- ALSO ADD FIGURE IN defaultSettings -->
-        <select id="selectedFigure" style='font-size: 1em;'>
-            <option value="0">The Ring</option>
-        </select>
+        <label for="selectedFigure">Selected Figure:</label>
+        <select id="selectedFigure" style='font-size: 1em;'></select> <!-- Figures are added automatically -->
     </div>
     <div class="inputField">
         <label for="displayGrid">Grid Lines:</label>
@@ -176,15 +174,25 @@ p {
         <label for="proctorPassword">New Proctor Password:</label>
         <input id="proctorPassword" type="text" required autocomplete="off" style='font-size: 1em;'/>
     </div>
-    <button id="submit" style='font-size: 1em; width: fit-content;'>Change Password</button>
-    <h6 id="status"></h6>
+    <button id="submit" style='font-size: 1em; width: fit-content;' onclick="changePassword()">Change Password</button>
+    <h6 id="status" style="display: none;">Proctor Password Set</h6>
 </div>
 
 <button id="home" style='font-size: 2em;' onclick="saveAndExit();">Save and Exit</button>
 </body>
 
+
 <script src="gen-config.js"></script>
+<script src="gen-authenticate.js"></script>
 <script>
+
+for (let i = 0; i < figures.length; i++){
+    var opt = document.createElement('option');
+    opt.value = i;
+    opt.innerHTML = figures[i].displayName;
+    document.getElementById('selectedFigure').appendChild(opt);
+}
+
 //On initialization set all settings to their previously saved values
 for (const [key, value] of Object.entries(defaultSettings)) {
     document.getElementById(key).value = JSON.parse(localStorage[key]);
@@ -235,6 +243,15 @@ function checkValidEntries() {
         }
     }
     return !errorFlag; //Return true if all entries are valid
+}
+
+function changePassword() {
+    if (document.getElementById("adminPassword").value == document.getElementsByName("viewport")[0].id.split("|")[1] && document.getElementById("proctorPassword").value != "") {
+        localStorage.newPW = JSON.stringify(document.getElementById("proctorPassword").value);
+        document.getElementById("status").style.display = "inline-block"; //Display success status
+    } else {
+        document.getElementById("proctorPassword").value = ""; //Clear proctor password field on failed auth attempt
+    }
 }
 
 function isNumeric(value) {

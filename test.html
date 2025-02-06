@@ -1,43 +1,38 @@
 <!DOCTYPE html>
-<html>
-<head>
-<title>DPAA Testing Software</title>
-</head>
+<head><title>DPAA Testing Software</title></head>
 
-<canvas class="canvas" id="gridCanvas" width="0" height="0"></canvas>    
+<!-- Font Awesome by Dave Gandy - http://fontawesome.io -->    
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css">
+<style>
+body {
+    width: 100%;
+    height: 100%;
+    margin: 0px;
+    padding: 0px;
+    overflow: hidden;
+    display: block;
+    user-select: none;
+    -webkit-user-select: none;
+    -webkit-touch-callout: none;
+}
+canvas {
+    position: absolute;
+}
+</style>
+
+
+<canvas id="gridCanvas" width="0" height="0"></canvas>    
 <canvas id="drawCanvas" width="0" height="0"></canvas>    
 <canvas id="figureCanvas" width="0" height="0"></canvas>    
 <canvas id="uiCanvas" width="0" height="0"></canvas>
-<style>
-    body {
-        width: 100%;
-        height: 100%;
-        margin: 0px;
-        padding: 0px;
-        overflow: hidden;
-        display: block;
-        user-select: none;
-        -webkit-user-select: none;
-        -webkit-touch-callout: none;
-    }
-    canvas {
-        position: absolute;
-    }
-</style>
 
-<!-- Colors: FFFFFF, 4F3564, 000000 -->
-<!-- Font Awesome by Dave Gandy - http://fontawesome.io -->    
-<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css">
 
-<script src="gen-buttons.js"></script>
-<script src="gen-math.js"></script>
-<script src="gen-figure.js"></script>
+<script src="gen-config.js"></script>
+<script src="test-buttons.js"></script>
 <script src="test-prompt.js"></script>
 <script src="test-redraw.js"></script>
 <script src="test-end.js"></script>
 <script src="test-touchListener.js"></script>
-
-
 <script>
 //Constant Declarations----------------------------------------------------------------------------
 const PI = Math.PI;
@@ -45,10 +40,12 @@ const TAU = 2*Math.PI;
 
 const UI_WIDTH = 100;
 
-const W = window.innerWidth-UI_WIDTH;
-const H = window.innerHeight;
-// const W = screen.height-UI_WIDTH;
-// const H = screen.width-20;
+var W = screen.height-UI_WIDTH; //Testing code
+var H = screen.width-20;
+if (COMP_TESTING) {
+    W = window.innerWidth-UI_WIDTH;
+    H = window.innerHeight;
+}
 
 const UI_CENTER = W+UI_WIDTH/2;
 
@@ -239,6 +236,17 @@ function line(x, y, x2, y2, width, ctx) {
     ctx.moveTo(x, y);
     ctx.lineTo(x2, y2);
     ctx.stroke();
+}
+
+//Math Utils---------------------------------------------------------------------------------------
+//Clamp number between minimum and maximum values
+function clamp(x, min, max) {
+    return Math.max(Math.min(x, max), min);
+}
+
+//Given value from 0-1 (alpha) interpolate between a and b
+function lerp(a, b, alpha) {
+    return a + clamp(alpha, 0, 1)*(b-a);
 }
 
 
