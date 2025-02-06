@@ -31,7 +31,7 @@ document.addEventListener("touchstart", e => {
         return;
     }
 
-    if (!drawWithFinger) { //Change input modes dependant on the drawWithFinger TODO: Clean up this code (Need access to iOS device)
+    if (!DRAW_W_FINGER) { //Change input modes dependant on the drawWithFinger TODO: Clean up this code (Need access to iOS device)
         if (touch.touchType == "stylus") { //Stylus
             currentStroke = new PenStroke(touch.pageX, touch.pageY, brushColor);
             strokes.push(currentStroke);
@@ -106,7 +106,7 @@ document.addEventListener("touchmove", e => {
         handleSliderTouch(touch);
         return;
     }
-    if (drawWithFinger) { //Change input modes dependant on the drawWithFinger TODO: Clean up this code (Need access to iOS device)
+    if (DRAW_W_FINGER) { //Change input modes dependant on the drawWithFinger TODO: Clean up this code (Need access to iOS device)
         if (touches.length <= 1 && currentStroke == undefined) { //Trying to draw but no currentStroke
             return;
         }

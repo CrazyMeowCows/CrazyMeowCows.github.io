@@ -51,7 +51,7 @@ function scoreFigure() {
 
     drawCtx.strokeStyle = "red";
     strokes.forEach(stroke => {
-        if (stroke.strokeColor == DRAW_COLOR) {
+        if (stroke.strokeColor == drawColor) {
             drawCtx.globalCompositeOperation = "source-over";
         } else {
             drawCtx.globalCompositeOperation = "destination-out";
@@ -83,8 +83,13 @@ function scoreFigure() {
         }
     }
 
-    let scoreStr = Math.round(scoreInc/SELECTED_FIGURE.maxScore*100*10000)/10000
-    sessionStorage.scoreObject = JSON.stringify(scoreStr+"%"); //Stores drawing score in the session storages
+    let score = Math.round(scoreInc/SELECTED_FIGURE.maxScore*100*10000)/10000
+    if (score < 0) {
+        score = "NEGATIVE VALUE";
+    } else {
+        score += "%";
+    }
+    sessionStorage.scoreObject = JSON.stringify(score); //Stores drawing score in the session storages
 
     if (IS_TEST) {
         location.href = "testEnd_auth.html";

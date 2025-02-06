@@ -44,7 +44,7 @@ function drawCtxRedraw() {
 
     //Drawing strokes using one continuous line
     strokes.forEach(stroke => {
-        if (stroke.strokeColor == DRAW_COLOR) {
+        if (stroke.strokeColor == drawColor) {
             drawCtx.globalCompositeOperation = "source-over";
         } else {
             drawCtx.globalCompositeOperation = "destination-out";
@@ -155,14 +155,14 @@ function uiRedraw () {
     if (brushColor == ERASE_COLOR) {
         uiCtx.fillStyle = "#f2f2f2";
     } else {
-        uiCtx.fillStyle = DRAW_COLOR;
+        uiCtx.fillStyle = drawColor;
     }
     circle(UI_CENTER, sliderHeight, brushSize/MAX_BRUSH_SIZE*UI_BRUSH_RAD+5, true, uiCtx);
     uiCtx.stroke();
 
     //Draw icon buttons
     uiCtx.lineWidth = 1.5;
-    uiCtx.fillStyle = "#4F3564";
+    uiCtx.fillStyle = "black";
     let recurse = false;
     buttons.forEach(button => {
         drawIconButton(button, uiCtx);
@@ -183,11 +183,11 @@ function uiRedraw () {
     uiCtx.fillStyle = 'rgba(0,0,0,0.1)';
     uiCtx.beginPath();
     uiCtx.roundRect(pencil.x, pencil.y, pencil.w, pencil.h, [10, 10, 0, 0]);
-    if (brushColor == DRAW_COLOR) {
+    if (brushColor == drawColor) {
         uiCtx.lineWidth = 3;
+        uiCtx.fill();
     } else {
         uiCtx.lineWidth = 1.5;
-        uiCtx.fill();
     }
     uiCtx.stroke();
 
@@ -195,8 +195,8 @@ function uiRedraw () {
     uiCtx.roundRect(eraser.x, eraser.y, eraser.w, eraser.h, [0, 0, 10, 10]);
     if (brushColor == ERASE_COLOR) {
         uiCtx.lineWidth = 3;
-    } else {
         uiCtx.fill();
+    } else {
         uiCtx.lineWidth = 1.5;
     }
     uiCtx.stroke();
