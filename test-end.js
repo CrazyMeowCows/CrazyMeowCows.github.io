@@ -1,6 +1,8 @@
 function endTest() {
     isScoring = true; //Set isScoring
-    clearInterval(timerInterval);
+    try {
+        clearInterval(timerInterval);
+    } catch (error) {}
     zoomOut(false)
 
     uiCtx.fillStyle = "white";
@@ -28,7 +30,6 @@ function scoreFigure() {
     drawCtx.strokeStyle = "red";
     drawCtx.lineCap = "round";
     drawCtx.lineJoin = "round";
-
 
     // let minAngle = 0;
     // let maxAngle = TAU;

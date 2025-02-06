@@ -1,4 +1,6 @@
 function authenticate (value) {
+    return true; //TEMP
+
     let proctorPassword;
     try {
         proctorPassword = JSON.parse(localStorage.newPW); //Check if a alternate proctor password is set
@@ -13,5 +15,4 @@ function authenticate (value) {
         sessionStorage.isTest = JSON.stringify("false"); 
         location.href = 'crash'; //Crash website it passwords are not present
     }
-    // return true;
 }

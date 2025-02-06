@@ -45,10 +45,10 @@ const TAU = 2*Math.PI;
 
 const UI_WIDTH = 100;
 
-// const W = window.innerWidth-UI_WIDTH;
-// const H = window.innerHeight;
-const W = screen.height-UI_WIDTH;
-const H = screen.width-20;
+const W = window.innerWidth-UI_WIDTH;
+const H = window.innerHeight;
+// const W = screen.height-UI_WIDTH;
+// const H = screen.width-20;
 
 const UI_CENTER = W+UI_WIDTH/2;
 
@@ -183,26 +183,20 @@ function decrementTimer() {
         timerExpiredPrompt();
     }
 }
-if (IS_TEST) { //If in test mode activate the start prompt and begin the timer
-    activePrompt = "start";
-}
-if (ENABLE_TIMER) {
-    var timerInterval = setInterval(decrementTimer, 1000);
-}
+
+uiRedraw(); //Call uiRedraw to start loading the used fonts
 
 function load () { 
     if (document.fonts.check('1px FontAwesome')) { //Check if font is loaded
         uiRedraw(); //Call uiRedraw once fonts are loaded to display everything correctly
-        if (IS_TEST) {
-            beginTestPrompt()
-        }
+        if (IS_TEST) {beginTestPrompt();}
+        if (ENABLE_TIMER) {var timerInterval = setInterval(decrementTimer, 1000);}
+        mainRedraw(); //Draw main content
     } else {
         setTimeout(load, 20); //Recursively check every 20ms until font loads
     }
 }
-uiRedraw(); //Call uiRedraw to start loading the used fonts
 load(); //Begin loading loop
-mainRedraw(); //Draw main content
 
 
 //Drawing the content of the main canvas-----------------------------------------------------------
