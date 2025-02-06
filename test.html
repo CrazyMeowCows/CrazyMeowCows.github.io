@@ -172,6 +172,8 @@ var expiredOk = new Button((W+UI_WIDTH)/2-35, H/2-115, 70, 70, endTest, '\uF061'
 
 
 //Program Initialization---------------------------------------------------------------------------
+sessionStorage.isTest = JSON.stringify("false"); //Clear any previously set isTest flag 
+
 function decrementTimer() {
     if (activePrompt != "none") { //Dont decrement timer if a prompt is active
         return;
