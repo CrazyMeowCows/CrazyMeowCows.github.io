@@ -203,8 +203,11 @@ document.addEventListener("wheel", e => { //TODO: REMOVE
     }
 });
 
-//Given a touch, adjust the brush size slider
+//Given a touch, adjust the brush size slider and return if touch is on slider
 function handleSliderTouch (touch) {
+    if (!IS_TEST) { //Immediately abort if in practice mode and slider not present
+        return false;
+    }
     gridCtxRedraw();
     currentStroke = undefined;
     lastZoomed = true;

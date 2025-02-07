@@ -160,11 +160,15 @@ function extendCurrentStroke (rawX, rawY) {
 }
 
 var buttons = [];
-var brushPlus = new Button(15+W, 10, 70, 70, () => {brushSize = Math.min(brushSize+BRUSH_DELTA, MAX_BRUSH_SIZE)}, '\uF067', 2, false, false);
-var brushMinus = new Button(15+W, 310, 70, 70, () => {brushSize = Math.max(brushSize-BRUSH_DELTA, MIN_BRUSH_SIZE)}, '\uF068', 3, false, false);
-var pencil = new Button(15+W, H-250, 70, 70, () => {brushColor = drawColor}, '\uF040', 0, true, false);
-var eraser = new Button(15+W, pencil.y+70, 70, 70, () => {brushColor = ERASE_COLOR}, '\uF12d', 0, true, false);
-var resetZoom = new Button(15+W, H-80, 70, 70, () => {zoomOut(true)}, '\uF066', 0, false, false);
+let pencilToggleH = 15;
+if (IS_TEST) {
+    pencilToggleH = H-250;
+    new Button(15+W, 10, 70, 70, () => {brushSize = Math.min(brushSize+BRUSH_DELTA, MAX_BRUSH_SIZE)}, '\uF067', 2, false, false);
+    new Button(15+W, 310, 70, 70, () => {brushSize = Math.max(brushSize-BRUSH_DELTA, MIN_BRUSH_SIZE)}, '\uF068', 3, false, false);
+}
+var pencil = new Button(15+W, pencilToggleH, 70, 70, () => {brushColor = drawColor}, '\uF040', 0, true, false);
+var eraser = new Button(15+W, pencilToggleH+70, 70, 70, () => {brushColor = ERASE_COLOR}, '\uF12d', 0, true, false);
+new Button(15+W, H-80, 70, 70, () => {zoomOut(true)}, '\uF066', 0, false, false);
 var endEarly = new Button(10, H-80, 70, 70, () => {endTestPrompt(); endEarly.trans = 0;}, '', 0, false, false); //Text is rendered in uiRedraw
 
 var startTest = new Button((W+UI_WIDTH)/2-35, H/2+13, 70, 70, () => {activePrompt = "none"; uiRedraw(); lastZoomed = true;}, '\uF0DA', 0, false, true);

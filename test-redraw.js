@@ -140,25 +140,27 @@ function uiRedraw () {
         uiCtx.fillText(mins+":"+secs, W/2, 27);
     }
 
-    //Draw brush size slider
-    let sliderHeight = SLIDER_Y2-(brushSize-MIN_BRUSH_SIZE)/(MAX_BRUSH_SIZE-MIN_BRUSH_SIZE)*(SLIDER_Y2-SLIDER_Y1);
+    if (IS_TEST) {
+        //Draw brush size slider
+        let sliderHeight = SLIDER_Y2-(brushSize-MIN_BRUSH_SIZE)/(MAX_BRUSH_SIZE-MIN_BRUSH_SIZE)*(SLIDER_Y2-SLIDER_Y1);
 
-    line(UI_CENTER, SLIDER_Y1, UI_CENTER, SLIDER_Y2, 10, uiCtx)
-    uiCtx.strokeStyle = "#d6d6d6";
-    line(UI_CENTER, SLIDER_Y1, UI_CENTER, SLIDER_Y2, 6, uiCtx)
-    uiCtx.strokeStyle = "#a1a1a1";
-    line(UI_CENTER, sliderHeight, UI_CENTER, SLIDER_Y2, 6, uiCtx)
+        line(UI_CENTER, SLIDER_Y1, UI_CENTER, SLIDER_Y2, 10, uiCtx)
+        uiCtx.strokeStyle = "#d6d6d6";
+        line(UI_CENTER, SLIDER_Y1, UI_CENTER, SLIDER_Y2, 6, uiCtx)
+        uiCtx.strokeStyle = "#a1a1a1";
+        line(UI_CENTER, sliderHeight, UI_CENTER, SLIDER_Y2, 6, uiCtx)
 
-    //Draw current brush size
-    uiCtx.strokeStyle = "black";
-    uiCtx.lineWidth = 2;
-    if (brushColor == ERASE_COLOR) {
-        uiCtx.fillStyle = "#f2f2f2";
-    } else {
-        uiCtx.fillStyle = drawColor;
+        //Draw current brush size
+        uiCtx.strokeStyle = "black";
+        uiCtx.lineWidth = 2;
+        if (brushColor == ERASE_COLOR) {
+            uiCtx.fillStyle = "#f2f2f2";
+        } else {
+            uiCtx.fillStyle = drawColor;
+        }
+        circle(UI_CENTER, sliderHeight, brushSize/MAX_BRUSH_SIZE*UI_BRUSH_RAD+5, true, uiCtx);
+        uiCtx.stroke();
     }
-    circle(UI_CENTER, sliderHeight, brushSize/MAX_BRUSH_SIZE*UI_BRUSH_RAD+5, true, uiCtx);
-    uiCtx.stroke();
 
     //Draw icon buttons
     uiCtx.lineWidth = 1.5;

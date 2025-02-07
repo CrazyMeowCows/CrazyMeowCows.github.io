@@ -1,4 +1,7 @@
 <!DOCTYPE html>
+
+<!-- Font Awesome by Dave Gandy - http://fontawesome.io  -->
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css">
 <style>
 body {
     width: 100%;
@@ -38,6 +41,73 @@ button {
     bottom: 10px;
     display: none;
 }
+
+.modal {
+    display: none;
+    position: fixed; /* Stay in place */
+    z-index: 1; /* Sit on top */
+    padding-top: 15%; /* Location of the box */
+    left: 0;
+    top: 0;
+    width: 100%; /* Full width */
+    height: 100%; /* Full height */
+    overflow: hidden; /* Enable scroll if needed */
+    background-color: rgb(0,0,0); /* Fallback color */
+    background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
+}
+.modal-content {
+    position: relative;
+    background-color: #fefefe;
+    margin: auto;
+    padding: 30px 30px;
+    border: 2px solid black;
+    border-radius: 10px;
+    width: fit-content;
+    font-size: 27px;
+    box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2),0 6px 20px 0 rgba(0,0,0,0.19);
+    -webkit-animation-name: animatetop;
+    -webkit-animation-duration: 0.4s;
+    animation-name: animatetop;
+    animation-duration: 0.4s
+}
+.modal-buttonDiv {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+/* Add Animation */
+@-webkit-keyframes animatetop {
+  from {top:-300px; opacity:0} 
+  to {top:0; opacity:1}
+}
+
+@keyframes animatetop {
+  from {top:-300px; opacity:0}
+  to {top:0; opacity:1}
+}
+
+.iconButton {
+    background-color: white;
+
+    outline: 2px solid black;
+    border: none;
+    border-radius: 10px;
+
+    appearance: auto;
+    -webkit-appearance: none;
+
+    width: 70px;
+    height: 70px;
+    margin: 10px;
+    margin-top: 10px;
+    margin-bottom: 0px;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 60px;
+}
 </style>
 
 
@@ -53,7 +123,17 @@ button {
     </div>
     <h2 id="score"></h2>
 </div>
-<button id="home" style='font-size: 2em;' onclick="location.href = 'index.html';">Return Home</button>
+<button id="home" style='font-size: 2em;' onclick="document.getElementById('home-modal').style.display = 'block'">Return Home</button>
+
+<div id="home-modal" class="modal">
+    <div class="modal-content">
+        <p>Are you sure this session is complete and the data has been recorded? <br></br> Testing score will not be saved on this device.</p>
+        <div class="modal-buttonDiv">
+            <button class="iconButton" style="color: green;" onclick="location.href = 'index.html'"><i class="fa fa-check"></i></button>
+            <button class="iconButton" style="color: #6b0000;" onclick="document.getElementById('home-modal').style.display = 'none'"><i class="fa fa-times"></i></button>
+        </div>
+    </div>
+</div>
 </body>
 
 

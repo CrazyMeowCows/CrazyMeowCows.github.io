@@ -82,12 +82,16 @@ function scoreFigure() {
             }
         }
     }
-
+    
     let score = Math.round(scoreInc/SELECTED_FIGURE.maxScore*100*10000)/10000
     if (score < 0) {
         score = "NEGATIVE VALUE";
     } else {
-        score += "%";
+        let scoreFormat = new Intl.NumberFormat('en-US', { 
+            minimumIntegerDigits: 1, 
+            minimumFractionDigits: 4 
+        });
+        score = scoreFormat.format(score)+"%";
     }
     sessionStorage.scoreObject = JSON.stringify(score); //Stores drawing score in the session storages
 
