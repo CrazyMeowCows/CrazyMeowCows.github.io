@@ -1,5 +1,5 @@
 function authenticate (value) {
-    return true; //TEMP
+    // return true; //TEMP
 
     let proctorPassword;
     try {
