@@ -96,12 +96,12 @@ function figureCtxRedraw () {
     for (let i = 0; i < SELECTED_FIGURE.calcRad.length; i++) {
         let calcRad = SELECTED_FIGURE.calcRad[i];
         let r = calcRad(minAngle)*scale;
-        figureCtx.moveTo(Math.floor(offsetX+r*Math.cos(minAngle)), Math.floor(offsetY-r*Math.sin(minAngle)));
+        figureCtx.moveTo(offsetX+r*Math.cos(minAngle), offsetY-r*Math.sin(minAngle));
 
         for (let theta = minAngle; theta <= maxAngle; theta += (maxAngle-minAngle)/resolution) {
             r = calcRad(theta)*scale;
 
-            figureCtx.lineTo(Math.floor(offsetX+r*Math.cos(theta)), Math.floor(offsetY-r*Math.sin(theta)));
+            figureCtx.lineTo(offsetX+r*Math.cos(theta), offsetY-r*Math.sin(theta));
         }
         figureCtx.stroke();
     }
