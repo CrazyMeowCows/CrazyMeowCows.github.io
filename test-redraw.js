@@ -103,6 +103,10 @@ function figureCtxRedraw () {
 
             figureCtx.lineTo(offsetX+r*Math.cos(theta), offsetY-r*Math.sin(theta));
         }
+        if (resolution == THETA_RESOLUTION_HIGH_LOD) {
+            figureCtx.lineTo(offsetX+r*Math.cos(maxAngle), offsetY-r*Math.sin(maxAngle));
+        }
+
         figureCtx.stroke();
     }
 }

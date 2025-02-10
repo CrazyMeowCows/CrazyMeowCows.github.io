@@ -17,6 +17,8 @@ body {
 }
 canvas {
     position: absolute;
+    image-rendering: auto; 
+    /* image-rendering: crisp-edges; */
 }
 </style>
 
@@ -50,8 +52,8 @@ const ZOOM_SENS = 0.002;
 const MAX_ZOOM = 34;
 
 const SELECTED_FIGURE = figures[parseInt(JSON.parse(localStorage.selectedFigure))];
-const THETA_RESOLUTION_HIGH_LOD = 301;
-const THETA_RESOLUTION_LOW_LOD = 120;
+const THETA_RESOLUTION_HIGH_LOD = 300;
+const THETA_RESOLUTION_LOW_LOD = 200;
 
 const MIN_BRUSH_SIZE = parseInt(JSON.parse(localStorage.minBrushSize))/768*H;
 const MAX_BRUSH_SIZE = parseInt(JSON.parse(localStorage.maxBrushSize))/768*H;
@@ -101,7 +103,7 @@ drawCtx.lineJoin = "round";
 figureCtx.strokeStyle = "black";
 figureCtx.lineCap = "butt";
 figureCtx.lineJoin = "butt";
-figureCtx.lineWidth = 2;
+figureCtx.lineWidth = 1.9;
 
 uiCtx.textAlign = "center";
 uiCtx.textBaseline = "middle";
