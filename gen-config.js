@@ -29,4 +29,4 @@ new Figure("The Ring", 449790, 0.9, [
     (t) => {return 1/Math.sqrt(1.1*PI)}
 ]);
 
-const COMP_TESTING = true; //Use for development on non-iOS devices
+const COMP_TESTING = false; //Use for development on non-iOS devices
