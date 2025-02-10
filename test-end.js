@@ -86,7 +86,7 @@ function scoreFigure() {
     } else {
         let scoreFormat = new Intl.NumberFormat('en-US', { 
             minimumIntegerDigits: 1, 
-            minimumFractionDigits: 4 
+            minimumFractionDigits: 4 //Guaruntees 4 decimal places
         });
         score = scoreFormat.format(score)+"%";
     }

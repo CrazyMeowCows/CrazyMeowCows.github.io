@@ -123,14 +123,9 @@ function uiRedraw () {
         uiCtx.fill();
         uiCtx.stroke();
 
-        let mins = "" + Math.floor(timerSeconds/60);
-        if (mins.length <= 1) {
-            mins = "0"+mins;
-        }
-        let secs = "" + timerSeconds%60;
-        if (secs.length <= 1) {
-            secs = "0"+secs;
-        }
+        let mins = TIME_FORMAT.format(""+Math.floor(timerSeconds/60));
+        let secs = TIME_FORMAT.format(""+timerSeconds%60);
+
         uiCtx.fillStyle = "black";
         uiCtx.font = "normal 500 60px Times New Roman";
         uiCtx.fillText(mins+":"+secs, W/2, 27);
