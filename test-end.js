@@ -1,8 +1,5 @@
 function endTest() {
     isScoring = true; //Set isScoring
-    try {
-        clearInterval(timerInterval);
-    } catch (error) {}
     zoomOut(false)
 
     uiCtx.fillStyle = "white";

@@ -185,9 +185,9 @@ uiRedraw(); //Call uiRedraw to start loading the used fonts
 function load () { 
     if (document.fonts.check('1px FontAwesome')) { //Check if font is loaded
         uiRedraw(); //Call uiRedraw once fonts are loaded to display everything correctly
-        if (IS_TEST) {beginTestPrompt();}
-        if (ENABLE_TIMER) {var timerInterval = setInterval(decrementTimer, 1000);}
         mainRedraw(); //Draw main content
+        if (ENABLE_TIMER) {setInterval(decrementTimer, 1000);}
+        if (IS_TEST) {beginTestPrompt();}
     } else {
         setTimeout(load, 20); //Recursively check every 20ms until font loads
     }
