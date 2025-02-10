@@ -38,18 +38,14 @@ canvas {
 const PI = Math.PI;
 const TAU = 2*Math.PI;
 
-const UI_WIDTH = 100;
+const UI_WIDTH = 0;
 
-var W = screen.height-UI_WIDTH; //Testing code
-var H = screen.width;
-if (COMP_TESTING) {
-    W = window.innerWidth-UI_WIDTH;
-    H = window.innerHeight;
-}
-
-const UI_CENTER = W+UI_WIDTH/2;
+const W = COMP_TESTING ? window.innerWidth: screen.height;
+const H = COMP_TESTING ? window.innerHeight : screen.width;
 
 const GRID_SIZE = W/6;
+const RENDER_GRID = JSON.parse(localStorage.displayGrid) == "true";
+
 const ZOOM_SENS = 0.002;
 const MAX_ZOOM = 34;
 
@@ -57,22 +53,22 @@ const SELECTED_FIGURE = figures[parseInt(JSON.parse(localStorage.selectedFigure)
 const THETA_RESOLUTION_HIGH_LOD = 351;
 const THETA_RESOLUTION_LOW_LOD = 120;
 
-const SLIDER_Y1 = 110;
-const SLIDER_Y2 = 280;
-const UI_BRUSH_RAD = 18;
-const MAX_BRUSH_SIZE = parseInt(JSON.parse(localStorage.maxBrushSize))/768*H;
 const MIN_BRUSH_SIZE = parseInt(JSON.parse(localStorage.minBrushSize))/768*H;
-const BRUSH_DELTA = (MAX_BRUSH_SIZE-MIN_BRUSH_SIZE)/6;
+const MAX_BRUSH_SIZE = parseInt(JSON.parse(localStorage.maxBrushSize))/768*H;
 
-const ERASE_COLOR = "#FFFFFF";
-
-const RENDER_GRID = JSON.parse(localStorage.displayGrid) == "true";
 const IS_TEST = JSON.parse(sessionStorage.isTest) == "true";
 const ENABLE_TIMER = IS_TEST || JSON.parse(localStorage.practiceTimer) == "true";
 const ENABLE_SCORING = IS_TEST || JSON.parse(localStorage.practiceScore) == "true";
 
+const TEST_TIME_LIMIT_SEC = parseFloat(JSON.parse(localStorage.timerLengthMinutes))*60;
+const PRACTICE_TIME_LIMIT_SEC = parseFloat(JSON.parse(localStorage.practiceTimerLengthMinutes))*60;
+const TIME_FORMAT = new Intl.NumberFormat('en-US', { 
+    minimumIntegerDigits: 2 //Guaruntees leading and trailing 0's, ex. 05:01 instead of 5:1
+});
+
 const DRAW_W_FINGER = !IS_TEST && JSON.parse(localStorage.practiceDrawMode) == "finger"; //Draw with finger only if in practice mode and the setting is selected
-const TIME_LIMIT_SEC = parseFloat(JSON.parse(localStorage.timerLengthMinutes))*60;
+const ERASE_COLOR = "#FFFFFF";
+const DRAW_COLOR = IS_TEST ? "#FFE500" : "#808080"; //Test Color : Practice Color
 
 //DO NOT CHANGE - STANDARDIZES TEST RESULTS
 const FIGURE_SCALE = 0.8*H;
@@ -92,11 +88,10 @@ var figureCtx = figureCanvas.getContext("2d", { willReadFrequently: false, aplha
 var uiCanvas = document.getElementById('uiCanvas')
 var uiCtx = uiCanvas.getContext("2d", { willReadFrequently: false, aplha: false });
 
-gridCanvas.width = W; gridCanvas.height = H;
-drawCanvas.width = W; drawCanvas.height = H;
-figureCanvas.width = W; figureCanvas.height = H;
-
-uiCanvas.width = W+UI_WIDTH; uiCanvas.height = H;
+var canvasCol = document.getElementsByTagName("canvas");
+for (let i = 0; i < canvasCol.length; i++) {
+    canvasCol[i].width = W; canvasCol[i].height = H;
+}
 
 gridCtx.strokeStyle = "black";
 
@@ -106,6 +101,7 @@ drawCtx.lineJoin = "round";
 figureCtx.strokeStyle = "black";
 figureCtx.lineCap = "round";
 figureCtx.lineJoin = "round";
+figureCtx.lineWidth = 2;
 
 uiCtx.textAlign = "center";
 uiCtx.textBaseline = "middle";
@@ -113,11 +109,6 @@ uiCtx.lineCap = "round";
 
 
 //Variable Declarations----------------------------------------------------------------------------
-var drawColor = "#808080";
-if (IS_TEST) {
-    drawColor = "#FFFF00";
-}
-
 var oldGridSize = GRID_SIZE;
 
 var offsetX = W/2;
@@ -134,12 +125,12 @@ var dynamicGridSize;
 
 var brushSize = lerp(MIN_BRUSH_SIZE, MAX_BRUSH_SIZE, parseFloat(JSON.parse(localStorage.defaultBrushPercentage))/100);
 
-var timerSeconds = TIME_LIMIT_SEC;
+var timerSeconds = IS_TEST ? TEST_TIME_LIMIT_SEC : PRACTICE_TIME_LIMIT_SEC;
 
 var currentStroke;
 var lastStrokeX;
 var lastStrokeY;
-var brushColor = drawColor;
+var brushColor = DRAW_COLOR;
 
 var activePrompt = "none";
 var isScoring = false;
@@ -161,21 +152,15 @@ function extendCurrentStroke (rawX, rawY) {
 }
 
 var buttons = [];
-let pencilToggleH = 15;
-if (IS_TEST) {
-    pencilToggleH = H-250;
-    new Button(15+W, 10, 70, 70, () => {brushSize = Math.min(brushSize+BRUSH_DELTA, MAX_BRUSH_SIZE)}, '\uF067', 2, false, false);
-    new Button(15+W, 310, 70, 70, () => {brushSize = Math.max(brushSize-BRUSH_DELTA, MIN_BRUSH_SIZE)}, '\uF068', 3, false, false);
-}
-var pencil = new Button(15+W, pencilToggleH, 70, 70, () => {brushColor = drawColor}, '\uF040', 0, true, false);
-var eraser = new Button(15+W, pencilToggleH+70, 70, 70, () => {brushColor = ERASE_COLOR}, '\uF12d', 0, true, false);
-new Button(15+W, H-80, 70, 70, () => {zoomOut(true)}, '\uF066', 0, false, false);
-var endEarly = new Button(10, H-80, 70, 70, () => {endTestPrompt(); endEarly.trans = 0;}, '', 0, false, false); //Text is rendered in uiRedraw
+var pencil = new Button(W-90, 10, 80, (H-140)/2, () => {brushColor = DRAW_COLOR}, '\uF040', 0, true, false);
+var eraser = new Button(pencil.x, pencil.y+pencil.h, pencil.w, pencil.h, () => {brushColor = ERASE_COLOR}, '\uF12d', 0, true, false);
+var resetZoom = new Button(W-90, H-90, 80, 80, () => {zoomOut(true)}, '\uF066', 0, false, false);
+var endEarly = new Button(10, H-90, 80, 80, () => {endTestPrompt(); endEarly.trans = 0;}, 'End', 0, false, false);
 
-var startTest = new Button((W+UI_WIDTH)/2-35, H/2+13, 70, 70, () => {activePrompt = "none"; uiRedraw(); lastZoomed = true;}, '\uF0DA', 0, false, true);
-var yesEndTest = new Button((W+UI_WIDTH)/2-85, H/2-115, 70, 70, endTest, '\uF00C', 0, false, true);
-var noEndTest = new Button((W+UI_WIDTH)/2+15, H/2-115, 70, 70, () => {activePrompt = "none"; uiRedraw(); lastZoomed = true;}, '\uF00D', 0, false, true);
-var expiredOk = new Button((W+UI_WIDTH)/2-35, H/2-115, 70, 70, endTest, '\uF061', 0, false, true);
+var startTest = new Button((W)/2-35, H/2+13, 70, 70, () => {activePrompt = "none"; uiRedraw(); lastZoomed = true;}, '\uF0DA', 0, false, true);
+var yesEndTest = new Button((W)/2-85, H/2-115, 70, 70, endTest, '\uF00C', 0, false, true);
+var noEndTest = new Button((W)/2+15, H/2-115, 70, 70, () => {activePrompt = "none"; uiRedraw(); lastZoomed = true;}, '\uF00D', 0, false, true);
+var expiredOk = new Button((W)/2-35, H/2-115, 70, 70, endTest, '\uF061', 0, false, true);
 
 
 //Program Initialization---------------------------------------------------------------------------
@@ -198,9 +183,9 @@ uiRedraw(); //Call uiRedraw to start loading the used fonts
 function load () { 
     if (document.fonts.check('1px FontAwesome')) { //Check if font is loaded
         uiRedraw(); //Call uiRedraw once fonts are loaded to display everything correctly
-        if (IS_TEST) {beginTestPrompt();}
-        if (ENABLE_TIMER) {var timerInterval = setInterval(decrementTimer, 1000);}
         mainRedraw(); //Draw main content
+        if (ENABLE_TIMER) {setInterval(decrementTimer, 1000);}
+        if (IS_TEST) {beginTestPrompt();}
     } else {
         setTimeout(load, 20); //Recursively check every 20ms until font loads
     }

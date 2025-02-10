@@ -20,7 +20,7 @@ document.addEventListener("touchstart", e => {
         return;
     }
 
-    let uiTouch = handleSliderTouch(touch); //Test for UI elements
+    let uiTouch = false; //Test for UI elements
     buttons.forEach(button => {
         uiTouch = uiTouch || handleButtonTouch(button, touch)
     });
@@ -100,10 +100,6 @@ document.addEventListener("touchmove", e => {
     let touchY = touch.pageY;
 
     if (activePrompt != "none") { //Any Promt is Active
-        return;
-    }
-    if (touch.pageX > W) { //Touch is on UI Bar
-        handleSliderTouch(touch);
         return;
     }
     if (DRAW_W_FINGER) { //Change input modes dependant on the drawWithFinger TODO: Clean up this code (Need access to iOS device)
@@ -202,20 +198,3 @@ document.addEventListener("wheel", e => { //TODO: REMOVE
         mainRedraw();
     }
 });
-
-//Given a touch, adjust the brush size slider and return if touch is on slider
-function handleSliderTouch (touch) {
-    if (!IS_TEST) { //Immediately abort if in practice mode and slider not present
-        return false;
-    }
-    gridCtxRedraw();
-    currentStroke = undefined;
-    lastZoomed = true;
-
-    if (touch.pageX > W && touch.pageY >= SLIDER_Y1-10 && touch.pageY <= SLIDER_Y2+10) {
-        brushSize = lerp(MIN_BRUSH_SIZE, MAX_BRUSH_SIZE, (SLIDER_Y2-touch.pageY)/(SLIDER_Y2-SLIDER_Y1));
-        uiRedraw();
-        return true;
-    }
-    return false;
-}

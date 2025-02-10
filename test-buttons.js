@@ -34,7 +34,8 @@ function drawIconButton(button, ctx) {
     }
 
     if (button.icon.length > 1) {
-        ctx.font = 'normal 500 60px Times New Roman';
+        ctx.font = 'normal 500 45px Times New Roman';
+        ctx.fillStyle = "#6b0000";
     } else {
         ctx.font = '60px FontAwesome';
     }

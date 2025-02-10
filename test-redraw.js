@@ -44,7 +44,7 @@ function drawCtxRedraw() {
 
     //Drawing strokes using one continuous line
     strokes.forEach(stroke => {
-        if (stroke.strokeColor == drawColor) {
+        if (stroke.strokeColor == DRAW_COLOR) {
             drawCtx.globalCompositeOperation = "source-over";
         } else {
             drawCtx.globalCompositeOperation = "destination-out";
@@ -90,7 +90,6 @@ function figureCtxRedraw () {
     }
     
     //Drawing the visible part of the figure outline
-    figureCtx.lineWidth = 2;
     figureCtx.beginPath();
     let scale = FIGURE_SCALE*SELECTED_FIGURE.scaleFactor*zoom;
 
@@ -106,16 +105,13 @@ function figureCtxRedraw () {
         }
         figureCtx.stroke();
     }
-
-    //Add a line on the right side of canvas to seperate UI Bar
-    line(W, 0, W, H, 5, figureCtx);
 }
 
 
 //Drawing the content of the UI canvas-------------------------------------------------------------
 function uiRedraw () {
     //Clear the canvas every redraw
-    uiCtx.clearRect(0, 0, W+UI_WIDTH, H);
+    uiCtx.clearRect(0, 0, W, H);
 
     // Draw Timer
     if (ENABLE_TIMER) {
@@ -127,65 +123,24 @@ function uiRedraw () {
         uiCtx.fill();
         uiCtx.stroke();
 
-        let mins = "" + Math.floor(timerSeconds/60);
-        if (mins.length <= 1) {
-            mins = "0"+mins;
-        }
-        let secs = "" + timerSeconds%60;
-        if (secs.length <= 1) {
-            secs = "0"+secs;
-        }
+        let mins = TIME_FORMAT.format(""+Math.floor(timerSeconds/60));
+        let secs = TIME_FORMAT.format(""+timerSeconds%60);
+
         uiCtx.fillStyle = "black";
         uiCtx.font = "normal 500 60px Times New Roman";
         uiCtx.fillText(mins+":"+secs, W/2, 27);
     }
 
-    if (IS_TEST) {
-        //Draw brush size slider
-        let sliderHeight = SLIDER_Y2-(brushSize-MIN_BRUSH_SIZE)/(MAX_BRUSH_SIZE-MIN_BRUSH_SIZE)*(SLIDER_Y2-SLIDER_Y1);
-
-        line(UI_CENTER, SLIDER_Y1, UI_CENTER, SLIDER_Y2, 10, uiCtx)
-        uiCtx.strokeStyle = "#d6d6d6";
-        line(UI_CENTER, SLIDER_Y1, UI_CENTER, SLIDER_Y2, 6, uiCtx)
-        uiCtx.strokeStyle = "#a1a1a1";
-        line(UI_CENTER, sliderHeight, UI_CENTER, SLIDER_Y2, 6, uiCtx)
-
-        //Draw current brush size
-        uiCtx.strokeStyle = "black";
-        uiCtx.lineWidth = 2;
-        if (brushColor == ERASE_COLOR) {
-            uiCtx.fillStyle = "#f2f2f2";
-        } else {
-            uiCtx.fillStyle = drawColor;
-        }
-        circle(UI_CENTER, sliderHeight, brushSize/MAX_BRUSH_SIZE*UI_BRUSH_RAD+5, true, uiCtx);
-        uiCtx.stroke();
-    }
-
-    //Draw icon buttons
-    uiCtx.lineWidth = 1.5;
-    uiCtx.fillStyle = "black";
-    let recurse = false;
-    buttons.forEach(button => {
-        drawIconButton(button, uiCtx);
-        if (button.trans-- > 0) {
-            recurse = true;
-        }
-    });
-    if (recurse) {
-        requestAnimationFrame(uiRedraw);
-    }
-
-    //Draw end test button
-    uiCtx.font = 'normal 500 37px Times New Roman';
-    uiCtx.fillStyle = "#6b0000";
-    uiCtx.fillText("End", 45, H-80+35);
-
     //Draw Eraser/Pencil Toggle
+    uiCtx.fillStyle = "white";
+    uiCtx.beginPath();
+    uiCtx.roundRect(pencil.x, pencil.y, pencil.w, pencil.h*2, [10]);
+    uiCtx.fill();
+
     uiCtx.fillStyle = 'rgba(0,0,0,0.1)';
     uiCtx.beginPath();
     uiCtx.roundRect(pencil.x, pencil.y, pencil.w, pencil.h, [10, 10, 0, 0]);
-    if (brushColor == drawColor) {
+    if (brushColor == DRAW_COLOR) {
         uiCtx.lineWidth = 3;
         uiCtx.fill();
     } else {
@@ -202,4 +157,18 @@ function uiRedraw () {
         uiCtx.lineWidth = 1.5;
     }
     uiCtx.stroke();
+
+    //Draw icon buttons
+    uiCtx.lineWidth = 1.5;
+    uiCtx.fillStyle = "black";
+    let recurse = false;
+    buttons.forEach(button => {
+        drawIconButton(button, uiCtx);
+        if (button.trans-- > 0) {
+            recurse = true;
+        }
+    });
+    if (recurse) {
+        requestAnimationFrame(uiRedraw);
+    }
 }

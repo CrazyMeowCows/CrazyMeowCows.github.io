@@ -1,15 +1,12 @@
 function endTest() {
     isScoring = true; //Set isScoring
-    try {
-        clearInterval(timerInterval);
-    } catch (error) {}
     zoomOut(false)
 
     uiCtx.fillStyle = "white";
-    uiCtx.fillRect(0, 0, W+UI_WIDTH, H);
+    uiCtx.fillRect(0, 0, W, H);
     uiCtx.fillStyle = "black";
     uiCtx.font = 'normal 500 60px Times New Roman';
-    uiCtx.fillText("Loading...", (W+UI_WIDTH)/2, H/2-30);   
+    uiCtx.fillText("Loading...", (W)/2, H/2-30);   
 
     if (ENABLE_SCORING) {
         setTimeout(scoreFigure, 40);
@@ -51,7 +48,7 @@ function scoreFigure() {
 
     drawCtx.strokeStyle = "red";
     strokes.forEach(stroke => {
-        if (stroke.strokeColor == drawColor) {
+        if (stroke.strokeColor == DRAW_COLOR) {
             drawCtx.globalCompositeOperation = "source-over";
         } else {
             drawCtx.globalCompositeOperation = "destination-out";
@@ -89,7 +86,7 @@ function scoreFigure() {
     } else {
         let scoreFormat = new Intl.NumberFormat('en-US', { 
             minimumIntegerDigits: 1, 
-            minimumFractionDigits: 4 
+            minimumFractionDigits: 4 //Guaruntees 4 decimal places
         });
         score = scoreFormat.format(score)+"%";
     }
