@@ -5,9 +5,6 @@ document.addEventListener("touchstart", e => {
     let touchX = touch.pageX; 
     let touchY = touch.pageY;
 
-    if (isScoring) { //Test is being scored
-        return;
-    }
     if (activePrompt == "timerExpired") { //Various prompts and their associated buttons
         handleButtonTouch(expiredOk, touch);
         return;

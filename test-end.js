@@ -1,5 +1,4 @@
 function endTest() {
-    isScoring = true; //Set isScoring
     zoomOut(false)
 
     uiCtx.fillStyle = "white";

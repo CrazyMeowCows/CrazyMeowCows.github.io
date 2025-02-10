@@ -40,8 +40,6 @@ canvas {
 const PI = Math.PI;
 const TAU = 2*Math.PI;
 
-const UI_WIDTH = 0;
-
 const W = COMP_TESTING ? window.innerWidth: screen.height;
 const H = COMP_TESTING ? window.innerHeight : screen.width;
 
@@ -135,7 +133,6 @@ var lastStrokeY;
 var brushColor = DRAW_COLOR;
 
 var activePrompt = "none";
-var isScoring = false;
 
 var strokes = [];
 function PenStroke (xStart, yStart, strokeColor) {
