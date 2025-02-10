@@ -90,7 +90,7 @@ var uiCtx = uiCanvas.getContext("2d", { willReadFrequently: false, aplha: false 
 
 var canvasCol = document.getElementsByTagName("canvas");
 for (let i = 0; i < canvasCol.length; i++) {
-    canvasCol[i].width = W; canvasCol[i].height = H; //Set all canvas to screen W and H
+    canvasCol[i].width = W; canvasCol[i].height = H;
 }
 
 gridCtx.strokeStyle = "black";
@@ -152,10 +152,10 @@ function extendCurrentStroke (rawX, rawY) {
 }
 
 var buttons = [];
-var pencil = new Button(W-105, 10, 90, 100, () => {brushColor = DRAW_COLOR}, '\uF040', 0, true, false);
-var eraser = new Button(W-105, pencil.y+pencil.h, 90, pencil.h, () => {brushColor = ERASE_COLOR}, '\uF12d', 0, true, false);
-var resetZoom = new Button(W-105, H-100, 90, 90, () => {zoomOut(true)}, '\uF066', 0, false, false);
-var endEarly = new Button(10, H-100, 90, 90, () => {endTestPrompt(); endEarly.trans = 0;}, 'End', 0, false, false);
+var pencil = new Button(W-90, 10, 80, (H-140)/2, () => {brushColor = DRAW_COLOR}, '\uF040', 0, true, false);
+var eraser = new Button(pencil.x, pencil.y+pencil.h, pencil.w, pencil.h, () => {brushColor = ERASE_COLOR}, '\uF12d', 0, true, false);
+var resetZoom = new Button(W-90, H-90, 80, 80, () => {zoomOut(true)}, '\uF066', 0, false, false);
+var endEarly = new Button(10, H-90, 80, 80, () => {endTestPrompt(); endEarly.trans = 0;}, 'End', 0, false, false);
 
 var startTest = new Button((W)/2-35, H/2+13, 70, 70, () => {activePrompt = "none"; uiRedraw(); lastZoomed = true;}, '\uF0DA', 0, false, true);
 var yesEndTest = new Button((W)/2-85, H/2-115, 70, 70, endTest, '\uF00C', 0, false, true);

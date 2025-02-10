@@ -1,3 +1,26 @@
+// const defaultSettings = {
+//     selectedFigure: "0",
+//     timerLengthMinutes: "5",
+//     displayGrid: "true",
+//     maxBrushSize: "5",
+//     minBrushSize: "1",
+//     defaultBrushPercentage: "100",
+//     practiceDrawMode: "finger",
+//     practiceTimer: "false",
+//     practiceTimerLengthMinutes: "5",
+//     practiceScore: "false"
+// }
+
+// //Define Figure object 
+// var prompts = [];
+// function Prompt (name, text, promptButtons) {
+//     this.name = name;
+//     this.text = text;
+//     this.promptButtons = promptButtons;
+
+//     figures.push(this);
+// }
+
 //Prompt to begin test when ready, shows at start of test
 function beginTestPrompt() {
     activePrompt = "start";
