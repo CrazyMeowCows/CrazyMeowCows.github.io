@@ -94,7 +94,7 @@ button {
   to {top:0; opacity:1}
 }
 
-#timerBackground {
+#timerDiv {
     display: none;
     position: relative;
     text-align: center;
@@ -151,7 +151,7 @@ button {
 <canvas id="figureCanvas" width="0" height="0"></canvas>  
 
 <!-- Timer -->
-<div id="timerBackground">
+<div id="timerDiv">
     <p id="timer" style="margin-bottom: 0px;"></p>
 </div>
 
@@ -260,7 +260,7 @@ var timerSeconds = IS_TEST ? TEST_TIME_LIMIT_SEC : PRACTICE_TIME_LIMIT_SEC;
 var currentStroke;
 var lastStrokeX;
 var lastStrokeY;
-var brushColor = DRAW_COLOR;
+var brushColor;
 
 var activePrompt = null;
 
@@ -281,6 +281,9 @@ function extendCurrentStroke (rawX, rawY) {
 }
 
 
+//Define all prompts (modals)----------------------------------------------------------------------
+// Prompts must be called with activatePrompt(prompt_to_activate)
+// To clear the active prompt, call clearPrompt()
 var beginTest = new Prompt("Press play to begin test.<br></br>Timer countdown will begin immediately.", "rgba(240,240,240,1)", [
     new PromptButton("fa fa-caret-right", "green", cancelPrompt)
 ]);
@@ -297,9 +300,6 @@ var timerExpired = new Prompt("Timer Expired.", "rgba(0,0,0,0.3)", [
 ]);
 var loading = new Prompt("", "rgba(240,240,240,1)", []);
 
-// var pencil = new Button(W-90, 10, 80, (H-140)/2, () => {brushColor = DRAW_COLOR}, '\uF040', 0, true, false);
-// var eraser = new Button(pencil.x, pencil.y+pencil.h, pencil.w, pencil.h, () => {brushColor = ERASE_COLOR}, '\uF12d', 0, true, false);
-
 
 //Program Initialization---------------------------------------------------------------------------
 sessionStorage.isTest = JSON.stringify("false"); //Clear any previously set isTest flag 
@@ -310,7 +310,7 @@ if (IS_TEST) {
     activatePrompt(beginTest);
 }
 if (ENABLE_TIMER) {
-    document.getElementById("timerBackground").style.display = "block";
+    document.getElementById("timerDiv").style.display = "block";
     updateTimer();
     setInterval(decrementTimer, 1000);
 }
@@ -357,6 +357,7 @@ function setBrush(color) {
         eraserToggle.style.backgroundColor = "#FFFFFF";
     }
 }
+setBrush(DRAW_COLOR); //Initialize to brush instead of eraser
 
 //Drawing Shortcuts--------------------------------------------------------------------------------
 //Easy Circle Drawing
