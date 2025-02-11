@@ -1,5 +1,5 @@
 //TouchStart Listener------------------------------------------------------------------------------
-document.addEventListener("touchstart", e => {
+figureCanvas.addEventListener("touchstart", e => {
     touches = e.touches;
     touch = touches[0];
     let touchX = touch.pageX; 
@@ -71,7 +71,7 @@ document.addEventListener("touchstart", e => {
 })
 
 //TouchMove Listener-------------------------------------------------------------------------------
-document.addEventListener("touchmove", e => {
+figureCanvas.addEventListener("touchmove", e => {
     let touches = e.touches;
     let touch = touches[0];
     let touchX = touch.pageX; 
@@ -161,13 +161,13 @@ document.addEventListener("touchmove", e => {
 })
 
 //TouchEnd Listener--------------------------------------------------------------------------------
-document.addEventListener("touchend", e => { //Clear the Eraser Outline
+figureCanvas.addEventListener("touchend", e => { //Clear the Eraser Outline
     gridCtxRedraw();
     touchType = 0;
 });
 
 //Wheel Listener-----------------------------------------------------------------------------------
-document.addEventListener("wheel", e => { //TODO: REMOVE
+figureCanvas.addEventListener("wheel", e => { //TODO: REMOVE
     if (activePrompt) { //Any Prompt is Active
         return;
     }        

@@ -1,6 +1,5 @@
 var prompts = [];
-function Prompt (id, text, backgroundColor, promptButtons) {
-    this.id = id;
+function Prompt (text, backgroundColor, promptButtons) {
     this.text = text;
     this.backgroundColor = backgroundColor;
     this.promptButtons = promptButtons;
@@ -32,9 +31,8 @@ function initializePrompts() {
         let text = document.createElement("p");
         let buttons = document.createElement("div");
 
-        modal.id = prompt.id;
         modal.className = "modal";
-        modal.setAttribute("style", "background-color: " + prompt.backgroundColor + ";");
+        modal.style.backgroundColor = prompt.backgroundColor;
 
         modalContent.className = "modal-content";
 
@@ -45,8 +43,8 @@ function initializePrompts() {
         prompt.promptButtons.forEach(promptButton => {
             let button = document.createElement("button");
             button.className = "iconButton";
-            button.setAttribute("style", "color: " + promptButton.iconColor);
-            button.setAttribute("onclick", "" + promptButton.action);
+            button.style.color =  promptButton.iconColor;
+            button.onclick = promptButton.action;
 
             let icon = document.createElement("i");
             icon.className = promptButton.icon;
@@ -57,7 +55,10 @@ function initializePrompts() {
 
         modalContent.appendChild(text);
         modalContent.appendChild(buttons);
-        modal.appendChild(modalContent);
+        
+        if (prompt.text != "") { //Empty prompts shouldn't have content added
+            modal.appendChild(modalContent);
+        }
 
         document.body.appendChild(modal);
         prompt.htmlElement = modal;

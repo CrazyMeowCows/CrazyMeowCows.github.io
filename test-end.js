@@ -65,22 +65,29 @@ function scoreFigure() {
         drawCtx.stroke();
     });
 
+    let getMaxScore = false; //Set this to true to find the maximum score for a new figure, or if scoring calculations change
+
     let scoreInc = 0;
     imgData = drawCtx.getImageData(0, 0, SCORE_AREA_SIZE, SCORE_AREA_SIZE);
     for (let i = 0; i < imgData.data.length; i += 4) {
-        if (imgData.data[i] != 0) {
-            let x = (i / 4) % SCORE_AREA_SIZE - SCORE_AREA_SIZE/2;
-            let y = Math.floor((i / 4) / SCORE_AREA_SIZE) - SCORE_AREA_SIZE/2;
-            let theta = -Math.atan2(y, x);
-            let r = Math.hypot(x, y);
-            let innerR = SELECTED_FIGURE.calcRad[1](theta)*scale;
-            let outerR = SELECTED_FIGURE.calcRad[0](theta)*scale;
-            if (r >= innerR && r <= outerR) {
-                scoreInc++;
-            } else {
-                scoreInc--;
-            }
+        if (imgData.data[i] == 0 && !getMaxScore) { //Only look at filled in pixels
+            continue;
         }
+        let x = (i / 4) % SCORE_AREA_SIZE - SCORE_AREA_SIZE/2;
+        let y = Math.floor((i / 4) / SCORE_AREA_SIZE) - SCORE_AREA_SIZE/2;
+        let theta = -Math.atan2(y, x);
+        let r = Math.hypot(x, y);
+        let innerR = SELECTED_FIGURE.calcRad[1](theta)*scale;
+        let outerR = SELECTED_FIGURE.calcRad[0](theta)*scale;
+        if (r >= innerR && r <= outerR) {
+            scoreInc++;
+        } else if (!getMaxScore){
+            scoreInc--;
+        }
+    }
+
+    if (getMaxScore) { //Alert the max score
+        alert(scoreInc);
     }
     
     let score = Math.round(scoreInc/SELECTED_FIGURE.maxScore*100*10000)/10000

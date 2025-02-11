@@ -108,9 +108,10 @@ button {
     right: 0px;
 }
 #timerBackground {
+    display: none;
     position: relative;
     text-align: center;
-    font-size: 75px;
+    font-size: 70px;
     top: -10px;
     width: fit-content;
     padding: 0px 15px;
@@ -130,7 +131,7 @@ button {
 <button id="resetZoom" onclick="zoomOut(true)"><i class="fa fa-compress"></i></button>
 
 <div id="timerBackground">
-    <p id="timer" style="margin-bottom: 0px;">50:50</p>
+    <p id="timer" style="margin-bottom: 0px;"></p>
 </div>
 </body>
 
@@ -249,21 +250,21 @@ function extendCurrentStroke (rawX, rawY) {
 }
 
 
-var beginTest = new Prompt("beginTest", "Press play to begin test.<br></br>Timer countdown will begin immediately.", "rgba(240,240,240,1)", [
-    new PromptButton("fa fa-caret-right", "green", "cancelPrompt()")
+var beginTest = new Prompt("Press play to begin test.<br></br>Timer countdown will begin immediately.", "rgba(240,240,240,1)", [
+    new PromptButton("fa fa-caret-right", "green", cancelPrompt)
 ]);
-var endTestEarly = new Prompt("endTestEarly", "End Test Before Timer Ends?", "rgba(0,0,0,0.3)", [
-    new PromptButton("fa fa-check", "green", "endTest()"),
-    new PromptButton("fa fa-times", "#6b0000", "cancelPrompt()")
+var endTestEarly = new Prompt("End Test Before Timer Ends?", "rgba(0,0,0,0.3)", [
+    new PromptButton("fa fa-check", "green", endTest),
+    new PromptButton("fa fa-times", "#6b0000", cancelPrompt)
 ]);
-var endPracticeEarly = new Prompt("endPracticeEarly", "End Practice Session?", "rgba(0,0,0,0.3)", [
-    new PromptButton("fa fa-check", "green", "endTest()"),
-    new PromptButton("fa fa-times", "#6b0000", "cancelPrompt()")
+var endPracticeEarly = new Prompt("End Practice Session?", "rgba(0,0,0,0.3)", [
+    new PromptButton("fa fa-check", "green", endTest),
+    new PromptButton("fa fa-times", "#6b0000", cancelPrompt)
 ]);
-var timerExpired = new Prompt("timerExpired", "Timer Expired.", "rgba(0,0,0,0.3)", [
-    new PromptButton("fa fa-arrow-right", "green", "endTest()"),
+var timerExpired = new Prompt("Timer Expired.", "rgba(0,0,0,0.3)", [
+    new PromptButton("fa fa-arrow-right", "green", endTest),
 ]);
-var loading = new Prompt("loading", "Loading...", "rgba(240,240,240,1)", []);
+var loading = new Prompt("", "rgba(240,240,240,1)", []);
 
 // var pencil = new Button(W-90, 10, 80, (H-140)/2, () => {brushColor = DRAW_COLOR}, '\uF040', 0, true, false);
 // var eraser = new Button(pencil.x, pencil.y+pencil.h, pencil.w, pencil.h, () => {brushColor = ERASE_COLOR}, '\uF12d', 0, true, false);
@@ -272,24 +273,18 @@ var loading = new Prompt("loading", "Loading...", "rgba(240,240,240,1)", []);
 //Program Initialization---------------------------------------------------------------------------
 sessionStorage.isTest = JSON.stringify("false"); //Clear any previously set isTest flag 
 
-initializePrompts();
-
-function decrementTimer() {
-    if (activePrompt) { //Dont decrement timer if a prompt is active
-        return;
-    }
-    if (timerSeconds > 0) { //Decrement if >0, otherwise call timerExpiredPrompt
-        timerSeconds--;
-        // document.getElementById("timer").textContent + TIME_FORMAT.format(mis)""
-    } else {
-        activatePrompt(timerExpired);
-    }
-}
+initializePrompts(); //Create all prompt HTML elements from their js specifications
 
 mainRedraw(); //Draw main content
 
-if (ENABLE_TIMER) {setInterval(decrementTimer, 1000);}
-if (IS_TEST) {activatePrompt(beginTest);}
+if (IS_TEST) {
+    activatePrompt(beginTest);
+}
+if (ENABLE_TIMER) {
+    document.getElementById("timerBackground").style.display = "block";
+    updateTimer();
+    setInterval(decrementTimer, 1000);
+}
 
 
 //Drawing the content of the main canvas-----------------------------------------------------------
@@ -341,6 +336,26 @@ function clamp(x, min, max) {
 //Given value from 0-1 (alpha) interpolate between a and b
 function lerp(a, b, alpha) {
     return a + clamp(alpha, 0, 1)*(b-a);
+}
+
+
+//Timer Handling-----------------------------------------------------------------------------------
+function updateTimer() {
+    let mins = TIME_FORMAT.format(""+Math.floor(timerSeconds/60));
+    let secs = TIME_FORMAT.format(""+timerSeconds%60);
+
+    document.getElementById("timer").textContent = mins+":"+secs;
+}
+function decrementTimer() {
+    if (activePrompt) { //Dont decrement timer if a prompt is active
+        return;
+    }
+    if (timerSeconds > 0) { //Decrement if >0, otherwise call timerExpiredPrompt
+        timerSeconds--;
+        updateTimer();
+    } else {
+        activatePrompt(timerExpired);
+    }
 }
 
 
