@@ -23,6 +23,7 @@ function cancelPrompt() {
     activePrompt = null;
 }
 
+//Given the JS descriptions of each prompt, create an HTML element for each and reference that into the JS prompt object
 function initializePrompt(prompt) {
     let modal = document.createElement("div"); //Initialize all modal elements
     let modalContent = document.createElement("div");

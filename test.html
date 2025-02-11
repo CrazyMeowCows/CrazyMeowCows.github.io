@@ -94,6 +94,19 @@ button {
   to {top:0; opacity:1}
 }
 
+.ripple {
+  background-position: center;
+  transition: background 0.5s;
+}
+.ripple:hover {
+  background: #b9b9b9 radial-gradient(circle, transparent 1%, #b9b9b9 1%) center/15000%;
+}
+.ripple:active {
+  background-color: #b9b9b9;
+  background-size: 100%;
+  transition: background 0s;
+}
+
 #timerDiv {
     display: none;
     position: relative;
@@ -131,7 +144,7 @@ button {
 }
 .toggleButton {
     margin-top: 0px;
-    margin-bottom: 0px;
+    margin-bottom: 3px;
     height: 50%;
 }
 #brush {
@@ -157,7 +170,7 @@ button {
 
 <!-- Buttons -->
 <button id="endEarly" onclick="promptSessionEnd()">End</button>
-<button id="resetZoom" onclick="zoomOut(true)"><i class="fa fa-compress"></i></button>
+<button class="ripple" id="resetZoom" onclick="zoomOut(true)"><i class="fa fa-compress"></i></button>
 
 <!-- Brush/Eraser Toggle -->
 <div id="toggleDiv">
@@ -310,9 +323,9 @@ if (IS_TEST) {
     activatePrompt(beginTest);
 }
 if (ENABLE_TIMER) {
-    document.getElementById("timerDiv").style.display = "block";
-    updateTimer();
-    setInterval(decrementTimer, 1000);
+    document.getElementById("timerDiv").style.display = "block"; //Display timer
+    updateTimer(); //Display initialized time
+    setInterval(decrementTimer, 1000); //Decrement timer every 1000ms (1 sec)
 }
 
 
