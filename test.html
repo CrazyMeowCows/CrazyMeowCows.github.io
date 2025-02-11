@@ -21,6 +21,9 @@ canvas {
     /* image-rendering: crisp-edges; */
 }
 
+p {
+    margin-top: 0px;
+}
 button {
     font-family: 'Times New Roman', Times, serif;
     appearance: auto;
@@ -48,6 +51,7 @@ button {
 
 .modal {
     display: none;
+    text-align: center;
     position: fixed; /* Stay in place */
     z-index: 1; /* Sit on top */
     padding-top: 15%; /* Location of the box */
@@ -90,12 +94,45 @@ button {
   from {top:-300px; opacity:0}
   to {top:0; opacity:1}
 }
+
+#endEarly {
+    position: absolute;
+    font-size: 40px;
+    color: #c50000;
+    bottom: 10px;
+    left: 0px;
+}
+#resetZoom {
+    position: absolute;
+    bottom: 10px;
+    right: 0px;
+}
+#timerBackground {
+    position: relative;
+    text-align: center;
+    font-size: 75px;
+    top: -10px;
+    width: fit-content;
+    padding: 0px 15px;
+    margin: auto;
+    background-color: white;
+    border-radius: 10px;
+    border: 3px solid black;
+}
 </style>
 
-
+<body>
 <canvas id="gridCanvas" width="0" height="0"></canvas>    
 <canvas id="drawCanvas" width="0" height="0"></canvas>    
 <canvas id="figureCanvas" width="0" height="0"></canvas>    
+
+<button id="endEarly" onclick="promptSessionEnd()">End</button>
+<button id="resetZoom" onclick="zoomOut(true)"><i class="fa fa-compress"></i></button>
+
+<div id="timerBackground">
+    <p id="timer" style="margin-bottom: 0px;">50:50</p>
+</div>
+</body>
 
 
 <script src="gen-config.js"></script>
@@ -212,30 +249,30 @@ function extendCurrentStroke (rawX, rawY) {
 }
 
 
-var beginTest = new Prompt("Press play to begin test.\nTimer countdown will begin immediately.", "#f0f0f0", 1, [
-    new PromptButton("fa fa-caret-right", "green", cancelPrompt)
+var beginTest = new Prompt("beginTest", "Press play to begin test.<br></br>Timer countdown will begin immediately.", "rgba(240,240,240,1)", [
+    new PromptButton("fa fa-caret-right", "green", "cancelPrompt()")
 ]);
-var endTestEarly = new Prompt("End Test Before Timer Ends?", "#000000", 0.3, [
-    new PromptButton("fa fa-check", "green", endTest),
-    new PromptButton("fa fa-times", "#6b0000", cancelPrompt)
+var endTestEarly = new Prompt("endTestEarly", "End Test Before Timer Ends?", "rgba(0,0,0,0.3)", [
+    new PromptButton("fa fa-check", "green", "endTest()"),
+    new PromptButton("fa fa-times", "#6b0000", "cancelPrompt()")
 ]);
-var endPracticeEarly = new Prompt("End Practice Session?", "#000000", 0.3, [
-    new PromptButton("fa fa-check", "green", endTest),
-    new PromptButton("fa fa-times", "#6b0000", cancelPrompt)
+var endPracticeEarly = new Prompt("endPracticeEarly", "End Practice Session?", "rgba(0,0,0,0.3)", [
+    new PromptButton("fa fa-check", "green", "endTest()"),
+    new PromptButton("fa fa-times", "#6b0000", "cancelPrompt()")
 ]);
-var timerExpired = new Prompt("Timer Expired.", "#000000", 0.3, [
-    new PromptButton("fa fa-arrow-right", "green", endTest),
+var timerExpired = new Prompt("timerExpired", "Timer Expired.", "rgba(0,0,0,0.3)", [
+    new PromptButton("fa fa-arrow-right", "green", "endTest()"),
 ]);
-var loading = new Prompt("Loading...", "#f0f0f0", 1, []);
-// var buttons = [];
+var loading = new Prompt("loading", "Loading...", "rgba(240,240,240,1)", []);
+
 // var pencil = new Button(W-90, 10, 80, (H-140)/2, () => {brushColor = DRAW_COLOR}, '\uF040', 0, true, false);
 // var eraser = new Button(pencil.x, pencil.y+pencil.h, pencil.w, pencil.h, () => {brushColor = ERASE_COLOR}, '\uF12d', 0, true, false);
-// var resetZoom = new Button(W-90, H-90, 80, 80, () => {zoomOut(true)}, '\uF066', 0, false, false);
-// var endEarly = new Button(10, H-90, 80, 80, () => {endTestPrompt(); endEarly.trans = 0;}, 'End', 0, false, false);
 
 
 //Program Initialization---------------------------------------------------------------------------
 sessionStorage.isTest = JSON.stringify("false"); //Clear any previously set isTest flag 
+
+initializePrompts();
 
 function decrementTimer() {
     if (activePrompt) { //Dont decrement timer if a prompt is active
@@ -243,8 +280,9 @@ function decrementTimer() {
     }
     if (timerSeconds > 0) { //Decrement if >0, otherwise call timerExpiredPrompt
         timerSeconds--;
+        // document.getElementById("timer").textContent + TIME_FORMAT.format(mis)""
     } else {
-        timerExpiredPrompt();
+        activatePrompt(timerExpired);
     }
 }
 

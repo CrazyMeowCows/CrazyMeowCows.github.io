@@ -1,9 +1,10 @@
 var prompts = [];
-function Prompt (text, backgroundColor, backgroundOpacity, promptButtons) {
+function Prompt (id, text, backgroundColor, promptButtons) {
+    this.id = id;
     this.text = text;
     this.backgroundColor = backgroundColor;
-    this.backgroundOpacity = backgroundOpacity;
     this.promptButtons = promptButtons;
+    this.htmlElement;
 
     prompts.push(this);
 }
@@ -14,56 +15,51 @@ function PromptButton (icon, iconColor, action) {
     this.action = action;
 }
 
-// prompts.forEach(prompt => {
-
-// });
-
-
-{/* <div id="home-modal" class="modal">
-    <div class="modal-content">
-        <p>Are you sure this session is complete and the data has been recorded? <br></br> Testing score will not be saved on this device.</p>
-        <div class="modal-buttonDiv">
-            <button class="iconButton" style="color: green;" onclick="location.href = 'index.html'"><i class="fa fa-check"></i></button>
-            <button class="iconButton" style="color: #6b0000;" onclick="document.getElementById('home-modal').style.display = 'none'"><i class="fa fa-times"></i></button>
-        </div>
-    </div>
-</div> */}
-
-var modal = document.createElement("div");
-modal.className = "modal";
-
-var modalContent = document.createElement("div");
-modalContent.className = "modal-content";
-
-var text = document.createElement("p");
-text.textContent = "This is new.";
-
-var buttons = document.createElement("div");
-buttons.className = "modal-buttonDiv";
-
-var button1 = document.createElement("button");
-button1.className = "iconButton";
-button1.setAttribute("style", "color: green");
-
-var button1Icon = document.createElement("i");
-button1Icon.className = "fa fa-check";
-button1.appendChild(button1Icon)
-
-buttons.appendChild(button1);
-
-modalContent.appendChild(text);
-modalContent.appendChild(buttons);
-
-modal.appendChild(modalContent);
-
-modal.setAttribute("style", "display: inline");
-
-document.body.appendChild(modal); 
-
 function activatePrompt(prompt) {
     activePrompt = prompt;
+    prompt.htmlElement.style.display = "inline";
 }
 
 function cancelPrompt() {
+    activePrompt.htmlElement.style.display = "none";
     activePrompt = null;
+}
+
+function initializePrompts() {
+    prompts.forEach(prompt => {
+        let modal = document.createElement("div");
+        let modalContent = document.createElement("div");
+        let text = document.createElement("p");
+        let buttons = document.createElement("div");
+
+        modal.id = prompt.id;
+        modal.className = "modal";
+        modal.setAttribute("style", "background-color: " + prompt.backgroundColor + ";");
+
+        modalContent.className = "modal-content";
+
+        buttons.className = "modal-buttonDiv";
+
+        text.innerHTML = prompt.text;
+
+        prompt.promptButtons.forEach(promptButton => {
+            let button = document.createElement("button");
+            button.className = "iconButton";
+            button.setAttribute("style", "color: " + promptButton.iconColor);
+            button.setAttribute("onclick", "" + promptButton.action);
+
+            let icon = document.createElement("i");
+            icon.className = promptButton.icon;
+            button.appendChild(icon)
+
+            buttons.appendChild(button);
+        });
+
+        modalContent.appendChild(text);
+        modalContent.appendChild(buttons);
+        modal.appendChild(modalContent);
+
+        document.body.appendChild(modal);
+        prompt.htmlElement = modal;
+    });
 }

@@ -1,3 +1,11 @@
+function promptSessionEnd() {
+    if (IS_TEST) {
+        activatePrompt(endTestEarly);
+    } else {
+        activatePrompt(endPracticeEarly);
+    }
+}
+
 function endTest() {
     zoomOut(false)
 
