@@ -84,29 +84,16 @@ button {
     align-items: center;
 }
 
-/* Add Animation */
+/* Animate modals */
 @-webkit-keyframes animatetop {
   from {top:-300px; opacity:0} 
   to {top:0; opacity:1}
 }
-
 @keyframes animatetop {
   from {top:-300px; opacity:0}
   to {top:0; opacity:1}
 }
 
-#endEarly {
-    position: absolute;
-    font-size: 40px;
-    color: #c50000;
-    bottom: 10px;
-    left: 0px;
-}
-#resetZoom {
-    position: absolute;
-    bottom: 10px;
-    right: 0px;
-}
 #timerBackground {
     display: none;
     position: relative;
@@ -120,18 +107,62 @@ button {
     border-radius: 10px;
     border: 3px solid black;
 }
+#endEarly {
+    position: absolute;
+    font-size: 40px;
+    color: #c50000;
+    bottom: 10px;
+    left: 0px;
+}
+#resetZoom {
+    position: absolute;
+    bottom: 10px;
+    right: 0px;
+}
+
+#toggleDiv {
+    position: absolute;
+    top: 10px;
+    right: 0px;
+    height: -webkit-calc(100% - 110px);
+    height:    -moz-calc(100% - 110px);
+    height:         calc(100% - 110px);
+    display: block;
+}
+.toggleButton {
+    margin-top: 0px;
+    margin-bottom: 0px;
+    height: 50%;
+}
+#brush {
+    border-radius: 10px 10px 0px 0px;
+}
+#eraser {
+    font-size: 55px;
+    border-radius: 0px 0px 10px 10px;
+}
 </style>
 
+
 <body>
+<!-- Canvas stack for background grid, drawing, and rendering the figure -->
 <canvas id="gridCanvas" width="0" height="0"></canvas>    
 <canvas id="drawCanvas" width="0" height="0"></canvas>    
-<canvas id="figureCanvas" width="0" height="0"></canvas>    
+<canvas id="figureCanvas" width="0" height="0"></canvas>  
 
+<!-- Timer -->
+<div id="timerBackground">
+    <p id="timer" style="margin-bottom: 0px;"></p>
+</div>
+
+<!-- Buttons -->
 <button id="endEarly" onclick="promptSessionEnd()">End</button>
 <button id="resetZoom" onclick="zoomOut(true)"><i class="fa fa-compress"></i></button>
 
-<div id="timerBackground">
-    <p id="timer" style="margin-bottom: 0px;"></p>
+<!-- Brush/Eraser Toggle -->
+<div id="toggleDiv">
+    <button class="toggleButton" id="brush" onclick="setBrush(DRAW_COLOR)"><i class="fa fa-pencil"></i></button>
+    <button class="toggleButton" id="eraser" onclick="setBrush(ERASE_COLOR)"><i class="fa fa-eraser"></i></button>
 </div>
 </body>
 
@@ -304,6 +335,28 @@ function mainRedraw() {
     figureCtxRedraw();
 }    
 
+
+//Toggle between brush and eraser------------------------------------------------------------------
+var brushToggle = document.getElementById("brush");
+var eraserToggle = document.getElementById("eraser");
+
+function setBrush(color) {
+    brushColor = color;
+
+    if (color == DRAW_COLOR) {
+        brushToggle.style.outline = "4px outset black";
+        eraserToggle.style.outline = "2px solid black";
+
+        brushToggle.style.backgroundColor = "#FFFFFF";
+        eraserToggle.style.backgroundColor = "#e3e3e3";
+    } else {
+        brushToggle.style.outline = "2px solid black";
+        eraserToggle.style.outline = "4px outset black";
+        
+        brushToggle.style.backgroundColor = "#e3e3e3";
+        eraserToggle.style.backgroundColor = "#FFFFFF";
+    }
+}
 
 //Drawing Shortcuts--------------------------------------------------------------------------------
 //Easy Circle Drawing
