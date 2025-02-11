@@ -19,12 +19,12 @@ figureCanvas.addEventListener("touchstart", e => {
             if (brushColor == ERASE_COLOR) {
                 drawCtx.globalCompositeOperation = "destination-out";
                 gridCtx.lineWidth = 1.5;
-                circle(touchX, touchY, brushSize, false, gridCtx);
+                circle(touchX, touchY, BRUSH_SIZE, false, gridCtx);
             } else {
                 drawCtx.globalCompositeOperation = "source-over";
             }
 
-            circle(touch.pageX, touch.pageY, brushSize, true, drawCtx);
+            circle(touch.pageX, touch.pageY, BRUSH_SIZE, true, drawCtx);
         } 
         else if (touches.length <= 1) { //Single Finger Pan
             panX = touch.pageX;
@@ -47,12 +47,12 @@ figureCanvas.addEventListener("touchstart", e => {
             if (brushColor == ERASE_COLOR) {
                 drawCtx.globalCompositeOperation = "destination-out";
                 gridCtx.lineWidth = 1.5;
-                circle(touchX, touchY, brushSize, false, gridCtx);
+                circle(touchX, touchY, BRUSH_SIZE, false, gridCtx);
             } else {
                 drawCtx.globalCompositeOperation = "source-over";
             }
 
-            circle(touchX, touchY, brushSize, true, drawCtx);
+            circle(touchX, touchY, BRUSH_SIZE, true, drawCtx);
         } 
         else if (touches.length >= 2) { //2 Finger Pan/Zoom
             touchType = 2;
@@ -87,12 +87,12 @@ figureCanvas.addEventListener("touchmove", e => {
         if (touches.length == 1 && currentStroke != undefined && touchType == 1) { //Stylus
             gridCtxRedraw();
             
-            line(lastStrokeX, lastStrokeY, touchX, touchY, brushSize*2, drawCtx);
+            line(lastStrokeX, lastStrokeY, touchX, touchY, BRUSH_SIZE*2, drawCtx);
             extendCurrentStroke(touchX, touchY);
             
             if (brushColor == ERASE_COLOR) {
                 gridCtx.lineWidth = 1.5;
-                circle(touchX, touchY, brushSize, false, gridCtx);
+                circle(touchX, touchY, BRUSH_SIZE, false, gridCtx);
             }
             return;
         }
@@ -125,12 +125,12 @@ figureCanvas.addEventListener("touchmove", e => {
         if (touch.touchType == "stylus" && currentStroke != undefined) { //Stylus
             gridCtxRedraw();
             
-            line(lastStrokeX, lastStrokeY, touchX, touchY, brushSize*2, drawCtx);
+            line(lastStrokeX, lastStrokeY, touchX, touchY, BRUSH_SIZE*2, drawCtx);
             extendCurrentStroke(touchX, touchY);
             
             if (brushColor == ERASE_COLOR) {
                 gridCtx.lineWidth = 1.5;
-                circle(touchX, touchY, brushSize, false, gridCtx);
+                circle(touchX, touchY, BRUSH_SIZE, false, gridCtx);
             }
             return;
         }
