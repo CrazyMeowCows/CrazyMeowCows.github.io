@@ -5,26 +5,7 @@ document.addEventListener("touchstart", e => {
     let touchX = touch.pageX; 
     let touchY = touch.pageY;
 
-    if (activePrompt == "timerExpired") { //Various prompts and their associated buttons
-        handleButtonTouch(expiredOk, touch);
-        return;
-    } else if (activePrompt == "endEarly") {
-        handleButtonTouch(yesEndTest, touch);
-        handleButtonTouch(noEndTest, touch);
-        return;
-    } else if (activePrompt == "start") {
-        handleButtonTouch(startTest, touch);
-        return;
-    }
-
-    let uiTouch = false; //Test for UI elements
-    buttons.forEach(button => {
-        uiTouch = uiTouch || handleButtonTouch(button, touch)
-    });
-    if (uiTouch) {
-        if (activePrompt == "none") {
-            uiRedraw();
-        }
+    if (activePrompt) { //Any Prompt is Active
         return;
     }
 
@@ -96,7 +77,7 @@ document.addEventListener("touchmove", e => {
     let touchX = touch.pageX; 
     let touchY = touch.pageY;
 
-    if (activePrompt != "none") { //Any Promt is Active
+    if (activePrompt) { //Any Prompt is Active
         return;
     }
     if (DRAW_W_FINGER) { //Change input modes dependant on the drawWithFinger TODO: Clean up this code (Need access to iOS device)
@@ -187,11 +168,12 @@ document.addEventListener("touchend", e => { //Clear the Eraser Outline
 
 //Wheel Listener-----------------------------------------------------------------------------------
 document.addEventListener("wheel", e => { //TODO: REMOVE
-    if (activePrompt == "none") {
-        zoom = clamp(zoom-e.deltaY*ZOOM_SENS*Math.abs(zoom)/2, 1, MAX_ZOOM);
+    if (activePrompt) { //Any Prompt is Active
+        return;
+    }        
+    zoom = clamp(zoom-e.deltaY*ZOOM_SENS*Math.abs(zoom)/2, 1, MAX_ZOOM);
 
-        zoomX = e.pageX;
-        zoomY = e.pageY;
-        mainRedraw();
-    }
+    zoomX = e.pageX;
+    zoomY = e.pageY;
+    mainRedraw();
 });

@@ -1,11 +1,7 @@
 function endTest() {
     zoomOut(false)
 
-    uiCtx.fillStyle = "white";
-    uiCtx.fillRect(0, 0, W, H);
-    uiCtx.fillStyle = "black";
-    uiCtx.font = 'normal 500 60px Times New Roman';
-    uiCtx.fillText("Loading...", (W)/2, H/2-30);   
+    activatePrompt(loading);
 
     if (ENABLE_SCORING) {
         setTimeout(scoreFigure, 40);

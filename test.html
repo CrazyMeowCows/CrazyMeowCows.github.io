@@ -20,17 +20,85 @@ canvas {
     image-rendering: auto; 
     /* image-rendering: crisp-edges; */
 }
+
+button {
+    font-family: 'Times New Roman', Times, serif;
+    appearance: auto;
+    -webkit-appearance: none;
+
+    background-color: white;
+    color: black;
+
+    outline: 2px solid black;
+    border: none;
+    border-radius: 10px;
+    padding: 0px;
+
+    width: 70px;
+    height: 70px;
+    margin: 10px;
+    margin-top: 10px;
+    margin-bottom: 0px;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 60px;
+}
+
+.modal {
+    display: none;
+    position: fixed; /* Stay in place */
+    z-index: 1; /* Sit on top */
+    padding-top: 15%; /* Location of the box */
+    left: 0;
+    top: 0;
+    width: 100%; /* Full width */
+    height: 100%; /* Full height */
+    overflow: hidden; /* Disable scroll */
+    background-color: rgb(0,0,0); /* Fallback color */
+    background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
+}
+.modal-content {
+    position: relative;
+    background-color: #fefefe;
+    margin: auto;
+    padding: 30px 30px;
+    border: 2px solid black;
+    border-radius: 10px;
+    width: fit-content;
+    font-size: 27px;
+    box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2),0 6px 20px 0 rgba(0,0,0,0.19);
+    -webkit-animation-name: animatetop;
+    -webkit-animation-duration: 0.4s;
+    animation-name: animatetop;
+    animation-duration: 0.4s
+}
+.modal-buttonDiv {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+/* Add Animation */
+@-webkit-keyframes animatetop {
+  from {top:-300px; opacity:0} 
+  to {top:0; opacity:1}
+}
+
+@keyframes animatetop {
+  from {top:-300px; opacity:0}
+  to {top:0; opacity:1}
+}
 </style>
 
 
 <canvas id="gridCanvas" width="0" height="0"></canvas>    
 <canvas id="drawCanvas" width="0" height="0"></canvas>    
 <canvas id="figureCanvas" width="0" height="0"></canvas>    
-<canvas id="uiCanvas" width="0" height="0"></canvas>
 
 
 <script src="gen-config.js"></script>
-<script src="test-buttons.js"></script>
 <script src="test-prompt.js"></script>
 <script src="test-redraw.js"></script>
 <script src="test-end.js"></script>
@@ -85,9 +153,6 @@ var drawCtx = drawCanvas.getContext("2d", { willReadFrequently: false, aplha: fa
 var figureCanvas = document.getElementById('figureCanvas')
 var figureCtx = figureCanvas.getContext("2d", { willReadFrequently: false, aplha: false });
 
-var uiCanvas = document.getElementById('uiCanvas')
-var uiCtx = uiCanvas.getContext("2d", { willReadFrequently: false, aplha: false });
-
 var canvasCol = document.getElementsByTagName("canvas");
 for (let i = 0; i < canvasCol.length; i++) {
     canvasCol[i].width = W; canvasCol[i].height = H;
@@ -102,10 +167,6 @@ figureCtx.strokeStyle = "black";
 figureCtx.lineCap = "butt";
 figureCtx.lineJoin = "butt";
 figureCtx.lineWidth = 1.9;
-
-uiCtx.textAlign = "center";
-uiCtx.textBaseline = "middle";
-uiCtx.lineCap = "round";
 
 
 //Variable Declarations----------------------------------------------------------------------------
@@ -132,7 +193,7 @@ var lastStrokeX;
 var lastStrokeY;
 var brushColor = DRAW_COLOR;
 
-var activePrompt = "none";
+var activePrompt = null;
 
 var strokes = [];
 function PenStroke (xStart, yStart, strokeColor) {
@@ -150,46 +211,47 @@ function extendCurrentStroke (rawX, rawY) {
     lastStrokeY = rawY;
 }
 
-var buttons = [];
-var pencil = new Button(W-90, 10, 80, (H-140)/2, () => {brushColor = DRAW_COLOR}, '\uF040', 0, true, false);
-var eraser = new Button(pencil.x, pencil.y+pencil.h, pencil.w, pencil.h, () => {brushColor = ERASE_COLOR}, '\uF12d', 0, true, false);
-var resetZoom = new Button(W-90, H-90, 80, 80, () => {zoomOut(true)}, '\uF066', 0, false, false);
-var endEarly = new Button(10, H-90, 80, 80, () => {endTestPrompt(); endEarly.trans = 0;}, 'End', 0, false, false);
 
-var startTest = new Button((W)/2-35, H/2+13, 70, 70, () => {activePrompt = "none"; uiRedraw(); lastZoomed = true;}, '\uF0DA', 0, false, true);
-var yesEndTest = new Button((W)/2-85, H/2-115, 70, 70, endTest, '\uF00C', 0, false, true);
-var noEndTest = new Button((W)/2+15, H/2-115, 70, 70, () => {activePrompt = "none"; uiRedraw(); lastZoomed = true;}, '\uF00D', 0, false, true);
-var expiredOk = new Button((W)/2-35, H/2-115, 70, 70, endTest, '\uF061', 0, false, true);
+var beginTest = new Prompt("Press play to begin test.\nTimer countdown will begin immediately.", "#f0f0f0", 1, [
+    new PromptButton("fa fa-caret-right", "green", cancelPrompt)
+]);
+var endTestEarly = new Prompt("End Test Before Timer Ends?", "#000000", 0.3, [
+    new PromptButton("fa fa-check", "green", endTest),
+    new PromptButton("fa fa-times", "#6b0000", cancelPrompt)
+]);
+var endPracticeEarly = new Prompt("End Practice Session?", "#000000", 0.3, [
+    new PromptButton("fa fa-check", "green", endTest),
+    new PromptButton("fa fa-times", "#6b0000", cancelPrompt)
+]);
+var timerExpired = new Prompt("Timer Expired.", "#000000", 0.3, [
+    new PromptButton("fa fa-arrow-right", "green", endTest),
+]);
+var loading = new Prompt("Loading...", "#f0f0f0", 1, []);
+// var buttons = [];
+// var pencil = new Button(W-90, 10, 80, (H-140)/2, () => {brushColor = DRAW_COLOR}, '\uF040', 0, true, false);
+// var eraser = new Button(pencil.x, pencil.y+pencil.h, pencil.w, pencil.h, () => {brushColor = ERASE_COLOR}, '\uF12d', 0, true, false);
+// var resetZoom = new Button(W-90, H-90, 80, 80, () => {zoomOut(true)}, '\uF066', 0, false, false);
+// var endEarly = new Button(10, H-90, 80, 80, () => {endTestPrompt(); endEarly.trans = 0;}, 'End', 0, false, false);
 
 
 //Program Initialization---------------------------------------------------------------------------
 sessionStorage.isTest = JSON.stringify("false"); //Clear any previously set isTest flag 
 
 function decrementTimer() {
-    if (activePrompt != "none") { //Dont decrement timer if a prompt is active
+    if (activePrompt) { //Dont decrement timer if a prompt is active
         return;
     }
     if (timerSeconds > 0) { //Decrement if >0, otherwise call timerExpiredPrompt
         timerSeconds--;
-        uiRedraw();
     } else {
         timerExpiredPrompt();
     }
 }
 
-uiRedraw(); //Call uiRedraw to start loading the used fonts
+mainRedraw(); //Draw main content
 
-function load () { 
-    if (document.fonts.check('1px FontAwesome')) { //Check if font is loaded
-        uiRedraw(); //Call uiRedraw once fonts are loaded to display everything correctly
-        mainRedraw(); //Draw main content
-        if (ENABLE_TIMER) {setInterval(decrementTimer, 1000);}
-        if (IS_TEST) {beginTestPrompt();}
-    } else {
-        setTimeout(load, 20); //Recursively check every 20ms until font loads
-    }
-}
-load(); //Begin loading loop
+if (ENABLE_TIMER) {setInterval(decrementTimer, 1000);}
+if (IS_TEST) {activatePrompt(beginTest);}
 
 
 //Drawing the content of the main canvas-----------------------------------------------------------
