@@ -98,9 +98,6 @@ button {
   background-position: center;
   transition: background 0.5s;
 }
-.ripple:hover {
-  background: #b9b9b9 radial-gradient(circle, transparent 1%, #b9b9b9 1%) center/15000%;
-}
 .ripple:active {
   background-color: #b9b9b9;
   background-size: 100%;
@@ -347,25 +344,21 @@ function mainRedraw() {
 
 
 //Toggle between brush and eraser------------------------------------------------------------------
-var brushToggle = document.getElementById("brush");
-var eraserToggle = document.getElementById("eraser");
-
 function setBrush(color) {
     brushColor = color;
 
-    if (color == DRAW_COLOR) {
-        brushToggle.style.outline = "4px outset black";
-        eraserToggle.style.outline = "2px solid black";
-
-        brushToggle.style.backgroundColor = "#FFFFFF";
-        eraserToggle.style.backgroundColor = "#e3e3e3";
-    } else {
-        brushToggle.style.outline = "2px solid black";
-        eraserToggle.style.outline = "4px outset black";
-        
-        brushToggle.style.backgroundColor = "#e3e3e3";
-        eraserToggle.style.backgroundColor = "#FFFFFF";
+    let active = document.getElementById("brush");;
+    let inactive = document.getElementById("eraser");;
+    if (color == ERASE_COLOR) {
+        active = document.getElementById("eraser");;
+        inactive = document.getElementById("brush");;
     }
+
+    active.style.outline = "4px outset black";
+    inactive.style.backgroundColor = "#FFFFFF";
+
+    inactive.style.outline = "2px solid black";
+    active.style.backgroundColor = "#f0f0f0";
 }
 setBrush(DRAW_COLOR); //Initialize to brush instead of eraser
 
