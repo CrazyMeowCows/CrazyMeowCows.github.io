@@ -60,8 +60,8 @@ new Figure("The Shubi", 0, 0.43, (t, scale) => {
     let u = ceil(floor(p*s/ceil(p*s))-(p*s)/3);
 
     return new EquationPair(
-        u*(2-2/6*sin(t+PI)+3/60*sqr(sin(10*t+PI))-a-b-c)/sqrt(PI),
         u*(2/(sqrt(PI)*(1.000096616+0.05*sqr(sin(t))))),
+        u*(2-2/6*sin(t+PI)+3/60*sqr(sin(10*t+PI))-a-b-c)/sqrt(PI),
         t, scale
     );
 });

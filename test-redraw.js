@@ -66,28 +66,33 @@ function figureCtxRedraw () {
     let resolution = THETA_RESOLUTION_LOW_LOD;
 
     //Get the theta range of the part of the outline visible on screen
-    let minAngle;
-    let maxAngle;
-    if (offsetX > 0 && (offsetX-W)*zoom < 0 && offsetY > 0 && (offsetY-H)*zoom < 0) { //If center of figure is visible set visible angle to -PI->PI
+    let minAngle = TAU;
+    let maxAngle = 0;
+    if (offsetX > 0 && (offsetX-W)*zoom < 0 && offsetY > 0 && (offsetY-H)*zoom < 0) { //If center of figure is visible set visible angle to 0->TAU
         minAngle = 0;
         maxAngle = TAU;
         resolution = THETA_RESOLUTION_HIGH_LOD
     } else {
         let cornerAngles = [ //Otherwise find the theta values that point to each corner of the screen
-            Math.atan2(-offsetY*zoom, -offsetX*zoom),
-            Math.atan2((-offsetY+H)*zoom, -offsetX*zoom),
-            Math.atan2((-offsetY+H)*zoom, (-offsetX+W)*zoom),
-            Math.atan2(-offsetY*zoom, (-offsetX+W)*zoom)
+            Math.atan2(offsetY, -offsetX+W),
+            Math.atan2(offsetY, -offsetX),
+            -Math.atan2(-offsetY+H, -offsetX),
+            -Math.atan2(-offsetY+H, -offsetX+W)
         ];
         for (let i = 0; i < 4; i++) { //Find the corners with the min and max theta values
-            minAngle = Math.min(minAngle, -cornerAngles[i]);
-            maxAngle = Math.max(maxAngle, -cornerAngles[i]);
+            if (cornerAngles[i] < 0) cornerAngles[i] = TAU+cornerAngles[i]; 
+
+            minAngle = Math.min(minAngle, cornerAngles[i]);
+            maxAngle = Math.max(maxAngle, cornerAngles[i]);
         }
-        if (offsetX > 0 && Math.sign(minAngle) != Math.sign(maxAngle)) { //Handle the -180->180 discontinuity
-            maxAngle = -cornerAngles[2]+TAU;
-            minAngle = -cornerAngles[3]; 
+        if (offsetX < 0 && minAngle < PI/4 && maxAngle > 3*PI/2) { //Handle the -180->180 discontinuity
+            maxAngle = cornerAngles[1];
+            minAngle = cornerAngles[2]-TAU; 
         }
     }
+
+    minAngle = 0;
+    maxAngle = PI;
     
     //Drawing the visible part of the figure outline
     let scale = FIGURE_SCALE*SELECTED_FIGURE.scaleFactor*zoom;
@@ -100,14 +105,12 @@ function figureCtxRedraw () {
     innerPath.moveTo(offsetX+rads.innerX, offsetY-rads.innerY);
     outerPath.moveTo(offsetX+rads.outerX, offsetY-rads.outerY);
 
-    for (let theta = minAngle+thetaInc; theta <= maxAngle; theta += thetaInc) {
+    for (let theta = minAngle+thetaInc; theta <= maxAngle+0.01; theta += thetaInc) {
         let rads = SELECTED_FIGURE.calcRad(theta, scale);
         innerPath.lineTo(offsetX+rads.innerX, offsetY-rads.innerY);
         outerPath.lineTo(offsetX+rads.outerX, offsetY-rads.outerY);
     }
 
-    figureCtx.strokeStyle = 'red';
     figureCtx.stroke(innerPath);
-    figureCtx.strokeStyle = 'blue';
     figureCtx.stroke(outerPath);
 }
