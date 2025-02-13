@@ -78,7 +78,7 @@ function scoreFigure() {
         let theta = -Math.atan2(y, x);
         let pixelR = Math.hypot(x, y);
         let figureRads = SELECTED_FIGURE.calcRad(theta, scale);
-        if (pixelR >= figureRads.inner && pixelR <= figureRads.outer) {
+        if (pixelR >= figureRads.inner && pixelR <= figureRads.outer) { //TODO: FIX SHUBI SCORING
             scoreInc++;
         } else if (!getMaxScore){
             scoreInc--;
