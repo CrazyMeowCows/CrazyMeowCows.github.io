@@ -27,4 +27,5 @@ new Figure("The Ring", 423406, 0.85, [
     (t) => {return 1/Math.sqrt(1.1*PI)}
 ]);
 
+const VERSION = "7.0.1";
 const COMP_TESTING = true; //Use for development on non-iOS devices
