@@ -76,10 +76,9 @@ function scoreFigure() {
         let x = (i / 4) % SCORE_AREA_SIZE - SCORE_AREA_SIZE/2;
         let y = Math.floor((i / 4) / SCORE_AREA_SIZE) - SCORE_AREA_SIZE/2;
         let theta = -Math.atan2(y, x);
-        let r = Math.hypot(x, y);
-        let innerR = SELECTED_FIGURE.calcRad[1](theta)*scale;
-        let outerR = SELECTED_FIGURE.calcRad[0](theta)*scale;
-        if (r >= innerR && r <= outerR) {
+        let pixelR = Math.hypot(x, y);
+        let figureRads = SELECTED_FIGURE.calcRad(theta, scale);
+        if (pixelR >= figureRads.inner && pixelR <= figureRads.outer) {
             scoreInc++;
         } else if (!getMaxScore){
             scoreInc--;

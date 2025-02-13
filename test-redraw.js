@@ -66,11 +66,11 @@ function figureCtxRedraw () {
     let resolution = THETA_RESOLUTION_LOW_LOD;
 
     //Get the theta range of the part of the outline visible on screen
-    let minAngle = PI;
-    let maxAngle = -PI;
+    let minAngle;
+    let maxAngle;
     if (offsetX > 0 && (offsetX-W)*zoom < 0 && offsetY > 0 && (offsetY-H)*zoom < 0) { //If center of figure is visible set visible angle to -PI->PI
-        minAngle = -PI;
-        maxAngle = PI;
+        minAngle = 0;
+        maxAngle = TAU;
         resolution = THETA_RESOLUTION_HIGH_LOD
     } else {
         let cornerAngles = [ //Otherwise find the theta values that point to each corner of the screen
@@ -90,23 +90,24 @@ function figureCtxRedraw () {
     }
     
     //Drawing the visible part of the figure outline
-    figureCtx.beginPath();
     let scale = FIGURE_SCALE*SELECTED_FIGURE.scaleFactor*zoom;
+    let thetaInc = (maxAngle-minAngle)/resolution;
 
-    for (let i = 0; i < SELECTED_FIGURE.calcRad.length; i++) {
-        let calcRad = SELECTED_FIGURE.calcRad[i];
-        let r = calcRad(minAngle)*scale;
-        figureCtx.moveTo(offsetX+r*Math.cos(minAngle), offsetY-r*Math.sin(minAngle));
+    const innerPath = new Path2D();
+    const outerPath = new Path2D();
 
-        for (let theta = minAngle; theta <= maxAngle; theta += (maxAngle-minAngle)/resolution) {
-            r = calcRad(theta)*scale;
+    let rads = SELECTED_FIGURE.calcRad(minAngle, scale);
+    innerPath.moveTo(offsetX+rads.innerX, offsetY-rads.innerY);
+    outerPath.moveTo(offsetX+rads.outerX, offsetY-rads.outerY);
 
-            figureCtx.lineTo(offsetX+r*Math.cos(theta), offsetY-r*Math.sin(theta));
-        }
-        if (resolution == THETA_RESOLUTION_HIGH_LOD) {
-            figureCtx.lineTo(offsetX+r*Math.cos(maxAngle), offsetY-r*Math.sin(maxAngle));
-        }
-
-        figureCtx.stroke();
+    for (let theta = minAngle+thetaInc; theta <= maxAngle; theta += thetaInc) {
+        let rads = SELECTED_FIGURE.calcRad(theta, scale);
+        innerPath.lineTo(offsetX+rads.innerX, offsetY-rads.innerY);
+        outerPath.lineTo(offsetX+rads.outerX, offsetY-rads.outerY);
     }
+
+    figureCtx.strokeStyle = 'red';
+    figureCtx.stroke(innerPath);
+    figureCtx.strokeStyle = 'blue';
+    figureCtx.stroke(outerPath);
 }
