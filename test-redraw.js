@@ -66,7 +66,7 @@ function figureCtxRedraw () {
     let resolution = THETA_RESOLUTION_LOW_LOD;
 
     //Get the theta range of the part of the outline visible on screen
-    let minAngle = TAU;
+    let minAngle = TAU; //Set these to the opposite values to enable finding min and max later
     let maxAngle = 0;
     if (offsetX > 0 && (offsetX-W)*zoom < 0 && offsetY > 0 && (offsetY-H)*zoom < 0) { //If center of figure is visible set visible angle to 0->TAU
         minAngle = 0;
@@ -85,21 +85,24 @@ function figureCtxRedraw () {
             minAngle = Math.min(minAngle, cornerAngles[i]);
             maxAngle = Math.max(maxAngle, cornerAngles[i]);
         }
-        if (offsetX < 0 && minAngle < PI/4 && maxAngle > 3*PI/2) { //Handle the -180->180 discontinuity
+        if (offsetX < 0 && minAngle < PI/4 && maxAngle > 3*PI/2) { //Handle the 360->0 discontinuity
             maxAngle = cornerAngles[1];
             minAngle = cornerAngles[2]-TAU; 
         }
     }
 
-    minAngle = 0;
-    maxAngle = PI;
+    if (SELECTED_FIGURE.isHemisphere) { //Avoid discontinuities at 0 and PI on hemispherical shapes
+        if (minAngle >= PI) return; //Dont bother rendering if not on screen at all
+        minAngle = Math.max(minAngle, 0.00001);
+        maxAngle = Math.min(maxAngle, PI-0.00001);
+    }
     
     //Drawing the visible part of the figure outline
     let scale = FIGURE_SCALE*SELECTED_FIGURE.scaleFactor*zoom;
     let thetaInc = (maxAngle-minAngle)/resolution;
 
-    const innerPath = new Path2D();
-    const outerPath = new Path2D();
+    let innerPath = new Path2D();
+    let outerPath = new Path2D();
 
     let rads = SELECTED_FIGURE.calcRad(minAngle, scale);
     innerPath.moveTo(offsetX+rads.innerX, offsetY-rads.innerY);
