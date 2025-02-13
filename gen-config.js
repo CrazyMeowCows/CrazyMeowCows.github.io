@@ -54,12 +54,10 @@ new Figure("The Shubi", 0, 0.43, (t, scale) => {
     let b = 1/500*sqr(cos(7*(t+PI/2-.16)))*sin(22*(t+PI/2-0.16))*tan((t+PI/2-.16)/2);
     let c = 1/500*sqr(cos(7*(t+PI/2+.16)))*sin(22*(t+PI/2+0.16))*tan((t+PI/2+.16)/2);
     
-    let p = (1+t/abs(t))/2+(1-ceil(t/(t+1))-floor(t+(t+1))/ceil(t+(t+1)));
+    let p = (1+t/abs(t))/2+(1-ceil(t/(t+1))-floor(t/(t+1))/ceil(t/(t+1)));
     let s = ceil((PI+.1)/abs(t+.1))-floor((PI+.1)/abs(t+.1)+floor((t+.1)/(PI+.1))/(floor((t+.1)/(PI+.1))+1))+1-ceil(abs(t-PI)/(abs(t-PI)+.1))-floor(abs(t-PI)/(abs(t-PI)+.1));
 
-    let u = ceil(floor(p*s/ceil(p*s))-p*s/3);
-
-    console.log(u);
+    let u = ceil(floor(p*s/ceil(p*s))-(p*s)/3);
 
     return new EquationPair(
         u*(2-2/6*sin(t+PI)+3/60*sqr(sin(10*t+PI))-a-b-c)/sqrt(PI),
