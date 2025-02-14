@@ -27,29 +27,32 @@ function scoreFigure() {
     drawCanvas.style.display = "none";
 
     //Drawing strokes using one continuous line
+    drawCtx.strokeStyle = "black";
+
+    let minAngle = 0;
+    let maxAngle = TAU;
+    let thetaInc = (maxAngle-minAngle)/THETA_RESOLUTION_HIGH_LOD;
+
+    let innerPath = new Path2D();
+    let outerPath = new Path2D();
+
+    let rads = SELECTED_FIGURE.calcRad(minAngle, scale);
+    innerPath.moveTo(SCORE_AREA_SIZE/2+rads.innerX, SCORE_AREA_SIZE/2-rads.innerY);
+    outerPath.moveTo(SCORE_AREA_SIZE/2+rads.outerX, SCORE_AREA_SIZE/2-rads.outerY);
+
+    for (let theta = minAngle+thetaInc; theta <= maxAngle+0.01; theta += thetaInc) {
+        let rads = SELECTED_FIGURE.calcRad(theta, scale);
+        innerPath.lineTo(SCORE_AREA_SIZE/2+rads.innerX, SCORE_AREA_SIZE/2-rads.innerY);
+        outerPath.lineTo(SCORE_AREA_SIZE/2+rads.outerX, SCORE_AREA_SIZE/2-rads.outerY);
+    }
+
+    drawCtx.stroke(innerPath);
+    drawCtx.stroke(outerPath);
+
     drawCtx.strokeStyle = "red";
     drawCtx.lineCap = "round";
     drawCtx.lineJoin = "round";
 
-    // let minAngle = 0;
-    // let maxAngle = TAU;
-    // drawCtx.lineWidth = 5;
-    // drawCtx.strokeStyle = "black";
-
-    // for (let i = 0; i < SELECTED_FIGURE.calcRad.length; i++) {
-    //     let calcRad = SELECTED_FIGURE.calcRad[i];
-    //     let r = calcRad(minAngle)*scale;
-    //     drawCtx.moveTo(SCORE_AREA_SIZE/2+r*Math.cos(minAngle), SCORE_AREA_SIZE/2-r*Math.sin(minAngle));
-
-    //     for (let theta = minAngle; theta <= maxAngle; theta += (maxAngle-minAngle)/THETA_RESOLUTION_HIGH_LOD) {
-    //         r = calcRad(theta)*scale;
-
-    //         drawCtx.lineTo(SCORE_AREA_SIZE/2+r*Math.cos(theta), SCORE_AREA_SIZE/2-r*Math.sin(theta));
-    //     }
-    //     drawCtx.stroke();
-    // }
-
-    drawCtx.strokeStyle = "red";
     strokes.forEach(stroke => {
         if (stroke.strokeColor == DRAW_COLOR) {
             drawCtx.globalCompositeOperation = "source-over";
@@ -69,8 +72,9 @@ function scoreFigure() {
 
     let scoreInc = 0;
     imgData = drawCtx.getImageData(0, 0, SCORE_AREA_SIZE, SCORE_AREA_SIZE);
+    imgData = drawCtx.getImageData(0, 0, SCORE_AREA_SIZE, SCORE_AREA_SIZE);
     for (let i = 0; i < imgData.data.length; i += 4) {
-        if (imgData.data[i] == 0 && !getMaxScore) { //Only look at filled in pixels
+        if (imgData.data[i] == 0 && !getMaxScore) { //Skip blank pixels
             continue;
         }
         let x = (i / 4) % SCORE_AREA_SIZE - SCORE_AREA_SIZE/2;
@@ -78,6 +82,12 @@ function scoreFigure() {
         let theta = -Math.atan2(y, x);
         let pixelR = Math.hypot(x, y);
         let figureRads = SELECTED_FIGURE.calcRad(theta, scale);
+
+        if (theta < 0 && SELECTED_FIGURE.isHemisphere && !getMaxScore) {
+            scoreInc--;
+            continue;
+        }
+
         if (pixelR >= figureRads.inner && pixelR <= figureRads.outer) { //TODO: FIX SHUBI SCORING
             scoreInc++;
         } else if (!getMaxScore){

@@ -50,7 +50,7 @@ new Figure("The Ring", 423406, 0.85, false, (t, scale) => {
         t, scale
     );
 });
-new Figure("The Shubi", 736596, 0.43, true, (t, scale) => {
+new Figure("The Shubi", 919087, 0.7, true, (t, scale) => {
     let a = 3/900*sqr(cos(7*(t+PI/2)))*sin(22*(t+PI/2))*tan((t+PI/2)/2);
     let b = 1/500*sqr(cos(7*(t+PI/2-.16)))*sin(22*(t+PI/2-0.16))*tan((t+PI/2-.16)/2);
     let c = 1/500*sqr(cos(7*(t+PI/2+.16)))*sin(22*(t+PI/2+0.16))*tan((t+PI/2+.16)/2);
@@ -61,8 +61,8 @@ new Figure("The Shubi", 736596, 0.43, true, (t, scale) => {
     let u = ceil(floor(p*s/ceil(p*s))-(p*s)/3);
 
     return new EquationPair(
-        u*(2/(sqrt(PI)*(1.000096616+0.05*sqr(sin(t))))),
-        u*(2-2/6*sin(t+PI)+3/60*sqr(sin(10*t+PI))-a-b-c)/sqrt(PI),
+        u*(2/(sqrt(PI)*(1.000096616+0.05*sqr(sin(t)))))*0.6,
+        u*(2-2/6*sin(t+PI)+3/60*sqr(sin(10*t+PI))-a-b-c)/sqrt(PI)*0.6,
         t, scale
     );
 });

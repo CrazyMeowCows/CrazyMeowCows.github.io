@@ -70,7 +70,7 @@ function figureCtxRedraw () {
     let maxAngle = 0;
     if (offsetX > 0 && (offsetX-W)*zoom < 0 && offsetY > 0 && (offsetY-H)*zoom < 0) { //If center of figure is visible set visible angle to 0->TAU
         minAngle = 0;
-        maxAngle = TAU;
+        maxAngle = SELECTED_FIGURE.isHemisphere ? PI : TAU;
         resolution = THETA_RESOLUTION_HIGH_LOD
     } else {
         let cornerAngles = [ //Otherwise find the theta values that point to each corner of the screen
@@ -90,6 +90,8 @@ function figureCtxRedraw () {
             minAngle = cornerAngles[2]-TAU; 
         }
     }
+
+    // console.log(maxAngle)
 
     if (SELECTED_FIGURE.isHemisphere) { //Avoid discontinuities at 0 and PI on hemispherical shapes
         if (minAngle >= PI) return; //Dont bother rendering if not on screen at all
