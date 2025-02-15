@@ -178,9 +178,10 @@ button {
 
 
 <script src="gen-config.js"></script>
+<script src="gen-figures.js"></script>
+<script src="test-end.js"></script>
 <script src="test-prompt.js"></script>
 <script src="test-redraw.js"></script>
-<script src="test-end.js"></script>
 <script src="test-touchListener.js"></script>
 <script>
 //Constant Declarations----------------------------------------------------------------------------
@@ -343,15 +344,15 @@ function mainRedraw() {
 }    
 
 
-//Toggle between brush and eraser------------------------------------------------------------------
+//Toggle button between brush and eraser-----------------------------------------------------------
 function setBrush(color) {
     brushColor = color;
 
-    let active = document.getElementById("brush");;
-    let inactive = document.getElementById("eraser");;
+    let active = document.getElementById("brush");
+    let inactive = document.getElementById("eraser");
     if (color == ERASE_COLOR) {
-        active = document.getElementById("eraser");;
-        inactive = document.getElementById("brush");;
+        active = document.getElementById("eraser");
+        inactive = document.getElementById("brush");
     }
 
     active.style.outline = "4px outset black";
@@ -399,7 +400,7 @@ function updateTimer() {
     let mins = TIME_FORMAT.format(""+Math.floor(timerSeconds/60));
     let secs = TIME_FORMAT.format(""+timerSeconds%60);
 
-    document.getElementById("timer").textContent = mins+":"+secs;
+    document.getElementById("timer").textContent = mins+":"+secs; //Set the timer HTML element
 }
 function decrementTimer() {
     if (activePrompt) { //Dont decrement timer if a prompt is active
@@ -420,14 +421,12 @@ function zoomOut(animate) {
     offsetX = W/2;
     offsetY = H/2+GRID_SIZE/3;
     zoomX = W/2;
-    zoomY = 0;
+    zoomY = H/2;
     zoom = 1;
     oldGridSize = GRID_SIZE;
     mainRedraw();
 
-    if (animate) {
-        zoomOutAnimation(0);
-    }
+    if (animate) zoomOutAnimation(0);
 }
 
 //Bump zoom out then back in
@@ -435,9 +434,7 @@ function zoomOutAnimation(inc) {
     zoom -= 0.007*Math.sign(10-inc);
     mainRedraw();
 
-    if (inc < 20) {
-        requestAnimationFrame(() => {zoomOutAnimation(inc+1)});
-    }
+    if (inc < 20) requestAnimationFrame(() => {zoomOutAnimation(inc+1)});
 }
 </script>
 </html>

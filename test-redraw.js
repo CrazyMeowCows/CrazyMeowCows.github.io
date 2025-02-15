@@ -91,8 +91,6 @@ function figureCtxRedraw () {
         }
     }
 
-    // console.log(maxAngle)
-
     if (SELECTED_FIGURE.isHemisphere) { //Avoid discontinuities at 0 and PI on hemispherical shapes
         if (minAngle >= PI) return; //Dont bother rendering if not on screen at all
         minAngle = Math.max(minAngle, 0.00001);
