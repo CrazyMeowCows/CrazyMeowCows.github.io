@@ -201,8 +201,6 @@ const SELECTED_FIGURE = figures[parseInt(JSON.parse(localStorage.selectedFigure)
 const THETA_RESOLUTION_HIGH_LOD = 301;
 const THETA_RESOLUTION_LOW_LOD = 200;
 
-const BRUSH_SIZE = parseInt(JSON.parse(localStorage.brushSize))/768*H;
-
 const IS_TEST = JSON.parse(sessionStorage.isTest) == "true";
 const ENABLE_TIMER = IS_TEST || JSON.parse(localStorage.practiceTimer) == "true";
 const ENABLE_SCORING = IS_TEST || JSON.parse(localStorage.practiceScore) == "true";
@@ -218,8 +216,14 @@ const ERASE_COLOR = "#FFFFFF";
 const DRAW_COLOR = IS_TEST ? "#FFE500" : "#808080"; //Test Color : Practice Color
 
 //DO NOT CHANGE - STANDARDIZES TEST RESULTS
-const FIGURE_SCALE = 0.8*H;
+const AVG_Y = (SELECTED_FIGURE.minY+SELECTED_FIGURE.maxY)/2;
+const Y_SCALE = (H/2-50)/(SELECTED_FIGURE.maxY-AVG_Y);
+const X_SCALE = (W/2-100)/(SELECTED_FIGURE.width/2);
+const SCALE = Math.min(X_SCALE, Y_SCALE);
+
 const SCORE_AREA_SIZE = 4000; //CANNOT EXCEED 4096px by 4096px DUE TO iOS/SAFARI LIMITATIONS
+
+const BRUSH_SIZE = parseInt(JSON.parse(localStorage.brushSize))/768*SCALE;
 
 
 //Canvas Setup and Styling-------------------------------------------------------------------------
@@ -252,7 +256,7 @@ figureCtx.lineWidth = 1.9;
 var oldGridSize = GRID_SIZE;
 
 var offsetX = W/2;
-var offsetY = H/2+GRID_SIZE/3;
+var offsetY = H/2+50;
 var zoomX = 0;
 var zoomY = 0;
 var zoom = 1;
@@ -335,7 +339,7 @@ function mainRedraw() {
 
     //Limit panning
     offsetX = clamp(offsetX, -W*0.55*zoom+W, W*0.55*zoom);
-    offsetY = clamp(offsetY, -H*0.65*zoom+H, H*0.65*zoom);
+    offsetY = clamp(offsetY, -H*0.55*zoom+H, H*0.55*zoom);
 
     //Call each canvas' redraw functions
     gridCtxRedraw();
@@ -419,9 +423,9 @@ function decrementTimer() {
 //Reset to a centered view at a zoom of 1
 function zoomOut(animate) {
     offsetX = W/2;
-    offsetY = H/2+GRID_SIZE/3;
-    zoomX = W/2;
-    zoomY = H/2;
+    offsetY = H/2+50;
+    zoomX = offsetX;
+    zoomY = offsetY;
     zoom = 1;
     oldGridSize = GRID_SIZE;
     mainRedraw();
