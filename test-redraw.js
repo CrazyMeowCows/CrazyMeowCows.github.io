@@ -73,11 +73,12 @@ function figureCtxRedraw () {
         maxAngle = SELECTED_FIGURE.maxTheta;
         resolution = THETA_RESOLUTION_HIGH_LOD
     } else {
+        let figureYOffset = AVG_Y*SCALE*zoom;
         let cornerAngles = [ //Otherwise find the theta values that point to each corner of the screen
-            Math.atan2(offsetY, -offsetX+W),
-            Math.atan2(offsetY, -offsetX),
-            -Math.atan2(-offsetY+H, -offsetX),
-            -Math.atan2(-offsetY+H, -offsetX+W)
+            Math.atan2(offsetY+figureYOffset, -offsetX+W),
+            Math.atan2(offsetY+figureYOffset, -offsetX),
+            -Math.atan2(-offsetY+H-figureYOffset, -offsetX),
+            -Math.atan2(-offsetY+H-figureYOffset, -offsetX+W)
         ];
         for (let i = 0; i < 4; i++) { //Find the corners with the min and max theta values
             if (cornerAngles[i] < 0) cornerAngles[i] = TAU+cornerAngles[i]; 
@@ -90,49 +91,45 @@ function figureCtxRedraw () {
             minAngle = cornerAngles[2]-TAU; 
         }
     }
-
-    // if (SELECTED_FIGURE.isHemisphere) { //Avoid discontinuities at 0 and PI on hemispherical shapes
-    //     if (minAngle >= PI) return; //Dont bother rendering if not on screen at all
-    //     minAngle = Math.max(minAngle, 0.00001);
-    //     maxAngle = Math.min(maxAngle, PI-0.00001);
-    // }
     
     //Drawing the visible part of the figure outline
+    if (SELECTED_FIGURE.maxTheta-TAU != SELECTED_FIGURE.minTheta) {
+        maxAngle = Math.min(maxAngle, SELECTED_FIGURE.maxTheta);
+        minAngle = Math.max(minAngle, SELECTED_FIGURE.minTheta);
+    }
     let thetaInc = (maxAngle-minAngle)/resolution;
 
     let innerPath = new Path2D();
     let outerPath = new Path2D();
 
-    let rads = getCoordsFromFigure(minAngle);
-    innerPath.moveTo(offsetX+rads.innerX, offsetY-rads.innerY);
-    outerPath.moveTo(offsetX+rads.outerX, offsetY-rads.outerY);
+    rads = getCoordsFromFigure(minAngle, SCALE*zoom, offsetX, offsetY);
+    innerPath.moveTo(rads.innerX, rads.innerY);
+    outerPath.moveTo(rads.outerX, rads.outerY);
 
-    for (let theta = minAngle+thetaInc; theta <= maxAngle+0.01; theta += thetaInc) {
-        let rads = getCoordsFromFigure(theta);
-        innerPath.lineTo(offsetX+rads.innerX, offsetY-rads.innerY);
-        outerPath.lineTo(offsetX+rads.outerX, offsetY-rads.outerY);
+    for (let theta = minAngle+thetaInc; theta <= maxAngle; theta += thetaInc) {
+        rads = getCoordsFromFigure(theta, SCALE*zoom, offsetX, offsetY);
+        innerPath.lineTo(rads.innerX, rads.innerY);
+        outerPath.lineTo(rads.outerX, rads.outerY);
     }
+
+    rads = getCoordsFromFigure(maxAngle, SCALE*zoom, offsetX, offsetY);
+    innerPath.lineTo(rads.innerX, rads.innerY);
+    outerPath.lineTo(rads.outerX, rads.outerY);
 
     figureCtx.stroke(innerPath);
     figureCtx.stroke(outerPath);
 }
 
-function getCoordsFromFigure(theta) {
+function getCoordsFromFigure(theta, scale, screenOffsetX, screenOffsetY) {
     let equationPair = SELECTED_FIGURE.calcRad(theta);
     
-    let scale = SCALE*zoom;
     let yOffset = -AVG_Y*scale;
 
     let innerRad = equationPair.inner*scale;
     let outerRad = equationPair.outer*scale;
 
     return new coordPair (
-        innerRad*cos(theta), innerRad*sin(theta)+yOffset,
-        outerRad*cos(theta), outerRad*sin(theta)+yOffset
+        screenOffsetX+innerRad*cos(theta), screenOffsetY-(innerRad*sin(theta)+yOffset),
+        screenOffsetX+outerRad*cos(theta), screenOffsetY-(outerRad*sin(theta)+yOffset)
     )
-}
-
-function coordPair(innerX, innerY, outerX, outerY) {
-    this.innerX = innerX; this.innerY = innerY;
-    this.outerX = outerX; this.outerY = outerY;
 }
