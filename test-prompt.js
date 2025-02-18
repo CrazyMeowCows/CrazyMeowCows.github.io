@@ -7,13 +7,14 @@ function Prompt (text, backgroundColor, promptButtons) {
     initializePrompt(this);
 }
 
-function PromptButton (icon, iconColor, action) {
-    this.icon = icon;
+function PromptButton (content, iconColor, action) {
+    this.content = content;
     this.iconColor = iconColor;
     this.action = action;
 }
 
 function activatePrompt(prompt) {
+    if (activePrompt) {cancelPrompt();}
     activePrompt = prompt;
     prompt.htmlElement.style.display = "inline";
 }
@@ -45,9 +46,17 @@ function initializePrompt(prompt) {
         button.style.color =  promptButton.iconColor;
         button.onclick = promptButton.action;
 
-        let icon = document.createElement("i");
-        icon.className = promptButton.icon;
-        button.appendChild(icon)
+        let content;
+        if (promptButton.content.includes("fa")) {
+            content = document.createElement("i");
+            content.className = promptButton.content;
+        } else {
+            content = document.createElement("p");
+            content.innerHTML = promptButton.content;
+            content.style.marginTop = "0px";
+            content.style.marginBottom = "0px";
+        }
+        button.appendChild(content)
 
         buttons.appendChild(button);
     });
