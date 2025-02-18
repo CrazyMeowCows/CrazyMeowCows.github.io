@@ -185,9 +185,9 @@ sessionStorage.isTest = JSON.stringify("false"); //Clear any previously set isTe
 
 mainRedraw(); //Draw main content
 
-// if (IS_TEST) {
+if (IS_TEST) {
     activatePrompt(handedness);
-// }
+}
 if (ENABLE_TIMER) {
     document.getElementById("timerDiv").style.display = "block"; //Display timer
     updateTimer(); //Display initialized time
