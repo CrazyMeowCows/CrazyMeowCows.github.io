@@ -15,7 +15,7 @@ p {
 }
 canvas {
     position: absolute;
-    image-rendering: auto; 
+    image-rendering: auto;
     /* image-rendering: crisp-edges; */
 }
 
@@ -58,9 +58,6 @@ button {
 #endEarly {
     font-size: 40px;
     color: #c50000;
-    margin-right: auto;
-    float: left;
-    background-color: white;
     z-index: 1;
 }
 #resetZoom {
@@ -148,7 +145,6 @@ button {
     top: -10px;
     width: fit-content;
     padding: 0px 15px;
-    margin-left: auto;
     background-color: white;
     border-radius: 10px;
     outline: 2px solid black;

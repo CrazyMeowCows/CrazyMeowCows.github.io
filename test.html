@@ -14,11 +14,15 @@
     </div>
     
     <!-- Timer -->
-    <div id="topDiv" style="display: flex;">
+    <div id="topDiv" style="display: flex; justify-content: center;">
         <div id="timerDiv">
             <p id="timer" style="margin-bottom: 0px; margin-top: 7px;"></p>
         </div>
+        <!-- <div id="asdas"> -->
+            <!-- <p id="timer" style="margin-bottom: 0px; margin-top: 7px;"></p> -->
+        <!-- </div> -->
         <button id="endEarly" onclick="promptSessionEnd()">End</button>
+        <button id="buffer" style="outline: 0px;"></button>
     </div>
 </div>
 
@@ -188,6 +192,7 @@ if (ENABLE_TIMER) {
     document.getElementById("timerDiv").style.display = "block"; //Display timer
     updateTimer(); //Display initialized time
     setInterval(decrementTimer, 1000); //Decrement timer every 1000ms (1 sec)
+    document.getElementById("buffer").style.display = "none";
 }
 
 
