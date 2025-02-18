@@ -120,9 +120,9 @@ button {
     position: absolute;
     top: 10px;
     right: 0px;
-    height: -webkit-calc(100% - 110px);
-    height:    -moz-calc(100% - 110px);
-    height:         calc(100% - 110px);
+    height: -webkit-calc(100vh - 110px);
+    height:    -moz-calc(100vh - 110px);
+    height:         calc(100vh - 110px);
     display: block;
 }
 .toggleButton {
