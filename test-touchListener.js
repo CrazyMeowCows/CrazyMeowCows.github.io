@@ -2,7 +2,6 @@
 figureCanvas.addEventListener("touchstart", e => {
     touches = e.touches;
     touch = touches[0];
-    console.log(touch);
     let touchX = touch.pageX; 
     let touchY = touch.pageY;
 
@@ -72,7 +71,7 @@ figureCanvas.addEventListener("touchstart", e => {
 })
 
 //TouchMove Listener-------------------------------------------------------------------------------
-canvasStack.addEventListener("touchmove", e => {
+figureCanvas.addEventListener("touchmove", e => {
     let touches = e.touches;
     let touch = touches[0];
     let touchX = touch.pageX; 
@@ -162,13 +161,13 @@ canvasStack.addEventListener("touchmove", e => {
 })
 
 //TouchEnd Listener--------------------------------------------------------------------------------
-canvasStack.addEventListener("touchend", e => { //Clear the Eraser Outline
+figureCanvas.addEventListener("touchend", e => { //Clear the Eraser Outline
     gridCtxRedraw();
     touchType = 0;
 });
 
 //Wheel Listener-----------------------------------------------------------------------------------
-canvasStack.addEventListener("wheel", e => { //TODO: REMOVE
+figureCanvas.addEventListener("wheel", e => { //TODO: REMOVE
     if (activePrompt) { //Any Prompt is Active
         return;
     }        

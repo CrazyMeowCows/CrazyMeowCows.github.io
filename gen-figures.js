@@ -22,6 +22,12 @@ function coordPair(innerX, innerY, outerX, outerY) {
 }
 
 //NOTE: This is the only place new figures need be added, figures take form: inner equation, outer equation
+new Figure("The Ring", 423406, -0.67, 0.67, 0.67*2, 0, Math.PI*2, (t) => {
+    return new EquationPair(
+        (1/sqrt(1.1*PI)),
+        (1-1/6*sin(t+PI)-1/300*sqr(cos(7*(t+PI/2-0.07)))*sin(22*(t+PI/2-0.07))*tan((t+PI/2-0.07)/2)-1/300*sqr(cos(7*(t+PI/2+0.07)))*sin(22*(t+PI/2+0.07))*tan((t+PI/2+0.07)/2)+sin(t+PI)/7.2)/sqrt(PI),
+    );
+});
 new Figure("The Shubi", 919087, 0, 1.4, 2.4, 0, Math.PI, (t) => {
     let a = 3/900*sqr(cos(7*(t+PI/2)))*sin(22*(t+PI/2))*tan((t+PI/2)/2);
     let b = 1/500*sqr(cos(7*(t+PI/2-.16)))*sin(22*(t+PI/2-0.16))*tan((t+PI/2-.16)/2);
