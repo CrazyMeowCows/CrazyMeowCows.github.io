@@ -156,26 +156,35 @@ button {
 
 <body>
 <!-- Canvas stack for background grid, drawing, and rendering the figure -->
-<canvas id="gridCanvas" width="0" height="0"></canvas>    
-<canvas id="drawCanvas" width="0" height="0"></canvas>    
-<canvas id="figureCanvas" width="0" height="0"></canvas>  
-
-<!-- Timer -->
-<div id="timerDiv">
-    <p id="timer" style="margin-bottom: 0px;"></p>
+<div id="main">
+    <div id="canvasStack">
+        <canvas id="gridCanvas"></canvas>    
+        <canvas id="drawCanvas"></canvas>    
+        <canvas id="figureCanvas"></canvas>
+    </div>
+    
+    <!-- Timer -->
+    <div id="topDiv">
+        <div id="timerDiv">
+            <p id="timer" style="margin-bottom: 0px; margin-top: 7px;"></p>
+        </div>
+        <button id="endEarly" onclick="promptSessionEnd()">End</button>
+    </div>
 </div>
 
-<!-- Buttons -->
-<button id="endEarly" onclick="promptSessionEnd()">End</button>
-<button class="ripple" id="resetZoom" onclick="zoomOut(true)"><i class="fa fa-compress"></i></button>
 
-<!-- Brush/Eraser Toggle -->
-<div id="toggleDiv">
-    <button class="toggleButton" id="brush" onclick="setBrush(DRAW_COLOR)"><i class="fa fa-pencil"></i></button>
-    <button class="toggleButton" id="eraser" onclick="setBrush(ERASE_COLOR)"><i class="fa fa-eraser"></i></button>
+
+<div id="sideDiv">
+    <!-- Buttons -->
+    <button class="ripple" id="resetZoom" onclick="zoomOut(true)"><i class="fa fa-compress"></i></button>
+
+    <!-- Brush/Eraser Toggle -->
+    <div id="toggleDiv">
+        <button class="toggleButton" id="brush" onclick="setBrush(DRAW_COLOR)"><i class="fa fa-pencil"></i></button>
+        <button class="toggleButton" id="eraser" onclick="setBrush(ERASE_COLOR)"><i class="fa fa-eraser"></i></button>
+    </div>
 </div>
 </body>
-
 
 <script src="gen-config.js"></script>
 <script src="gen-figures.js"></script>

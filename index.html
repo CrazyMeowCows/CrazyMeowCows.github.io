@@ -10,7 +10,7 @@ body {
     margin: 0px;
     padding: 0px;
     overflow: hidden;
-    display: block;
+    
     user-select: none;
     -webkit-user-select: none;
     -webkit-touch-callout: none;
@@ -24,13 +24,13 @@ p {
 }
 
 #main {
-    margin-top: 20vmin;
     display: flex;
     flex-direction: column; 
-    justify-content: center;    
+    justify-content: center;
     font-size: 2em;    
     padding: 0px 0px;
     text-align: center;
+    height: 90vh;
 }
 #vers {
     left: 10px;
@@ -99,6 +99,7 @@ button {
     <h1 id="title">Area Filling <br> Accuracy Evaluator</h1>
     <button class="navButton" onclick="location.href = 'test.html'">Practice</button>
     <button class="navButton" id="startTest" onclick="location.href = 'testBegin_auth.html'">Initiate Test</button>
+    <button class="navButton" id="info" onclick="location.href = 'info.html'">Info</button>
 </div>
 
 <button class="iconButton" onclick="location.href = 'settings_auth.html'"><i class="fa fa-cog"></i></button>
@@ -124,4 +125,7 @@ for (const [key, value] of Object.entries(defaultSettings)) {
     }
 };
 sessionStorage.isTest = JSON.stringify("false");
+
+//Enable or disable the info button
+if (JSON.parse(localStorage["infoButton"]) == "false") document.getElementById("info").style.display = "none";
 </script>
