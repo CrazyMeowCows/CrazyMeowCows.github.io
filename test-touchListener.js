@@ -1,8 +1,21 @@
+function correctTouches(touches) {
+    let cTouches = []
+    for (let i = 0; i < touches.length; i++) {
+        cTouches.push(new Touch(touches[i].pageX-touchXOffset, touches[i].pageY, touches[i].touchType))
+    }
+    return cTouches;
+}
+
+function Touch(pageX, pageY, touchType) {
+    this.pageX = pageX;
+    this.pageY = pageY;
+    this.touchType = touchType;
+}
+
 //TouchStart Listener------------------------------------------------------------------------------
 figureCanvas.addEventListener("touchstart", e => {
-    touches = e.touches;
+    touches = correctTouches(e.touches);
     touch = touches[0];
-    console.log(touch);
     let touchX = touch.pageX; 
     let touchY = touch.pageY;
 
@@ -72,8 +85,8 @@ figureCanvas.addEventListener("touchstart", e => {
 })
 
 //TouchMove Listener-------------------------------------------------------------------------------
-canvasStack.addEventListener("touchmove", e => {
-    let touches = e.touches;
+figureCanvas.addEventListener("touchmove", e => {
+    touches = correctTouches(e.touches);
     let touch = touches[0];
     let touchX = touch.pageX; 
     let touchY = touch.pageY;
@@ -162,13 +175,13 @@ canvasStack.addEventListener("touchmove", e => {
 })
 
 //TouchEnd Listener--------------------------------------------------------------------------------
-canvasStack.addEventListener("touchend", e => { //Clear the Eraser Outline
+figureCanvas.addEventListener("touchend", e => { //Clear the Eraser Outline
     gridCtxRedraw();
     touchType = 0;
 });
 
 //Wheel Listener-----------------------------------------------------------------------------------
-canvasStack.addEventListener("wheel", e => { //TODO: REMOVE
+figureCanvas.addEventListener("wheel", e => { //TODO: REMOVE
     if (activePrompt) { //Any Prompt is Active
         return;
     }        

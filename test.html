@@ -6,23 +6,17 @@
 <link rel="stylesheet" href="test_style.css">
 <body>
 <!-- Canvas stack for background grid, drawing, and rendering the figure -->
-<div id="main">
-    <div id="canvasStack">
-        <canvas id="gridCanvas"></canvas>    
-        <canvas id="drawCanvas"></canvas>    
-        <canvas id="figureCanvas"></canvas>
+<canvas id="gridCanvas"></canvas>    
+<canvas id="drawCanvas"></canvas>    
+<canvas id="figureCanvas"></canvas>
+
+<!-- Timer -->
+<div id="topDiv">
+    <div id="timerDiv">
+        <p id="timer" style="margin-bottom: 0px; margin-top: 7px;"></p>
     </div>
-    
-    <!-- Timer -->
-    <div id="topDiv">
-        <div id="timerDiv">
-            <p id="timer" style="margin-bottom: 0px; margin-top: 7px;"></p>
-        </div>
-        <button id="endEarly" onclick="promptSessionEnd()">End</button>
-    </div>
+    <button id="endEarly" onclick="promptSessionEnd()">End</button>
 </div>
-
-
 
 <div id="sideDiv">
     <!-- Buttons -->
@@ -95,7 +89,7 @@ var drawCtx = drawCanvas.getContext("2d", { willReadFrequently: false, aplha: fa
 var figureCanvas = document.getElementById('figureCanvas')
 var figureCtx = figureCanvas.getContext("2d", { willReadFrequently: false, aplha: false });
 
-let canvasCol = document.getElementsByTagName("canvas");
+var canvasCol = document.getElementsByTagName("canvas");
 for (let i = 0; i < canvasCol.length; i++) {
     canvasCol[i].width = W; canvasCol[i].height = H;
 }
@@ -125,6 +119,7 @@ var zoomGestureDist;
 var panX;
 var panY;
 var dynamicGridSize;
+var touchXOffset = 0;
 
 var timerSeconds = IS_TEST ? TEST_TIME_LIMIT_SEC : PRACTICE_TIME_LIMIT_SEC;
 
@@ -182,9 +177,9 @@ sessionStorage.isTest = JSON.stringify("false"); //Clear any previously set isTe
 
 mainRedraw(); //Draw main content
 
-if (IS_TEST) {
+// if (IS_TEST) {
     activatePrompt(handedness);
-}
+// }
 if (ENABLE_TIMER) {
     document.getElementById("timerDiv").style.display = "block"; //Display timer
     updateTimer(); //Display initialized time
@@ -239,7 +234,13 @@ function setHandedness(hand) {
     if (hand == "left") {
         sideDiv.style.left = "0px";
         sideDiv.style.right = "auto";
-        document.getElementById("main").style.left = "90px";
+
+        document.getElementById("topDiv").style.left = "90px";
+        for (let i = 0; i < canvasCol.length; i++) {
+            canvasCol[i].style.left = "90px";
+        }
+
+        touchXOffset = 90;
     }
 
     activatePrompt(beginTest);
