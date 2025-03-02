@@ -94,7 +94,7 @@ button {
     position: relative;
     background-color: #fefefe;
     margin: auto;
-    margin-top: 30vmin;
+    margin-top: 30vh;
     padding: 30px 30px;
     border: 2px solid black;
     border-radius: 10px;
@@ -157,7 +157,7 @@ button {
     right: 0;
     top: 0;
     width: 90px;
-    height: 100vmin;  
+    height: 100vh;  
     outline: 2px solid black;
 }
 #topDiv {
