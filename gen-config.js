@@ -7,7 +7,8 @@ const defaultSettings = {
     practiceTimerLengthMinutes: "5",
     practiceTimer: "false",
     practiceScore: "false",
-    practiceDrawMode: "finger"
+    practiceDrawMode: "finger",
+    infoButton: "true"
 }
 
 const COMP_TESTING = true; //Use for correct screen sizing on non-iOS devices
