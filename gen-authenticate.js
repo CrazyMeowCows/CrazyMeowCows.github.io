@@ -13,6 +13,6 @@ function authenticate (value) {
         return value == proctorPassword || value == document.getElementsByName("viewport")[0].id.split("|")[1]; //Return authentication
     } catch (error) {
         sessionStorage.isTest = JSON.stringify("false"); 
-        location.href = 'index.html'; //Crash website it passwords are not present
+        location.href = 'index.html'; //Send to home if passwords are not present
     }
 }

@@ -114,7 +114,7 @@ function figureCtxRedraw () {
 
     rads = getCoordsFromFigure(maxAngle, SCALE*zoom, offsetX, offsetY);
     innerPath.lineTo(rads.innerX, rads.innerY);
-    outerPath.lineTo(rads.outerX, rads.outerY);
+    outerPath.lineTo(rads.outerX, rads.outerY); 
 
     figureCtx.stroke(innerPath);
     figureCtx.stroke(outerPath);
