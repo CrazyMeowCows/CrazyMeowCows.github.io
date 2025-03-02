@@ -14,17 +14,15 @@
     </div>
     
     <!-- Timer -->
-    <div id="topDiv" style="display: flex; justify-content: center;">
+    <div id="topDiv">
         <div id="timerDiv">
             <p id="timer" style="margin-bottom: 0px; margin-top: 7px;"></p>
         </div>
-        <!-- <div id="asdas"> -->
-            <!-- <p id="timer" style="margin-bottom: 0px; margin-top: 7px;"></p> -->
-        <!-- </div> -->
         <button id="endEarly" onclick="promptSessionEnd()">End</button>
-        <button id="buffer" style="outline: 0px;"></button>
     </div>
 </div>
+
+
 
 <div id="sideDiv">
     <!-- Buttons -->
@@ -34,10 +32,9 @@
     <div id="toggleDiv">
         <button class="toggleButton" id="brush" onclick="setBrush(DRAW_COLOR)"><i class="fa fa-pencil"></i></button>
         <button class="toggleButton" id="eraser" onclick="setBrush(ERASE_COLOR)"><i class="fa fa-eraser"></i></button>
-        </div>
-    </body>
+    </div>
 </div>
-
+</body>
 
 <script src="gen-config.js"></script>
 <script src="gen-figures.js"></script>
@@ -192,7 +189,6 @@ if (ENABLE_TIMER) {
     document.getElementById("timerDiv").style.display = "block"; //Display timer
     updateTimer(); //Display initialized time
     setInterval(decrementTimer, 1000); //Decrement timer every 1000ms (1 sec)
-    document.getElementById("buffer").style.display = "none";
 }
 
 
