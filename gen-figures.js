@@ -22,7 +22,7 @@ function coordPair(innerX, innerY, outerX, outerY) {
 }
 
 //NOTE: This is the only place new figures need be added, figures take form: inner equation, outer equation
-new Figure("The Shubi", 997288, 0, 1.4, 2.4, 0, Math.PI, (t) => {
+new Figure("The Shubi", 1064152, 0, 1.4, 2.4, 0, Math.PI, (t) => {
     let a = 3/900*sqr(cos(7*(t+PI/2)))*sin(22*(t+PI/2))*tan((t+PI/2)/2);
     let b = 1/500*sqr(cos(7*(t+PI/2-.16)))*sin(22*(t+PI/2-0.16))*tan((t+PI/2-.16)/2);
     let c = 1/500*sqr(cos(7*(t+PI/2+.16)))*sin(22*(t+PI/2+0.16))*tan((t+PI/2+.16)/2);

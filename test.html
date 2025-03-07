@@ -12,12 +12,10 @@
 <canvas id="figureCanvas"></canvas>
 
 <!-- Timer -->
-<!-- <div id="topDiv"> -->
-    <div id="timerDiv">
-        <p id="timer" style="margin-bottom: 0px; margin-top: 7px;"></p>
-    </div>
-    <button id="endEarly" onclick="promptSessionEnd()">End</button>
-<!-- </div> -->
+<div id="timerDiv">
+    <p id="timer" style="margin-bottom: 0px; margin-top: 7px;"></p>
+</div>
+<button id="endEarly" onclick="promptSessionEnd()">End</button>
 
 <div id="sideDiv">
     <!-- Buttons -->
@@ -76,7 +74,7 @@ const Y_SCALE = (H/2-60)/(SELECTED_FIGURE.maxY-AVG_Y);
 const X_SCALE = (W/2-100)/(SELECTED_FIGURE.width/2);
 const SCALE = Math.min(X_SCALE, Y_SCALE);
 
-const SCORE_AREA_SIZE = 4000; //CANNOT EXCEED 4096px by 4096px DUE TO iOS/SAFARI LIMITATIONS
+const SCORE_AREA_SIZE = 4092; //CANNOT EXCEED 4096px by 4096px DUE TO iOS/SAFARI LIMITATIONS
 
 const BRUSH_SIZE = parseInt(JSON.parse(localStorage.brushSize))/768*SCALE;
 
