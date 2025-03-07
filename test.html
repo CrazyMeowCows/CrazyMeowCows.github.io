@@ -41,9 +41,9 @@
 const PI = Math.PI;
 const TAU = 2*Math.PI;
 
-var scale = 2;
-const W = COMP_TESTING ? (window.innerWidth-90)*scale : (screen.height-90)*scale;
-const H = COMP_TESTING ? (window.innerHeight)*scale : (screen.width)*scale;
+var scale = window.devicePixelRatio;
+const W = COMP_TESTING ? window.innerWidth-90 : screen.height-90;
+const H = COMP_TESTING ? window.innerHeight : screen.width;
 
 const GRID_SIZE = W/6;
 const RENDER_GRID = JSON.parse(localStorage.displayGrid) == "true";
@@ -92,11 +92,11 @@ var figureCtx = figureCanvas.getContext("2d", { willReadFrequently: false, aplha
 
 var canvasCol = document.getElementsByTagName("canvas");
 for (let i = 0; i < canvasCol.length; i++) {
-    canvasCol[i].style.width = W/scale; 
-    canvasCol[i].style.height = H/scale;   
+    canvasCol[i].style.width = `${W}px`;
+    canvasCol[i].style.height = `${H}px`;
 
-    canvasCol[i].width = W; 
-    canvasCol[i].height = H;
+    canvasCol[i].width = W*scale; 
+    canvasCol[i].height = H*scale;
 }
 
 gridCtx.scale(scale, scale);
