@@ -4,6 +4,7 @@
 <!-- Font Awesome by Dave Gandy - http://fontawesome.io -->    
 <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css">
 <link rel="stylesheet" href="test_style.css">
+
 <body>
 <!-- Canvas stack for background grid, drawing, and rendering the figure -->
 <canvas id="gridCanvas"></canvas>    
@@ -11,12 +12,12 @@
 <canvas id="figureCanvas"></canvas>
 
 <!-- Timer -->
-<div id="topDiv">
+<!-- <div id="topDiv"> -->
     <div id="timerDiv">
         <p id="timer" style="margin-bottom: 0px; margin-top: 7px;"></p>
     </div>
     <button id="endEarly" onclick="promptSessionEnd()">End</button>
-</div>
+<!-- </div> -->
 
 <div id="sideDiv">
     <!-- Buttons -->
@@ -186,9 +187,8 @@ sessionStorage.isTest = JSON.stringify("false"); //Clear any previously set isTe
 
 mainRedraw(); //Draw main content
 
-if (IS_TEST) {
-    activatePrompt(handedness);
-}
+activatePrompt(handedness); //Call handedness prompt
+
 if (ENABLE_TIMER) {
     document.getElementById("timerDiv").style.display = "block"; //Display timer
     updateTimer(); //Display initialized time
@@ -206,8 +206,8 @@ function mainRedraw() {
     oldGridSize = dynamicGridSize;
 
     //Limit panning
-    offsetX = clamp(offsetX, W-W*0.55*zoom, W*0.55*zoom);
-    offsetY = clamp(offsetY, H-H*0.55*zoom, H*0.55*zoom);
+    offsetX = clamp(offsetX, W-W*0.53*zoom, W*0.53*zoom);
+    offsetY = clamp(offsetY, H-H*0.53*zoom, H*0.53*zoom);
 
     //Call each canvas' redraw functions
     gridCtxRedraw();
@@ -238,17 +238,24 @@ setBrush(DRAW_COLOR); //Initialize to brush instead of eraser
 
 //Set handedness of user---------------------------------------------------------------------------
 function setHandedness(hand) {
-    let sideDiv = document.getElementById("sideDiv");
-
-    if (hand == "left") {
-        sideDiv.style.left = "0px";
-        sideDiv.style.right = "auto";
-
-        document.getElementById("topDiv").style.left = "90px";
+    if (hand == "right") {
+        //Handle all the canvas'
         for (let i = 0; i < canvasCol.length; i++) {
             canvasCol[i].style.left = "90px";
         }
 
+        //Handle sidebar UI
+        document.getElementById("sideDiv").style.left = "0px";
+        document.getElementById("sideDiv").style.right = "auto";
+
+        //Handle Timer and End Test Buttons
+        document.body.style.flexDirection = "row-reverse";
+        document.getElementById("timerDiv").style.marginLeft = "0px";
+        document.getElementById("timerDiv").style.marginRight = "90px";
+        document.getElementById("endEarly").style.marginLeft = "100px";
+        document.getElementById("endEarly").style.marginRight = "10px";
+
+        //Handle the touch offset
         touchXOffset = 90;
     }
 
@@ -324,7 +331,7 @@ function zoomOut(animate) {
 
 //Bump zoom out then back in
 function zoomOutAnimation(inc) {
-    zoom -= 0.007*Math.sign(10-inc);
+    zoom -= 0.005*Math.sign(10-inc);
     zoomX = offsetX;
     zoomY = H/2-offsetY;
     mainRedraw();
