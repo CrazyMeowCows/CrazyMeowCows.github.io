@@ -109,14 +109,13 @@ figureCanvas.addEventListener("touchmove", e => {
 //TouchEnd Listener--------------------------------------------------------------------------------
 figureCanvas.addEventListener("touchend", e => { //Clear the Eraser Outline
     gridCtxRedraw();
-    touchType = 0;
+    alert(currentStroke.x.length);
 });
 
 //Wheel Listener-----------------------------------------------------------------------------------
-figureCanvas.addEventListener("wheel", e => { //TODO: REMOVE
-    if (activePrompt) { //Any Prompt is Active
-        return;
-    }        
+figureCanvas.addEventListener("wheel", e => { //This is just for desktop testing
+    if (activePrompt) return; //Any Prompt is Active
+        
     zoom = clamp(zoom-e.deltaY*ZOOM_SENS*Math.abs(zoom)/2, 1, MAX_ZOOM);
 
     zoomX = e.pageX;
