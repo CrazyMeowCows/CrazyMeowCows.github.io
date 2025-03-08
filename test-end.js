@@ -31,31 +31,31 @@ function scoreFigure() {
     let figureScale = Math.min(xScale, yScale); //Scale of figure in scoring mode
     let drawToScoreScale = figureScale/SCALE; //Realtive size of scoring figure compared to drawing figure
 
-    let minAngle = SELECTED_FIGURE.minTheta;
-    let maxAngle = SELECTED_FIGURE.maxTheta;
-
     if (!SCORE_DEBUG) {drawCanvas.style.display = "none";}
-    // else {
-    //     drawCtx.strokeStyle = "black";
+    else {
+        let minAngle = SELECTED_FIGURE.minTheta;
+        let maxAngle = SELECTED_FIGURE.maxTheta;
+
+        drawCtx.strokeStyle = "black";
         
-    //     let thetaInc = (maxAngle-minAngle)/THETA_RESOLUTION_HIGH_LOD;
+        let thetaInc = (maxAngle-minAngle)/THETA_RESOLUTION_HIGH_LOD;
 
-    //     let innerPath = new Path2D();
-    //     let outerPath = new Path2D();
+        let innerPath = new Path2D();
+        let outerPath = new Path2D();
 
-    //     let rads = getCoordsFromFigure(minAngle, figureScale, SCORE_AREA_SIZE/2, SCORE_AREA_SIZE/2);
-    //     innerPath.moveTo(rads.innerX, rads.innerY);
-    //     outerPath.moveTo(rads.outerX, rads.outerY);
+        let rads = getCoordsFromFigure(minAngle, figureScale, SCORE_AREA_SIZE/2, SCORE_AREA_SIZE/2);
+        innerPath.moveTo(rads.innerX, rads.innerY);
+        outerPath.moveTo(rads.outerX, rads.outerY);
 
-    //     for (let theta = minAngle+thetaInc; theta <= maxAngle+0.01; theta += thetaInc) {
-    //         let rads = getCoordsFromFigure(theta, figureScale, SCORE_AREA_SIZE/2, SCORE_AREA_SIZE/2);
-    //         innerPath.lineTo(rads.innerX, rads.innerY);
-    //         outerPath.lineTo(rads.outerX, rads.outerY);
-    //     }
+        for (let theta = minAngle+thetaInc; theta <= maxAngle+0.01; theta += thetaInc) {
+            let rads = getCoordsFromFigure(theta, figureScale, SCORE_AREA_SIZE/2, SCORE_AREA_SIZE/2);
+            innerPath.lineTo(rads.innerX, rads.innerY);
+            outerPath.lineTo(rads.outerX, rads.outerY);
+        }
 
-    //     drawCtx.stroke(innerPath);
-    //     drawCtx.stroke(outerPath);
-    // }
+        drawCtx.stroke(innerPath);
+        drawCtx.stroke(outerPath);
+    }
 
     //Drawing strokes using one continuous line
     drawCtx.strokeStyle = "red";
@@ -79,7 +79,6 @@ function scoreFigure() {
 
     //Score strokes against figure 
     let scoreInc = 0;
-    let scoreDEC = 0;
     imgData = drawCtx.getImageData(0, 0, SCORE_AREA_SIZE, SCORE_AREA_SIZE);
     for (let i = 0; i < imgData.data.length; i += 4) {
         if (imgData.data[i] == 0 && !FIND_MAX_SCORE) { //Skip blank pixels
@@ -90,8 +89,8 @@ function scoreFigure() {
         let theta = -Math.atan2(y, x);
         let pixelR = Math.hypot(x, y);
         let figureCoords = getCoordsFromFigure(theta, figureScale, 0, -AVG_Y*figureScale);
-        let innerR = Math.floor(Math.hypot(figureCoords.innerX, -figureCoords.innerY));
-        let outerR = Math.ceil(Math.hypot(figureCoords.outerX, -figureCoords.outerY));
+        let innerR = Math.hypot(figureCoords.innerX, -figureCoords.innerY);
+        let outerR = Math.hypot(figureCoords.outerX, -figureCoords.outerY);
 
         if (pixelR >= innerR && pixelR <= outerR) {
             imgData.data[i+1] = 255;
@@ -100,7 +99,7 @@ function scoreFigure() {
         } else if (!FIND_MAX_SCORE){
             imgData.data[i+2] = 255;
             imgData.data[i+3] = 255;
-            scoreDEC--;
+            scoreInc--;
         }
         if (pixelR < 30 && SCORE_DEBUG) { //Show 0,0
             imgData.data[i+2] = 255;
@@ -109,10 +108,9 @@ function scoreFigure() {
     }
     drawCtx.putImageData(imgData, 0, 0);
 
-    // if (FIND_MAX_SCORE) { //Alert the max score
+    if (FIND_MAX_SCORE) { //Alert the max score
         alert(scoreInc);
-        alert(scoreDEC);
-    // }
+    }
     
     //Publish score to sessionStorage
     let score = Math.round(scoreInc/SELECTED_FIGURE.maxScore*100*10000)/10000 //Round to 4 decimal places
