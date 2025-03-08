@@ -82,6 +82,8 @@ figureCanvas.addEventListener("touchmove", e => {
 
         mainRedraw();
     } else if (touches.length >= 2) { //2 Finger Pan/Zoom
+        currentStroke = undefined;
+
         let centerX = (touches[0].pageX + touches[1].pageX)/2;
         let centerY = (touches[0].pageY + touches[1].pageY)/2;
 

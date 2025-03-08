@@ -149,6 +149,7 @@ function PenStroke (xStart, yStart, strokeColor) {
     lastStrokeY = yStart;
 }
 function extendCurrentStroke (rawX, rawY) {
+    if (currentStroke == undefined) return;
     currentStroke.x.push((rawX-offsetX)/zoom);
     currentStroke.y.push((rawY-offsetY)/zoom);
     lastStrokeX = rawX;
