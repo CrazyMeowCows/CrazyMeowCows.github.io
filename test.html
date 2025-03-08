@@ -141,8 +141,10 @@ var rightHanded = true;
 
 var strokes = [];
 function PenStroke (xStart, yStart, strokeColor) {
-    this.x = [Math.round((xStart-offsetX)/zoom)];
-    this.y = [Math.round((yStart-offsetY)/zoom)];
+    this.x = [(xStart-offsetX)/zoom];
+    this.y = [(yStart-offsetY)/zoom];
+    // this.x = [Math.round((xStart-offsetX)/zoom)];
+    // this.y = [Math.round((yStart-offsetY)/zoom)];
     this.brushSize = BRUSH_SIZE/zoom;
     this.strokeColor = strokeColor;
     lastStrokeX = xStart;
@@ -150,8 +152,10 @@ function PenStroke (xStart, yStart, strokeColor) {
 }
 function extendCurrentStroke (rawX, rawY) {
     if (currentStroke == undefined) return;
-    currentStroke.x.push(Math.round((rawX-offsetX)/zoom));
-    currentStroke.y.push(Math.round((rawY-offsetY)/zoom));
+    currentStroke.x.push((rawX-offsetX)/zoom);
+    currentStroke.y.push((rawY-offsetY)/zoom);
+    // currentStroke.x.push(Math.round((rawX-offsetX)/zoom));
+    // currentStroke.y.push(Math.round((rawY-offsetY)/zoom));
     lastStrokeX = rawX;
     lastStrokeY = rawY;
 }
