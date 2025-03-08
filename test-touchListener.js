@@ -109,7 +109,10 @@ figureCanvas.addEventListener("touchmove", e => {
 //TouchEnd Listener--------------------------------------------------------------------------------
 figureCanvas.addEventListener("touchend", e => { //Clear the Eraser Outline
     gridCtxRedraw();
-    alert(currentStroke.x[0]);
+    if (currentStroke != undefined) {
+        extendCurrentStroke(lastStrokeX, lastStrokeY);
+    }
+    alert(currentStroke.x.length);
 });
 
 //Wheel Listener-----------------------------------------------------------------------------------
