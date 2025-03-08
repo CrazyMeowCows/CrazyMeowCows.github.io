@@ -24,7 +24,7 @@ function scoreFigure() {
     drawCanvas.width = SCORE_AREA_SIZE; 
     drawCanvas.height = SCORE_AREA_SIZE;
 
-    drawCtx.clearRect(0, 0, SCORE_AREA_SIZE, SCORE_AREA_SIZE);
+    drawCtx.clearRect(0, 0, SCORE_AREA_SIZE, SCORE_AREA_SIZE); //Should be wiped by canvas resize but cant be too safe
 
     let yScale = (SCORE_AREA_SIZE/2-500)/(SELECTED_FIGURE.maxY-AVG_Y);
     let xScale = (SCORE_AREA_SIZE/2-500)/(SELECTED_FIGURE.width/2);

@@ -19,7 +19,7 @@ canvas {
     position: absolute;
     top: 0px;
     left: 0px;
-    image-rendering: auto;
+    /* image-rendering: auto; */
 }
 
 
