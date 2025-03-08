@@ -23,11 +23,11 @@ figureCanvas.addEventListener("touchstart", e => {
     if (activePrompt) return; //Any Prompt is Active
 
     if ((DRAW_W_FINGER && touches.length == 1) || touch.touchType == "stylus") { //Single finger/stylus draw
-        currentStroke = new PenStroke(touch.pageX, touch.pageY, brushColor);
-        strokes.push(currentStroke);
-
+        currentStroke = new PenStroke(touch.pageX, touch.pageY, brushColor); //Creates a stroke in limbo
+        
         drawCtx.fillStyle = brushColor;
         drawCtx.strokeStyle = brushColor;
+
         if (brushColor == ERASE_COLOR) {
             drawCtx.globalCompositeOperation = "destination-out";
             gridCtx.lineWidth = 1.5;
@@ -35,8 +35,6 @@ figureCanvas.addEventListener("touchstart", e => {
         } else {
             drawCtx.globalCompositeOperation = "source-over";
         }
-
-        circle(touch.pageX, touch.pageY, BRUSH_SIZE, true, drawCtx);
     } else if ((touches.length == 1 && !DRAW_W_FINGER)) { //Single Finger Pan
         panX = touch.pageX;
         panY = touch.pageY;
@@ -64,6 +62,10 @@ figureCanvas.addEventListener("touchmove", e => {
 
     if ((DRAW_W_FINGER && touches.length == 1) || touch.touchType == "stylus") { //Single finger/stylus draw
         if (currentStroke == undefined) return; //Trying to draw but no currentStroke
+        if (!strokes.includes(currentStroke)) {
+            strokes.push(currentStroke); //Store currentStroke if its still in limbo
+            circle(lastStrokeX, lastStrokeY, BRUSH_SIZE, true, drawCtx);
+        }
             
         gridCtxRedraw();
         
@@ -109,9 +111,9 @@ figureCanvas.addEventListener("touchmove", e => {
 //TouchEnd Listener--------------------------------------------------------------------------------
 figureCanvas.addEventListener("touchend", e => { //Clear the Eraser Outline
     gridCtxRedraw();
-    if (currentStroke != undefined) {
-        // extendCurrentStroke(lastStrokeX, lastStrokeY);
-        // alert(currentStroke.y[0]);
+    if (!strokes.includes(currentStroke)) {
+        strokes.push(currentStroke); //Store currentStroke if its still in limbo
+        circle(lastStrokeX, lastStrokeY, BRUSH_SIZE, true, drawCtx);
     }
 });
 
