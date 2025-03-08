@@ -51,6 +51,11 @@ function drawCtxRedraw() {
         }
         drawCtx.strokeStyle = stroke.strokeColor;
         drawCtx.lineWidth = stroke.brushSize*zoom*2;
+
+        if (stroke.x.length == 1) { //TEST
+            circle(stroke.x[0]*zoom+offsetX, stroke.y[0]*zoom+offsetY, stroke.brushSize*zoom, true, drawCtx)
+        }
+
         drawCtx.beginPath();
         drawCtx.moveTo(stroke.x[0]*zoom+offsetX, stroke.y[0]*zoom+offsetY)
         for (let i = 0; i < stroke.x.length; i++) {
