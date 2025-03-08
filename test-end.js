@@ -59,6 +59,7 @@ function scoreFigure() {
 
     //Drawing strokes using one continuous line
     drawCtx.strokeStyle = "red";
+    drawCtx.fillStyle = "red";
     drawCtx.lineCap = "round";
     drawCtx.lineJoin = "round";
 
