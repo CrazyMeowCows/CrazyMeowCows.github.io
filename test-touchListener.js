@@ -111,7 +111,7 @@ figureCanvas.addEventListener("touchmove", e => {
 //TouchEnd Listener--------------------------------------------------------------------------------
 figureCanvas.addEventListener("touchend", e => { //Clear the Eraser Outline
     gridCtxRedraw();
-    if (!strokes.includes(currentStroke)) {
+    if (!strokes.includes(currentStroke) && currentStroke != undefined) {
         strokes.push(currentStroke); //Store currentStroke if its still in limbo
         circle(lastStrokeX, lastStrokeY, BRUSH_SIZE, true, drawCtx);
     }
