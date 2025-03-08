@@ -12,7 +12,8 @@ function Touch(pageX, pageY, touchType) {
     this.touchType = touchType;
 }
 
-figureCanvas.addEventListener('touchstart', (e) => e.preventDefault(), { passive: false });
+figureCanvas.addEventListener('touchstart', (e) => e.preventDefault(), { passive: false }); //Supress double tap to magnify
+let lastZoomed = false;
 
 //TouchStart Listener------------------------------------------------------------------------------
 figureCanvas.addEventListener("touchstart", e => {
@@ -74,8 +75,11 @@ figureCanvas.addEventListener("touchmove", e => {
             circle(touchX, touchY, BRUSH_SIZE, false, gridCtx);
         }
     } else if ((touches.length == 1 && !DRAW_W_FINGER)) { //Single Finger Pan
-        offsetX += touchX-panX;
-        offsetY += touchY-panY;
+        if (!lastZoomed) {
+            offsetX += touchX-panX;
+            offsetY += touchY-panY;
+        }
+        lastZoomed = false;
 
         panX = touchX;
         panY = touchY;
@@ -83,6 +87,7 @@ figureCanvas.addEventListener("touchmove", e => {
         mainRedraw();
     } else if (touches.length >= 2) { //2 Finger Pan/Zoom
         currentStroke = undefined;
+        lastZoomed = true;
 
         let centerX = (touches[0].pageX + touches[1].pageX)/2;
         let centerY = (touches[0].pageY + touches[1].pageY)/2;
