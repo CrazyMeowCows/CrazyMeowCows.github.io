@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+
+<input id="fileReader" type="file" onchange="onFileSelected(event)">
+<p id="output"></p>
+
+<canvas id="canvas" hidden="true"></canvas>
+
+
+<script>
+var canvas = /** @type {HTMLCanvasElement} */ (document.querySelector('#canvas'));
+var ctx = canvas.getContext("2d");
+
+var output = document.getElementById("output");
+output.setAttribute('style', 'white-space: pre;'); //Respect \n (line return) charecters when diplaying the output
+
+
+var fileReader = document.getElementById("fileReader");
+function onFileSelected(event) {
+    var selectedFile = event.target.files[0];
+    var reader = new FileReader();
+
+    reader.onload = function(event) {
+        decodeImage(event.target.result)
+    };
+
+    reader.readAsDataURL(selectedFile);
+}
+
+
+function decodeImage(src) {
+    let image = new Image();
+    image.src = src;
+    
+    if(image.width == 0) { //Wait until image is fully loaded
+        console.log("Loading...");
+        setTimeout(() => {decodeImage(src)}, 10);
+        return;
+    }
+
+    console.log("Loaded!");
+
+    canvas.width = image.width;
+    canvas.height = image.height;
+    ctx.drawImage(image, 0, 0); //Draw the image onto a canvas
+    
+    let imgData = ctx.getImageData(0, 0, image.width, image.height); //Grab pixel data off of canvas
+
+    let text = "";
+    for(let i = 0; i < imgData.data.length; i++) {
+        if ((i+1) % 4 == 0) continue; //Skip alpha channel
+        text = text + String.fromCharCode(imgData.data[i]);
+    }
+
+    output.innerHTML = text; //Display output to html element
+}
+</script>

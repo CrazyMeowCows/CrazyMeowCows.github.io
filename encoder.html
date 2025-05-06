@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+
+<textarea id="textEntry" >Enter your text to encode here!</textarea>
+<canvas id="canvas"></canvas>
+
+<style>
+    canvas{
+        image-rendering: crisp-edges;
+        width: 90vh;
+        height: 90vh;
+    }
+    textarea {
+        width: 90vh;
+        height: 90vh;
+    }
+</style>
+
+
+<script>
+var canvas = /** @type {HTMLCanvasElement} */ (document.querySelector('#canvas'));
+var ctx = canvas.getContext("2d");
+
+
+function encodeText(text) {
+    if(text.length <= 0) return; //Don't create an encoding for empty text box
+
+    let imgSize = Math.ceil(Math.sqrt(text.length/3));
+
+    //Create an empty imgData object of the appropriate size
+    canvas.width = imgSize;
+    canvas.height = imgSize;
+    let imgData = ctx.createImageData(imgSize, imgSize);
+
+    //Loop over the imgData and encode charecters into it 
+    for(let i = 0; i < imgData.data.length; i+=3) {
+        let offset = i/3; //Offset represents all the alpha channels that are being skipped
+        imgData.data[i+0+offset] = getCharCode(text, i+0); //Red
+        imgData.data[i+1+offset] = getCharCode(text, i+1); //Green
+        imgData.data[i+2+offset] = getCharCode(text, i+2); //Blue
+        imgData.data[i+3+offset] = 255; //Alpha (Transparency)
+    }
+
+    ctx.putImageData(imgData, 0, 0); //Draw the encoded image onto the canvas
+}
+setInterval(() => {encodeText(textEntry.value)}, 100); //Constantly update the image, it looks cool
+
+
+function getCharCode(text, index) {
+    if (index >= text.length) return 0; //Protect against NaN charecter values when out of bounds
+    return text.charCodeAt(index);
+}
+</script>
