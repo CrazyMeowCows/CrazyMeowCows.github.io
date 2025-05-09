@@ -1,25 +1,40 @@
 <!DOCTYPE html>
 
-<textarea id="textEntry" >Enter your text to encode here!</textarea>
-<canvas id="canvas"></canvas>
+<link rel="stylesheet" href="navBar.css">
 
 <style>
     canvas{
         image-rendering: crisp-edges;
-        width: 90vh;
-        height: 90vh;
+        width: 50%;
+        height: 50%;
     }
     textarea {
-        width: 90vh;
-        height: 90vh;
+        width: 50%;
+        resize: none;
     }
 </style>
 
+<body>
+<div class="page" id="encodePage" flex-direction="row" justify-content="center">
+    <textarea id="textEntry" ></textarea>
+    <canvas id="encodeCanvas"></canvas>
+</div>
 
+<!-- Setup the navbar on the side with all the settings pages -->
+<div class="navbar">
+    <a id="encodeNav" onclick="changePage('encoder');" style="background-color: #383838;">Encode</a>
+    <a id="decodeNav" onclick="changePage('decoder');">Decode</a>
+</div>
+</body>
+
+
+<script src="navBar.js"></script>
 <script>
-var canvas = /** @type {HTMLCanvasElement} */ (document.querySelector('#canvas'));
+var canvas = /** @type {HTMLCanvasElement} */ (document.querySelector('#encodeCanvas'));
 var ctx = canvas.getContext("2d");
 
+var textEntry = document.getElementById("textEntry");
+textEntry.value = "Enter your text to encode here!";
 
 function encodeText(text) {
     if(text.length <= 0) return; //Don't create an encoding for empty text box
@@ -48,5 +63,18 @@ setInterval(() => {encodeText(textEntry.value)}, 100); //Constantly update the i
 function getCharCode(text, index) {
     if (index >= text.length) return 0; //Protect against NaN charecter values when out of bounds
     return text.charCodeAt(index);
+}
+
+
+pages = document.getElementsByClassName("page"); //array of all settings pages
+for (let i = 0; i < pages.length; i++) {
+    let page = pages[i];
+    if (page.id == destination) { //Show the destination page and highlight that sidebar
+        page.style.display = "flex";
+        document.getElementById(page.id+"Nav").style.backgroundColor = "#383838";
+    } else { //Hide the non-destination pages and un-highlight those sidebars
+        page.style.display = "none";
+        document.getElementById(page.id+"Nav").style.backgroundColor = "#00000000";
+    }
 }
 </script>

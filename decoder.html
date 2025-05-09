@@ -1,17 +1,37 @@
 <!DOCTYPE html>
 
-<input id="fileReader" type="file" onchange="onFileSelected(event)">
-<p id="output"></p>
+<link rel="stylesheet" href="navBar.css">
 
-<canvas id="canvas" hidden="true"></canvas>
+<style>
+    #output {
+        white-space: pre-wrap;
+    }
+    input {
+        margin-left: 0px;
+    }
+</style>
+
+<body>
+    <div class="page" id="encodePage" flex-direction="row" justify-content="flex-start">
+        <canvas id="canvas" hidden="true"></canvas>
+        <input id="fileReader" type="file" onchange="onFileSelected(event)">
+        <p id="output" width="100%"></p>
+    </div>
+    
+    <!-- Setup the navbar on the side with all the settings pages -->
+    <div class="navbar">
+        <a id="encodeNav" onclick="changePage('encoder');">Encode</a>
+        <a id="decodeNav" onclick="changePage('decoder');" style="background-color: #383838;">Decode</a>
+    </div>
+</body>
 
 
+<script src="navBar.js"></script>
 <script>
 var canvas = /** @type {HTMLCanvasElement} */ (document.querySelector('#canvas'));
 var ctx = canvas.getContext("2d");
 
 var output = document.getElementById("output");
-output.setAttribute('style', 'white-space: pre;'); //Respect \n (line return) charecters when diplaying the output
 
 
 var fileReader = document.getElementById("fileReader");
