@@ -1,5 +1,5 @@
 function changePage(destination) {
     if (destination == "encoder") destination = "index";
-    console.log(destination);
+    alert(destination);
     location.href = destination + ".html"
 }
